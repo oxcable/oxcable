@@ -5,4 +5,4 @@ authors = ["Michael Nye <thenyeguy@gmail.com>"]
 
 [lib]
 name = "oxcable"
-path = "src/oxcable/lib.rs"
+path = "src/oxcable.rs"
