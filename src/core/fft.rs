@@ -1,3 +1,11 @@
+//! Efficient fast Fourier transform computation.
+//!
+//! A `Transformer` must first be created that stores precomputed information to
+//! speed up the transform. A `Transformer` can only perform FFTs of the chosen
+//! size.
+
+#![stable]
+
 use std::f64::consts::PI;
 use std::num::next_power_of_two;
 use std::vec::Vec;
@@ -5,9 +13,8 @@ use std::vec::Vec;
 use core::complex::Complex;
 
 
-/// Performs Discrete Fourier Transforms of a fixed size.
-///
-/// 
+#[stable]
+/// A container for precomputed values to perform FFTs of a fixed size.
 pub struct Transformer {
     size: uint,
     bit_reverses: Vec<uint>,
@@ -15,16 +22,19 @@ pub struct Transformer {
 }
 
 impl Transformer {
+    #[stable]
+    /// Returns a set precomputed information used to perform FFTs of the
+    /// provided size.
     pub fn new(size: uint) -> Transformer {
-        // Populate the bit reverses
-        // Uses bit shift because we only use the lower log2(size) bits to
-        // express the index, and these get shoved into the upper bits of the
-        // reverse
+        // Only operate in powers of two
         let bufsize = next_power_of_two(size);
+
+        // Populate the bit reverses
+        // We only use the lower log2(size) bits to express the index
         let mut bit_reverses = Vec::with_capacity(bufsize);
         for i in range(0, size) {
-            bit_reverses.push((bit_reverse(i as u32) as uint) >> 
-                              (32-int_log(bufsize as u32) as uint));
+            let br = bit_reverse(i as u32, int_log(bufsize as u32));
+            bit_reverses.push(br as uint);
         }
 
         // Populate the twiddle factors w_n^i
@@ -39,20 +49,46 @@ impl Transformer {
             twiddles: twiddles }
     }
 
+    #[stable]
+    /// Returns the size FFTs this Transformer performs
     pub fn get_size(&self) -> uint {
         self.size
     }
 
+    #[stable]
+    /// Performs an FFT on `input`, and places the result in `output`.
+    ///
+    /// The input is zero padded if less than `size` samples are provided, and
+    /// truncated if more than `size` samples are provided.
+    ///
+    /// Returns `Error` if `output` is too small to hold the result.
     pub fn fft(&self, input: &Vec<Complex>, output: &mut Vec<Complex>) -> 
         Result<(),()> {
         self.transform(input, output, false)
     }
 
+    #[stable]
+    /// Performs an inverse FFT on `input`, and places the result in `output`.
+    ///
+    /// The input is zero padded if less than `size` samples are provided, and
+    /// truncated if more than `size` samples are provided.
+    ///
+    /// Returns `Error` if `output` is too small to hold the result.
     pub fn ifft(&self, input: &Vec<Complex>, output: &mut Vec<Complex>) ->
         Result<(),()> {
         self.transform(input, output, true)
     }
 
+    /// Performs a transform on `input`, placing the result in `output`.
+    /// 
+    /// This function performs both forward and backwards transforms, since
+    /// there are only minor algorithmic differences in the beginning and end
+    /// of transformation.
+    ///
+    /// The input is zero padded if less than `size` samples are provided, and
+    /// truncated if more than `size` samples are provided.
+    ///
+    /// Returns `Error` if `output` is too small to hold the result.
     fn transform(&self, input: &Vec<Complex>, output: &mut Vec<Complex>,
                      inverse: bool) -> Result<(),()> {
         // Verify the provided vector is big enough for the result
@@ -110,16 +146,21 @@ impl Transformer {
 }
 
 
-fn bit_reverse(n: u32) -> u32 {
+/// Returns the bit reverse of `n`, for the lower `bits` bits.
+///
+/// For small examples, the bit reverse of 0b00011010 is 0b01011000, but the bit
+/// reverse of just the lower 5 bits is 0b00001011.
+fn bit_reverse(n: u32, bits: u32) -> u32 {
     let mut i = n;
     i = (i >> 16) | (i << 16);
     i = ((i & 0xFF00FF00) >> 8) | ((i & 0x00FF00FF) << 8);
     i = ((i & 0xF0F0F0F0) >> 4) | ((i & 0x0F0F0F0F) << 4);
     i = ((i & 0xCCCCCCCC) >> 2) | ((i & 0x33333333) << 2);
     i = ((i & 0xAAAAAAAA) >> 1) | ((i & 0x55555555) << 1);
-    i
+    i >> ((32 - bits) as uint)
 }
 
+/// Returns the log base 2 of n, rounded up.
 fn int_log(n: u32) -> u32 {
     let mut i = n-1; // correct for exact powers of 2
     let mut res = 0;
@@ -155,11 +196,13 @@ mod test {
     #[test]
     /// Tests bit_reverse.
     fn test_bit_reverse() {
-        assert!(bit_reverse(0x00000000) == 0x00000000);
-        assert!(bit_reverse(0xFFFFFFFF) == 0xFFFFFFFF);
-        assert!(bit_reverse(0x00000001) == 0x80000000);
-        assert!(bit_reverse(0x11111111) == 0x88888888);
-        assert!(bit_reverse(0x234f9e01) == 0x8079f2c4); //random
+        assert!(bit_reverse(0x00000000, 32) == 0x00000000);
+        assert!(bit_reverse(0xFFFFFFFF, 32) == 0xFFFFFFFF);
+        assert!(bit_reverse(0x00000001, 32) == 0x80000000);
+        assert!(bit_reverse(0x11111111, 32) == 0x88888888);
+        assert!(bit_reverse(0x234f9e01, 32) == 0x8079f2c4); //random
+        assert!(bit_reverse(0x00000001, 4) == 0x00000008);
+        assert!(bit_reverse(0x0000000F, 4) == 0x0000000F);
     }
 
     #[test]
