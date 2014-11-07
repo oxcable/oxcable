@@ -181,7 +181,7 @@ mod test {
     use super::{Transformer, int_log, bit_reverse};
 
     #[test]
-    /// Tests int_log a few edge cases
+    /// Tests int_log with many values
     fn test_int_log() {
         assert!(int_log(1) == 0);
         assert!(int_log(2) == 1);

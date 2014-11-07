@@ -45,12 +45,12 @@ impl OutputChannelArray {
     }
 
     /// Attempts to get the sample from time `t` in channel `i`.
-    pub fn get_value(&self, i: uint, t: Time) -> Option<Sample> {
+    pub fn get_sample(&self, i: uint, t: Time) -> Option<Sample> {
         self.chs[i].borrow_mut().get(t)
     }
 
     /// Pushes the next sample to channel `i`.
-    pub fn push_value(&self, i: uint, s: Sample) {
+    pub fn push_sample(&self, i: uint, s: Sample) {
         self.chs[i].borrow_mut().push(s);
     }
 }
@@ -89,7 +89,7 @@ impl InputChannelArray {
     ///
     /// Returns `None` if either channel `i` is empty, or if channel `i` could
     /// not return the sample for time `t`.
-    pub fn get_value(&self, i: uint, t: Time) -> Option<Sample> {
+    pub fn get_sample(&self, i: uint, t: Time) -> Option<Sample> {
         match self.chs[i] {
             Some(ref ch) => ch.borrow().get(t),
             None => None
