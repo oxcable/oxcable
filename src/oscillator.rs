@@ -162,11 +162,8 @@ fn poly_belp_offset(t: f32, dt: f32) -> f32 {
 // A couple of basic unit tests...
 #[cfg(test)]
 mod test {
-    /// Compares floating point numbers for equality
-    fn flt_eq(f1: f32, f2: f32) -> bool {
-        let epsilon = 1e-6;
-        f1 - f2 < epsilon
-    }
+    use core::util::flt_eq;
+    static EPSILON: f32 = 1e-6;
 
     /// Tests fmod with many values
     #[test]
@@ -174,27 +171,27 @@ mod test {
         use super::fmod;
 
         // negatives...
-        assert!(flt_eq(fmod(-1.5, 1.0), 0.5));
-        assert!(flt_eq(fmod(-1.0, 1.0), 0.0));
-        assert!(flt_eq(fmod(-0.5, 1.0), 0.5));
+        assert!(flt_eq(fmod(-1.5, 1.0), 0.5, EPSILON));
+        assert!(flt_eq(fmod(-1.0, 1.0), 0.0, EPSILON));
+        assert!(flt_eq(fmod(-0.5, 1.0), 0.5, EPSILON));
 
         // in range...
-        assert!(flt_eq(fmod(0.0, 1.0), 0.0));
-        assert!(flt_eq(fmod(0.5, 1.0), 0.5));
-        assert!(flt_eq(fmod(0.9, 1.0), 0.9));
+        assert!(flt_eq(fmod(0.0, 1.0), 0.0, EPSILON));
+        assert!(flt_eq(fmod(0.5, 1.0), 0.5, EPSILON));
+        assert!(flt_eq(fmod(0.9, 1.0), 0.9, EPSILON));
 
         // above...
-        assert!(flt_eq(fmod(1.0, 1.0), 0.0));
-        assert!(flt_eq(fmod(1.5, 1.0), 0.5));
-        assert!(flt_eq(fmod(2.0, 1.0), 0.0));
-        assert!(flt_eq(fmod(2.5, 1.0), 0.5));
+        assert!(flt_eq(fmod(1.0, 1.0), 0.0, EPSILON));
+        assert!(flt_eq(fmod(1.5, 1.0), 0.5, EPSILON));
+        assert!(flt_eq(fmod(2.0, 1.0), 0.0, EPSILON));
+        assert!(flt_eq(fmod(2.5, 1.0), 0.5, EPSILON));
 
         // different base...
-        assert!(flt_eq(fmod(-0.5, 0.9), 0.4));
-        assert!(flt_eq(fmod(0.0, 0.9), 0.0));
-        assert!(flt_eq(fmod(0.5, 0.9), 0.5));
-        assert!(flt_eq(fmod(0.9, 0.9), 0.0));
-        assert!(flt_eq(fmod(1.0, 0.9), 0.1));
+        assert!(flt_eq(fmod(-0.5, 0.9), 0.4, EPSILON));
+        assert!(flt_eq(fmod(0.0, 0.9), 0.0, EPSILON));
+        assert!(flt_eq(fmod(0.5, 0.9), 0.5, EPSILON));
+        assert!(flt_eq(fmod(0.9, 0.9), 0.0, EPSILON));
+        assert!(flt_eq(fmod(1.0, 0.9), 0.1, EPSILON));
     }
 
     /// Tests square wave
@@ -222,14 +219,23 @@ mod test {
         use core::AudioDevice;
         let mut osc = Oscillator::new(super::Saw(super::Aliased), 4410.0);
 
-        osc.tick(1); assert!(flt_eq(osc.output.get_sample(0, 1).unwrap(), -0.8));
-        osc.tick(2); assert!(flt_eq(osc.output.get_sample(0, 2).unwrap(), -0.6));
-        osc.tick(3); assert!(flt_eq(osc.output.get_sample(0, 3).unwrap(), -0.4));
-        osc.tick(4); assert!(flt_eq(osc.output.get_sample(0, 4).unwrap(), -0.2));
-        osc.tick(5); assert!(flt_eq(osc.output.get_sample(0, 5).unwrap(), 0.0));
-        osc.tick(6); assert!(flt_eq(osc.output.get_sample(0, 6).unwrap(), 0.2));
-        osc.tick(7); assert!(flt_eq(osc.output.get_sample(0, 7).unwrap(), 0.4));
-        osc.tick(8); assert!(flt_eq(osc.output.get_sample(0, 8).unwrap(), 0.6));
-        osc.tick(9); assert!(flt_eq(osc.output.get_sample(0, 9).unwrap(), 0.8));
+        osc.tick(1); assert!(flt_eq(osc.output.get_sample(0, 1).unwrap(), 
+                                    -0.8, EPSILON));
+        osc.tick(2); assert!(flt_eq(osc.output.get_sample(0, 2).unwrap(),
+                                    -0.6, EPSILON));
+        osc.tick(3); assert!(flt_eq(osc.output.get_sample(0, 3).unwrap(),
+                                    -0.4, EPSILON));
+        osc.tick(4); assert!(flt_eq(osc.output.get_sample(0, 4).unwrap(),
+                                    -0.2, EPSILON));
+        osc.tick(5); assert!(flt_eq(osc.output.get_sample(0, 5).unwrap(),
+                                    0.0, EPSILON));
+        osc.tick(6); assert!(flt_eq(osc.output.get_sample(0, 6).unwrap(),
+                                    0.2, EPSILON));
+        osc.tick(7); assert!(flt_eq(osc.output.get_sample(0, 7).unwrap(),
+                                    0.4, EPSILON));
+        osc.tick(8); assert!(flt_eq(osc.output.get_sample(0, 8).unwrap(),
+                                    0.6, EPSILON));
+        osc.tick(9); assert!(flt_eq(osc.output.get_sample(0, 9).unwrap(),
+                                    0.8, EPSILON));
     }
 }

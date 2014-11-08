@@ -12,6 +12,7 @@ pub type Time   = u64;
 pub mod channel;
 pub mod complex;
 pub mod fft;
+pub mod util;
 
 /// An interface for a synchronous audio device
 #[experimental]
