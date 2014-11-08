@@ -1,7 +1,6 @@
 //! Reads input from a microphone and mirrors it to a speaker ad nauseum.
 
 extern crate oxcable;
-extern crate portaudio;
 
 #[cfg(not(test))]
 fn main() {
