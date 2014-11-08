@@ -38,6 +38,11 @@ impl OutputChannelArray {
         }
         OutputChannelArray { chs: chs }
     }
+    
+    /// Returns the number of output channels
+    pub fn get_num_channels(&self) -> uint {
+        self.chs.len()
+    }
 
     /// Returns a reference to channel `i`.
     pub fn get_channel(&self, i: uint) -> ChannelRef {
@@ -73,6 +78,11 @@ impl InputChannelArray {
             chs.push(None);
         }
         InputChannelArray { chs: chs }
+    }
+
+    /// Returns the number of input channels
+    pub fn get_num_channels(&self) -> uint {
+        self.chs.len()
     }
 
     /// Sets channel `i` to read from `channel`.

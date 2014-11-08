@@ -11,22 +11,22 @@ use std::fmt;
 #[unstable="operator overloads in rust are not yet stable"]
 /// A complex number, stored to in rectangular form to 64-bit precision.
 pub struct Complex {
-    r: f64,
-    i: f64,
+    r: f32,
+    i: f32,
 }
 
 #[stable]
 impl Complex {
     #[stable]
     /// Returns a complex number with real part `r` and imaginary part `i`.
-    pub fn new(r: f64, i: f64) -> Complex {
+    pub fn new(r: f32, i: f32) -> Complex {
         Complex { r: r, i: i }
     }
 
     #[stable]
     /// Returns a complex number with real part `r` and zero imaginary part.
-    pub fn from_real(r: f64) -> Complex {
-        Complex { r: r, i: 0f64 }
+    pub fn from_real(r: f32) -> Complex {
+        Complex { r: r, i: 0f32 }
     }
 
     #[stable]
@@ -37,13 +37,13 @@ impl Complex {
 
     #[stable]
     /// Returns the real part.
-    pub fn real(&self) -> f64 {
+    pub fn real(&self) -> f32 {
         self.r
     }
 
     #[stable]
     /// Returns the imaginary part.
-    pub fn imag(&self) -> f64 {
+    pub fn imag(&self) -> f32 {
         self.i
     }
 
@@ -55,13 +55,13 @@ impl Complex {
 
     #[stable]
     /// Returns the absolute value.
-    pub fn abs(&self) -> f64 {
+    pub fn abs(&self) -> f32 {
         (self.r*self.r + self.i*self.i).sqrt()
     }
 
     #[stable]
     /// Multiplies the complex number by the scalar `s`.
-    pub fn scale(&self, s: f64) -> Complex {
+    pub fn scale(&self, s: f32) -> Complex {
         Complex { r: self.r*s, i: self.i*s }
     }
 

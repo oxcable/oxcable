@@ -6,7 +6,7 @@
 
 #![stable]
 
-use std::f64::consts::PI;
+use std::f32::consts::PI;
 use std::num::next_power_of_two;
 use std::vec::Vec;
 
@@ -40,9 +40,9 @@ impl Transformer {
         // Populate the twiddle factors w_n^i
         // w_n = exp(-j*2*pi*n/N)
         let mut twiddles = Vec::with_capacity(bufsize);
-        let exponent = Complex::new(0.0, -2.0*PI/(bufsize as f64));
+        let exponent = Complex::new(0.0, -2.0*PI/(bufsize as f32));
         for i in range(0, bufsize) {
-            twiddles.push(exponent.scale(i as f64).exp());
+            twiddles.push(exponent.scale(i as f32).exp());
         }
 
         Transformer { size: bufsize, bit_reverses: bit_reverses, 
@@ -137,7 +137,7 @@ impl Transformer {
         // If we are inverse transforming, conjugate and normalize the output
         if inverse {
             for i in range(0, self.size) {
-                output[i] = output[i].conj().scale(1.0/(self.size as f64));
+                output[i] = output[i].conj().scale(1.0/(self.size as f32));
             }
         }
 
@@ -257,13 +257,13 @@ mod test {
     /// Tests that the identify property, i.e. IFFT(FTT(f)) == f
     fn test_fft_identity() {
         let zero = Complex::zero();
-        let epsilon = 1e-8;
+        let epsilon = 1e-6;
 
         let mut input = Vec::with_capacity(8);
         let mut fft = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
         for i in range(0u, 8) {
-            input.push(Complex::from_real((i+1) as f64));
+            input.push(Complex::from_real((i+1) as f32));
             fft.push(zero);
             out.push(zero);
         }
@@ -273,8 +273,8 @@ mod test {
         assert!(t.ifft(&fft, &mut out).is_ok());
 
         for i in range(0u,7) {
-            println!("{}",out[i].real() - ((i+1) as f64));
-            assert!(out[i].real() - ((i+1) as f64) < epsilon);
+            println!("{}",out[i].real() - ((i+1) as f32));
+            assert!(out[i].real() - ((i+1) as f32) < epsilon);
             assert!(out[i].imag() < epsilon);
         }
     }
@@ -284,14 +284,14 @@ mod test {
     /// short by zero padding them.
     fn test_fft_zero_pad() {
         let zero = Complex::zero();
-        let epsilon = 1e-8;
+        let epsilon = 1e-6;
 
         let mut input = Vec::with_capacity(7);
         let mut fft = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
         for i in range(0u, 8) {
             if i < 7 {
-                input.push(Complex::from_real((i+1) as f64));
+                input.push(Complex::from_real((i+1) as f32));
             } 
             fft.push(zero);
             out.push(zero);
@@ -302,8 +302,8 @@ mod test {
         assert!(t.ifft(&fft, &mut out).is_ok());
 
         for i in range(0u,7) {
-            println!("{}",out[i].real() - ((i+1) as f64));
-            assert!(out[i].real() - ((i+1) as f64) < epsilon);
+            println!("{}",out[i].real() - ((i+1) as f32));
+            assert!(out[i].real() - ((i+1) as f32) < epsilon);
             assert!(out[i].imag() < epsilon);
         }
     }

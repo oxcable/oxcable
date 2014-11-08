@@ -6,3 +6,6 @@ authors = ["Michael Nye <thenyeguy@gmail.com>"]
 [lib]
 name = "oxcable"
 path = "src/oxcable.rs"
+
+[dependencies.rust-portaudio]
+git = "https://github.com/jeremyletang/rust-portaudio.git"

@@ -1,0 +1,12 @@
+[root]
+name = "OxilaryCable"
+version = "0.0.1"
+dependencies = [
+ "rust-portaudio 0.3.0 (git+https://github.com/jeremyletang/rust-portaudio.git)",
+]
+
+[[package]]
+name = "rust-portaudio"
+version = "0.3.0"
+source = "git+https://github.com/jeremyletang/rust-portaudio.git#0fc34d069403ef6cd2ca5a3f5f30e76d47f235d4"
+

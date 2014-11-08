@@ -2,7 +2,7 @@
 
 #![experimental]
 
-use std::f64::consts::PI;
+use std::f32::consts::PI;
 use std::rand;
 
 use core::{SAMPLE_RATE, AudioDevice, Sample, Time};
@@ -37,20 +37,20 @@ pub struct Oscillator {
     pub output: OutputChannelArray,
 
     waveform: Waveform,
-    phase: f64,
-    phase_delta: f64,
+    phase: f32,
+    phase_delta: f32,
     last_sample: Sample,
 }
 
 impl Oscillator {
     /// Returns an oscillator with the specified waveform at the specified
     /// frequency.
-    pub fn new(waveform: Waveform, freq: f64) -> Oscillator {
+    pub fn new(waveform: Waveform, freq: f32) -> Oscillator {
         Oscillator { 
             output: OutputChannelArray::new(1),
             waveform: waveform, 
             phase: 0.0, 
-            phase_delta: freq*2.0*PI/(SAMPLE_RATE as f64),
+            phase_delta: freq*2.0*PI/(SAMPLE_RATE as f32),
             last_sample: 0.0
         }
     }
@@ -111,7 +111,7 @@ impl AudioDevice for Oscillator {
                 // Perform leaky integration
                 self.phase_delta*out + (1.0-self.phase_delta)*self.last_sample
             },
-            WhiteNoise => 2.0*rand::random::<f64>() - 1.0,
+            WhiteNoise => 2.0*rand::random::<f32>() - 1.0,
             PulseTrain => {
                 // If we wrapped around...
                 if self.phase < self.phase_delta {
@@ -129,7 +129,7 @@ impl AudioDevice for Oscillator {
 
 
 /// Floating point modulus
-fn fmod(n: f64, base: f64) -> f64 {
+fn fmod(n: f32, base: f32) -> f32 {
     assert!(base > 0.0);
     let mut out = n;
     while out < 0.0 {
@@ -146,7 +146,7 @@ fn fmod(n: f64, base: f64) -> f64 {
 ///
 /// `t` should be the current waveform phase, normalized
 /// `dt` should be the change in phase for one sample time, normalized
-fn poly_belp_offset(t: f64, dt: f64) -> f64 {
+fn poly_belp_offset(t: f32, dt: f32) -> f32 {
     if t < dt { // t ~= 0
         let t = dt;
         -t*t + 2.0*t - 1.0
@@ -163,8 +163,8 @@ fn poly_belp_offset(t: f64, dt: f64) -> f64 {
 #[cfg(test)]
 mod test {
     /// Compares floating point numbers for equality
-    fn flt_eq(f1: f64, f2: f64) -> bool {
-        let epsilon = 1e-8;
+    fn flt_eq(f1: f32, f2: f32) -> bool {
+        let epsilon = 1e-6;
         f1 - f2 < epsilon
     }
 
