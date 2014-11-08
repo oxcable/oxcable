@@ -10,3 +10,4 @@ pub static BUFFER_SIZE: uint = 256;
 
 pub mod microphone;
 pub mod speaker;
+pub mod wav;
