@@ -21,8 +21,8 @@ use std::vec::Vec;
 use core::{Sample, Time};
 
 
-#[experimental]
 /// Stores generated audio data and manages access to that data.
+#[experimental]
 pub struct OutputChannelArray {
     chs: Vec<ChannelRef>
 }
@@ -61,8 +61,8 @@ impl OutputChannelArray {
 }
 
 
-#[experimental]
 /// Holds references to channels to draw input audio data from.
+#[experimental]
 pub struct InputChannelArray {
     chs: Vec<Option<ChannelRef>>
 }
@@ -112,8 +112,8 @@ impl InputChannelArray {
 pub type ChannelRef = Rc<RefCell<Channel>>;
 
 
-#[experimental]
 /// Container for a single channel of audio.
+#[experimental]
 struct Channel {
     t: Time,
     s: Sample,
@@ -142,4 +142,3 @@ impl Channel {
         self.s = s;
     }
 }
-

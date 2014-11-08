@@ -43,8 +43,8 @@ impl Microphone {
         }
     }
 
-    #[experimental="this should be replaced with a destructor"]
     /// Closes the portaudio stream
+    #[experimental="this should be replaced with a destructor"]
     pub fn stop(&mut self) { 
         self.pa_stream.stop();
         self.pa_stream.close();

@@ -13,10 +13,9 @@ pub mod channel;
 pub mod complex;
 pub mod fft;
 
-#[experimental]
 /// An interface for a synchronous audio device
+#[experimental]
 pub trait AudioDevice {
-    #[experimental]
     /// Process a single sample worth of audio
     ///
     /// This function should be called once per time step, starting at `t=1`.

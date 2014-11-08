@@ -13,7 +13,6 @@ use std::vec::Vec;
 use core::complex::Complex;
 
 
-#[stable]
 /// A container for precomputed values to perform FFTs of a fixed size.
 pub struct Transformer {
     size: uint,
@@ -22,7 +21,6 @@ pub struct Transformer {
 }
 
 impl Transformer {
-    #[stable]
     /// Returns a set precomputed information used to perform FFTs of the
     /// provided size.
     pub fn new(size: uint) -> Transformer {
@@ -49,13 +47,11 @@ impl Transformer {
             twiddles: twiddles }
     }
 
-    #[stable]
     /// Returns the size FFTs this Transformer performs
     pub fn get_size(&self) -> uint {
         self.size
     }
 
-    #[stable]
     /// Performs an FFT on `input`, and places the result in `output`.
     ///
     /// The input is zero padded if less than `size` samples are provided, and
@@ -67,7 +63,6 @@ impl Transformer {
         self.transform(input, output, false)
     }
 
-    #[stable]
     /// Performs an inverse FFT on `input`, and places the result in `output`.
     ///
     /// The input is zero padded if less than `size` samples are provided, and
@@ -180,8 +175,8 @@ mod test {
     use core::complex::Complex;
     use super::{Transformer, int_log, bit_reverse};
 
-    #[test]
     /// Tests int_log with many values
+    #[test]
     fn test_int_log() {
         assert!(int_log(1) == 0);
         assert!(int_log(2) == 1);
@@ -193,8 +188,8 @@ mod test {
         assert!(int_log(32) == 5);
     }
 
-    #[test]
     /// Tests bit_reverse.
+    #[test]
     fn test_bit_reverse() {
         assert!(bit_reverse(0x00000000, 32) == 0x00000000);
         assert!(bit_reverse(0xFFFFFFFF, 32) == 0xFFFFFFFF);
@@ -205,10 +200,10 @@ mod test {
         assert!(bit_reverse(0x0000000F, 4) == 0x0000000F);
     }
 
-    #[test]
     /// Tests the FFT of an impulse function.
     ///
     /// Analytically, an impulse function has a constant fourier transform.
+    #[test]
     fn test_fft_impulse() {
         let zero = Complex::zero();
         let one = Complex::from_real(1.0);
@@ -228,11 +223,11 @@ mod test {
         }
     }
 
-    #[test]
     /// Tests the IFFT of an impulse function.
     ///
     /// Analytically, a constant frequency domain results in an impulse
     /// function.
+    #[test]
     fn test_ifft_impulse() {
         let zero = Complex::zero();
         let one = Complex::from_real(1.0);
@@ -253,8 +248,8 @@ mod test {
         }
     }
 
-    #[test]
     /// Tests that the identify property, i.e. IFFT(FTT(f)) == f
+    #[test]
     fn test_fft_identity() {
         let zero = Complex::zero();
         let epsilon = 1e-6;
@@ -279,9 +274,9 @@ mod test {
         }
     }
 
-    #[test]
     /// Tests that the Transformer properly handles input buffers that are too
     /// short by zero padding them.
+    #[test]
     fn test_fft_zero_pad() {
         let zero = Complex::zero();
         let epsilon = 1e-6;
@@ -308,8 +303,8 @@ mod test {
         }
     }
 
-    #[test]
     /// Tests that the transformer fails when the output buffer is too short.
+    #[test]
     fn test_fft_output_buffer_too_small() {
         let zero = Complex::zero();
 

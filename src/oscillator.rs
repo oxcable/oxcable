@@ -168,8 +168,8 @@ mod test {
         f1 - f2 < epsilon
     }
 
-    #[test]
     /// Tests fmod with many values
+    #[test]
     fn test_fmod() {
         use super::fmod;
 
@@ -197,8 +197,8 @@ mod test {
         assert!(flt_eq(fmod(1.0, 0.9), 0.1));
     }
 
-    #[test]
     /// Tests square wave
+    #[test]
     fn test_naive_square() {
         use super::Oscillator;
         use core::AudioDevice;
@@ -215,8 +215,8 @@ mod test {
         osc.tick(9); assert!(osc.output.get_sample(0, 9).unwrap() == -1.0);
     }
 
-    #[test]
     /// Tests saw wave
+    #[test]
     fn test_naive_saw() {
         use super::Oscillator;
         use core::AudioDevice;
