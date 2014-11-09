@@ -1,4 +1,4 @@
-//! Writes wav files for 
+//! Writes wav files for every Oscillator waveform for analysis
 
 extern crate oxcable;
 
@@ -46,9 +46,10 @@ fn main() {
             wavs[i].tick(t);
         }
     }
+
+    // Finish the wav files
     for i in range(0, wavs.len()) {
         wavs[i].update_data_size();
     }
-
     println!("Done");
 }
