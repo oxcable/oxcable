@@ -4,7 +4,10 @@ import scipy.io.wavfile as wav
 import sys
 
 filters = ["first_order_low_pass",  "first_order_high_pass",
-           "first_order_low_shelf", "first_order_high_shelf"]
+           "first_order_low_shelf", "first_order_high_shelf",
+           "second_order_low_pass",  "second_order_high_pass",
+           "second_order_low_shelf", "second_order_high_shelf",
+           "second_order_peak"]
 
 
 def load_audio_data(filter_type):
