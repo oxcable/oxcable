@@ -5,7 +5,7 @@
 use std::io::{IoResult, File, Truncate, ReadWrite, SeekEnd, SeekSet};
 
 use core::{SAMPLE_RATE, AudioDevice, Time, Sample};
-use core::channel::{InputChannelArray, OutputChannelArray};
+use core::components::{InputArray, OutputArray};
 
 
 /// Reads audio from a wav file
@@ -14,7 +14,7 @@ use core::channel::{InputChannelArray, OutputChannelArray};
 /// reader will return silence until it is reset to the beginning of the file.
 pub struct WavReader {
     /// The wav file output
-    pub outputs: OutputChannelArray,
+    pub outputs: OutputArray,
 
     num_channels: uint,
     num_samples: uint,
@@ -32,7 +32,7 @@ impl WavReader {
         let header = WavHeader::read_from_file(&mut file).unwrap();
         assert!(header.is_valid());
         WavReader {
-            outputs: OutputChannelArray::new(header.num_channels as uint),
+            outputs: OutputArray::new(header.num_channels as uint),
             num_channels: header.num_channels as uint,
             num_samples: (header.data_size / ((header.bit_depth/8) as u32) / 
                 (header.num_channels as u32)) as uint,
@@ -66,7 +66,7 @@ impl AudioDevice for WavReader {
             } else {
                 0.0
             };
-            self.outputs.push_sample(i, s);
+            self.outputs.push(i, s);
         }
         self.samples_read += 1;
     }
@@ -79,7 +79,7 @@ impl AudioDevice for WavReader {
 /// with the proper size until `update_data_size` is called.
 pub struct WavWriter {
     /// The wav file input
-    pub inputs: InputChannelArray,
+    pub inputs: InputArray,
 
     num_channels: uint,
     file: File,
@@ -97,7 +97,7 @@ impl WavWriter {
                                     0u32);
         assert!(header.write_to_file(&mut file).is_ok());
         WavWriter { 
-            inputs: InputChannelArray::new(num_channels), 
+            inputs: InputArray::new(num_channels), 
             num_channels: num_channels,
             file: file,
             samples_written: 0
@@ -119,7 +119,7 @@ impl WavWriter {
 impl AudioDevice for WavWriter {
     fn tick(&mut self, t: Time) {
         for i in range(0, self.num_channels) {
-            let mut s = self.inputs.get_sample(i, t).unwrap_or(0.0);
+            let mut s = self.inputs.get(i, t).unwrap_or(0.0);
             if s > 0.999f32 { s = 0.999f32; }
             if s < -0.999f32 { s = -0.999f32; }
             assert!(self.file.write_le_i16((s*32768.0) as i16).is_ok());

@@ -5,15 +5,15 @@
 use std::vec::Vec;
 
 use core::{AudioDevice, Time};
-use core::channel::{InputChannelArray, OutputChannelArray};
+use core::components::{InputArray, OutputArray};
 use core::util::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
 
 
 /// A limiter
 pub struct Limiter {
-    pub inputs: InputChannelArray,
-    pub outputs: OutputChannelArray,
+    pub inputs: InputArray,
+    pub outputs: OutputArray,
 
     level_detectors: Vec<LevelDetector>,
     num_channels: uint, 
@@ -36,8 +36,8 @@ impl Limiter {
         }
 
         Limiter {
-            inputs: InputChannelArray::new(num_channels),
-            outputs: OutputChannelArray::new(num_channels),
+            inputs: InputArray::new(num_channels),
+            outputs: OutputArray::new(num_channels),
             level_detectors: levels,
             num_channels: num_channels,
             threshold: decibel_to_ratio(threshold),
@@ -49,7 +49,7 @@ impl Limiter {
 impl AudioDevice for Limiter {
     fn tick(&mut self, t: Time) {
         for i in range(0, self.num_channels) {
-            let s = self.inputs.get_sample(i, t).unwrap_or(0.0);
+            let s = self.inputs.get(i, t).unwrap_or(0.0);
 
             // Get the current signal level and use it to calculate the gain
             // correction
@@ -60,7 +60,7 @@ impl AudioDevice for Limiter {
                 1.0
             };
 
-            self.outputs.push_sample(i, self.gain*limit*s);
+            self.outputs.push(i, self.gain*limit*s);
         }
     }
 }

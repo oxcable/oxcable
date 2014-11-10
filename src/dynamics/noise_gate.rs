@@ -5,15 +5,15 @@
 use std::vec::Vec;
 
 use core::{AudioDevice, Time};
-use core::channel::{InputChannelArray, OutputChannelArray};
+use core::components::{InputArray, OutputArray};
 use core::util::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
 
 
 /// A noise gate
 pub struct NoiseGate {
-    pub inputs: InputChannelArray,
-    pub outputs: OutputChannelArray,
+    pub inputs: InputArray,
+    pub outputs: OutputArray,
 
     level_detectors: Vec<LevelDetector>,
     active: bool,
@@ -41,8 +41,8 @@ impl NoiseGate {
         }
 
         NoiseGate {
-            inputs: InputChannelArray::new(num_channels),
-            outputs: OutputChannelArray::new(num_channels),
+            inputs: InputArray::new(num_channels),
+            outputs: OutputArray::new(num_channels),
             level_detectors: levels,
             active: false,
             num_channels: num_channels,
@@ -56,7 +56,7 @@ impl NoiseGate {
 impl AudioDevice for NoiseGate {
     fn tick(&mut self, t: Time) {
         for i in range(0, self.num_channels) {
-            let mut s = self.inputs.get_sample(i, t).unwrap_or(0.0);
+            let mut s = self.inputs.get(i, t).unwrap_or(0.0);
 
             // Look for a state change
             let level = self.level_detectors[i].compute_next_level(s);
@@ -71,7 +71,7 @@ impl AudioDevice for NoiseGate {
                 s = 0.0;
             }
 
-            self.outputs.push_sample(i, self.gain*s);
+            self.outputs.push(i, self.gain*s);
         }
     }
 }

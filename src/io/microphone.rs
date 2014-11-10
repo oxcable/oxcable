@@ -5,14 +5,14 @@
 extern crate portaudio;
 
 use core::{SAMPLE_RATE, AudioDevice, Sample, Time};
-use core::channel::OutputChannelArray;
+use core::components::OutputArray;
 use io::{BUFFER_SIZE, PORTAUDIO_T};
 
 
 /// Reads audio from the OS's default input device
 pub struct Microphone {
     /// The output array holding read audio
-    pub outputs: OutputChannelArray,
+    pub outputs: OutputArray,
 
     pa_stream: portaudio::pa::PaStream<Sample>,
     num_channels: uint, 
@@ -35,7 +35,7 @@ impl Microphone {
         pa_stream.start();
 
         Microphone {
-            outputs: OutputChannelArray::new(num_channels),
+            outputs: OutputArray::new(num_channels),
             pa_stream: pa_stream,
             num_channels: num_channels,
             buffer: Vec::with_capacity(num_channels*BUFFER_SIZE),
@@ -65,7 +65,7 @@ impl AudioDevice for Microphone {
 
         for i in range(0, self.num_channels) {
             let s = self.buffer[self.samples_read*self.num_channels + i];
-            self.outputs.push_sample(i, s);
+            self.outputs.push(i, s);
         }
         self.samples_read += 1;
     }

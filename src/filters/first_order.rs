@@ -15,7 +15,7 @@ use std::f32::consts::PI;
 use std::vec::Vec;
 
 use core::{SAMPLE_RATE, AudioDevice, Sample, Time};
-use core::channel::{InputChannelArray, OutputChannelArray};
+use core::components::{InputArray, OutputArray};
 use core::util::decibel_to_ratio;
 
 
@@ -35,8 +35,8 @@ pub enum FilterMode {
 /// A filter that uses a first order all pass filter to perform the specified
 /// mode. Each of the channels will be filtered independently.
 pub struct Filter {
-    pub inputs: InputChannelArray,
-    pub outputs: OutputChannelArray,
+    pub inputs: InputArray,
+    pub outputs: OutputArray,
 
     num_channels: uint, 
     x_last: Vec<Sample>,
@@ -61,8 +61,8 @@ impl Filter {
         let (alpha, H0) = compute_parameters(mode);
 
         Filter {
-            inputs: InputChannelArray::new(num_channels),
-            outputs: OutputChannelArray::new(num_channels),
+            inputs: InputArray::new(num_channels),
+            outputs: OutputArray::new(num_channels),
             num_channels: num_channels,
             x_last: x_last,
             y1_last: y1_last,
@@ -113,7 +113,7 @@ fn compute_parameters(mode: FilterMode) -> (f32, f32) {
 impl AudioDevice for Filter {
     fn tick(&mut self, t: Time) {
         for i in range(0, self.num_channels) {
-            let x = self.inputs.get_sample(i, t).unwrap_or(0.0);
+            let x = self.inputs.get(i, t).unwrap_or(0.0);
 
             // Run the all pass filter, and feedback the result
             let y1 = self.alpha*x + self.x_last[i] - self.alpha*self.y1_last[i];
@@ -127,7 +127,7 @@ impl AudioDevice for Filter {
             // Store our results
             self.x_last[i] = x;
             self.y1_last[i] = y1;
-            self.outputs.push_sample(i, y);
+            self.outputs.push(i, y);
         }
     }
 }

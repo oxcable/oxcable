@@ -7,14 +7,14 @@ extern crate portaudio;
 use std::vec::Vec;
 
 use core::{SAMPLE_RATE, AudioDevice, Sample, Time};
-use core::channel::InputChannelArray;
+use core::components::InputArray;
 use io::{BUFFER_SIZE, PORTAUDIO_T};
 
 
 /// Writes audio to the OS's default output device
 pub struct Speaker {
     /// The input array, to receive final audio to write out
-    pub inputs: InputChannelArray,
+    pub inputs: InputArray,
 
     pa_stream: portaudio::pa::PaStream<Sample>,
     num_channels: uint, 
@@ -37,7 +37,7 @@ impl Speaker {
         pa_stream.start();
 
         Speaker {
-            inputs: InputChannelArray::new(num_channels),
+            inputs: InputArray::new(num_channels),
             pa_stream: pa_stream,
             num_channels: num_channels,
             buffer: Vec::with_capacity(num_channels*BUFFER_SIZE),
@@ -57,7 +57,7 @@ impl Speaker {
 impl AudioDevice for Speaker {
     fn tick(&mut self, t: Time) {
         for i in range(0, self.num_channels) {
-            let mut s = self.inputs.get_sample(i, t).unwrap_or(0.0);
+            let mut s = self.inputs.get(i, t).unwrap_or(0.0);
             if s > 1.0 { s = 1.0; }
             if s < -1.0 { s = -1.0; }
             self.buffer.push(s)

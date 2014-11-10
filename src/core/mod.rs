@@ -9,8 +9,8 @@ pub type Sample = f32;
 /// The datatype of a single sample time
 pub type Time   = u64;
 
-pub mod channel;
 pub mod complex;
+pub mod components;
 pub mod fft;
 pub mod util;
 
