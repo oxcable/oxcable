@@ -40,7 +40,7 @@ fn main() {
     }
 
     // Write files
-    for t in range(1, 44100) {
+    for t in range(0, 44100) {
         for i in range(0, oscs.len()) {
             oscs[i].tick(t);
             wavs[i].tick(t);

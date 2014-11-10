@@ -31,7 +31,7 @@ fn main() {
     wav_outs[2].inputs.set_channel(0, gate.outputs.get_channel(0));
 
     // Write files
-    let mut t = 1;
+    let mut t = 0;
     while !wav_in.is_done() {
         wav_in.tick(t);
         comp.tick(t);

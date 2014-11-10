@@ -35,7 +35,7 @@ fn main() {
     }
 
     // Write files
-    for t in range(1, 44100) {
+    for t in range(0, 44100) {
         wav_in.tick(t);
         for i in range(0, filters.len()) {
             filters[i].tick(t);

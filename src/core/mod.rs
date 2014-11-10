@@ -2,6 +2,7 @@
 
 #![experimental]
 
+
 /// The global sample rate, in Hz
 pub static SAMPLE_RATE: uint = 44100;
 /// The datatype of a single sample
@@ -9,10 +10,13 @@ pub type Sample = f32;
 /// The datatype of a single sample time
 pub type Time   = u64;
 
+
 pub mod complex;
 pub mod components;
 pub mod fft;
+pub mod ringbuffer;
 pub mod util;
+
 
 /// An interface for a synchronous audio device
 #[experimental]

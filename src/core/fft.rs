@@ -178,26 +178,26 @@ mod test {
     /// Tests int_log with many values
     #[test]
     fn test_int_log() {
-        assert!(int_log(1) == 0);
-        assert!(int_log(2) == 1);
-        assert!(int_log(3) == 2);
-        assert!(int_log(4) == 2);
-        assert!(int_log(7) == 3);
-        assert!(int_log(8) == 3);
-        assert!(int_log(31) == 5);
-        assert!(int_log(32) == 5);
+        assert_eq!(int_log(1), 0);
+        assert_eq!(int_log(2), 1);
+        assert_eq!(int_log(3), 2);
+        assert_eq!(int_log(4), 2);
+        assert_eq!(int_log(7), 3);
+        assert_eq!(int_log(8), 3);
+        assert_eq!(int_log(31), 5);
+        assert_eq!(int_log(32), 5);
     }
 
     /// Tests bit_reverse.
     #[test]
     fn test_bit_reverse() {
-        assert!(bit_reverse(0x00000000, 32) == 0x00000000);
-        assert!(bit_reverse(0xFFFFFFFF, 32) == 0xFFFFFFFF);
-        assert!(bit_reverse(0x00000001, 32) == 0x80000000);
-        assert!(bit_reverse(0x11111111, 32) == 0x88888888);
-        assert!(bit_reverse(0x234f9e01, 32) == 0x8079f2c4); //random
-        assert!(bit_reverse(0x00000001, 4) == 0x00000008);
-        assert!(bit_reverse(0x0000000F, 4) == 0x0000000F);
+        assert_eq!(bit_reverse(0x00000000, 32), 0x00000000);
+        assert_eq!(bit_reverse(0xFFFFFFFF, 32), 0xFFFFFFFF);
+        assert_eq!(bit_reverse(0x00000001, 32), 0x80000000);
+        assert_eq!(bit_reverse(0x11111111, 32), 0x88888888);
+        assert_eq!(bit_reverse(0x234f9e01, 32), 0x8079f2c4); //random
+        assert_eq!(bit_reverse(0x00000001, 4), 0x00000008);
+        assert_eq!(bit_reverse(0x0000000F, 4), 0x0000000F);
     }
 
     /// Tests the FFT of an impulse function.

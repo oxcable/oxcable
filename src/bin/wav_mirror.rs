@@ -14,7 +14,7 @@ fn main() {
     outwav.inputs.set_channel(0, inwav.outputs.get_channel(0));
     outwav.inputs.set_channel(1, inwav.outputs.get_channel(1));
 
-    let mut t: oxcable::core::Time = 1;
+    let mut t: oxcable::core::Time = 0;
     while !inwav.is_done() {
         inwav.tick(t);
         outwav.tick(t);
