@@ -1,9 +1,4 @@
 //! A simple delay module
-//!
-//! The delay filter plays back delayed copies of its input. The first delay is
-//! played at full amplitude, and is then decayed linearly by the feedback
-//! multiplier. The output is mixed with the raw input using the wetness
-//! percentage.
 
 #![experimental]
 
@@ -15,6 +10,12 @@ use core::components::{InputArray, OutputArray};
 use core::ringbuffer::RingBuffer;
 
 
+/// A delay that feeds back each channel independently
+///
+/// The delay filter plays back delayed copies of its input. The first delay is
+/// played at full amplitude, and is then decayed linearly by the feedback
+/// multiplier. The output is mixed with the raw input using the wetness
+/// percentage.
 pub struct Delay {
     pub inputs: InputArray,
     pub outputs: OutputArray,
@@ -26,6 +27,13 @@ pub struct Delay {
 }
 
 impl Delay {
+    /// Creates a new Delay object.
+    ///
+    /// * `delay`: the time to delay the input, in seconds
+    /// * `feedback`: how much of our delayed signal to feed back into the next
+    ///               delay
+    /// * `wetness`: how much of our input signal to mix into the delayed signal
+    ///              in the output
     pub fn new(delay: f32, feedback: f32, wetness: f32, 
                num_channels: uint) -> Delay {
         // Create the delay buffers, starting with silence
