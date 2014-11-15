@@ -7,3 +7,4 @@ pub mod filters;
 pub mod io;
 pub mod mixers;
 pub mod oscillator;
+pub mod reverb;

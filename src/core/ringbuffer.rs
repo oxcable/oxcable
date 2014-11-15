@@ -69,6 +69,20 @@ impl<T: Clone> RingBuffer<T> {
     }
 }
 
+impl<T: Num+Clone> RingBuffer<T> {
+    /// Attempts to add to the value at time `t` to `data`. If the requested
+    /// time is not in the buffer, instead returns `Err`.
+    pub fn add(&mut self, t: Time, data: T) -> Result<(),()> {
+        if self.start_t <= t && t < self.end_t {
+            let i = (t % self.capacity as Time) as uint;
+            self.buf[i] = self.buf[i] + data;
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -142,5 +156,26 @@ mod tests {
         assert_eq!(rb.buf[1], 22);
         assert_eq!(rb.update(8, 23), Ok(()));
         assert_eq!(rb.buf[0], 23);
+    }
+
+    #[test]
+    fn test_add() {
+        let mut rb: RingBuffer<int> = RingBuffer { 
+            buf: vec![7,13], 
+            capacity: 2, 
+            size: 2,
+            start_t: 7,
+            end_t: 9
+        };
+
+        // Test out of range
+        assert_eq!(rb.add(6, 22), Err(()));
+        assert_eq!(rb.add(9, 22), Err(()));
+
+        // Test in range
+        assert_eq!(rb.add(7, 1), Ok(()));
+        assert_eq!(rb.buf[1], 14);
+        assert_eq!(rb.add(8, 1), Ok(()));
+        assert_eq!(rb.buf[0], 8);
     }
 }
