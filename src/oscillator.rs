@@ -201,9 +201,10 @@ mod test {
     /// Tests square wave
     #[test]
     fn test_naive_square() {
-        use super::Oscillator;
+        use super::{AntialiasType, Waveform, Oscillator};
         use core::AudioDevice;
-        let mut osc = Oscillator::new(super::Square(super::Aliased), 4410.0);
+        let mut osc = Oscillator::new(Waveform::Square(AntialiasType::Aliased),
+                                      4410.0);
 
         osc.tick(0); assert!(osc.output.get(0, 0).unwrap() == 1.0);
         osc.tick(1); assert!(osc.output.get(0, 1).unwrap() == 1.0);
@@ -219,9 +220,10 @@ mod test {
     /// Tests saw wave
     #[test]
     fn test_naive_saw() {
-        use super::Oscillator;
+        use super::{AntialiasType, Waveform, Oscillator};
         use core::AudioDevice;
-        let mut osc = Oscillator::new(super::Saw(super::Aliased), 4410.0);
+        let mut osc = Oscillator::new(Waveform::Saw(AntialiasType::Aliased),
+                                      4410.0);
 
         osc.tick(0); assert!(flt_eq(osc.output.get(0, 0).unwrap(), 
                                     -0.8, EPSILON));
