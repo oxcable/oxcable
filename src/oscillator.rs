@@ -3,10 +3,14 @@
 #![experimental]
 
 use std::f32::consts::PI;
+use std::num::FloatMath;
 use std::rand;
 
 use core::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use core::components::OutputArray;
+
+use self::AntialiasType::PolyBlep;
+use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
 
 /// Antialiasing method for certain waveforms.
 ///

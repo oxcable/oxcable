@@ -2,6 +2,8 @@
 
 #![experimental]
 
+use std::num::Float;
+
 use core::{SAMPLE_RATE, Sample};
 
 

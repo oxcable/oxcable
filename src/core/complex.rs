@@ -6,6 +6,7 @@
 #![unstable="operator overloads in rust are not yet stable"]
 
 use std::fmt;
+use std::num::{Float, FloatMath};
 
 
 /// A complex number, stored to in rectangular form to 64-bit precision.

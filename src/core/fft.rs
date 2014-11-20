@@ -7,7 +7,7 @@
 #![stable]
 
 use std::f32::consts::PI;
-use std::num::next_power_of_two;
+use std::num::UnsignedInt;
 use std::vec::Vec;
 
 use core::complex::Complex;
@@ -25,7 +25,7 @@ impl Transformer {
     /// provided size.
     pub fn new(size: uint) -> Transformer {
         // Only operate in powers of two
-        let bufsize = next_power_of_two(size);
+        let bufsize = size.next_power_of_two();
 
         // Populate the bit reverses
         // We only use the lower log2(size) bits to express the index

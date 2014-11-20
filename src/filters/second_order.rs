@@ -16,11 +16,14 @@
 
 
 use std::f32::consts::PI;
+use std::num::{Float, FloatMath};
 use std::vec::Vec;
 
 use core::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use core::components::{InputArray, OutputArray};
 use core::util::decibel_to_ratio;
+
+use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf, Peak};
 
 
 /// Specifies the mode for a first order `Filter`

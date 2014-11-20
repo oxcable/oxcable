@@ -16,7 +16,7 @@ pub struct Speaker {
     /// The input array, to receive final audio to write out
     pub inputs: InputArray,
 
-    pa_stream: portaudio::pa::PaStream<Sample>,
+    pa_stream: portaudio::pa::Stream<Sample>,
     num_channels: uint, 
     buffer: Vec<Sample>,
     samples_written: uint,
@@ -26,15 +26,16 @@ impl Speaker {
     /// Opens a portaudio stream writing `num_channels` outputs
     pub fn new(num_channels: uint) -> Speaker {
         // Initialize portaudio
-        if portaudio::pa::initialize() != portaudio::types::PaNoError {
+        if portaudio::pa::initialize().is_err() {
             panic!("failed to initialize portaudio");
         }
 
         // Open a stream
-        let mut pa_stream = portaudio::pa::PaStream::new(PORTAUDIO_T);
-        pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32, 0i32,
-                               num_channels as i32, PORTAUDIO_T);
-        pa_stream.start();
+        let mut pa_stream = portaudio::pa::Stream::new(PORTAUDIO_T);
+        assert!(pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,
+                                       0i32, num_channels as i32,
+                                       PORTAUDIO_T).is_ok());
+        assert!(pa_stream.start().is_ok());
 
         Speaker {
             inputs: InputArray::new(num_channels),
@@ -48,9 +49,9 @@ impl Speaker {
     /// Closes the portaudio stream
     #[experimental="this should be replaced with a destructor"]
     pub fn stop(&mut self) { 
-        self.pa_stream.stop();
-        self.pa_stream.close();
-        portaudio::pa::terminate();
+        assert!(self.pa_stream.stop().is_ok());
+        assert!(self.pa_stream.close().is_ok());
+        assert!(portaudio::pa::terminate().is_ok());
     }
 }
 
@@ -65,7 +66,8 @@ impl AudioDevice for Speaker {
         self.samples_written += 1;
 
         if self.samples_written == BUFFER_SIZE {
-            self.pa_stream.write(self.buffer.clone(), BUFFER_SIZE as u32);
+            assert!(self.pa_stream.write(self.buffer.clone(), 
+                                         BUFFER_SIZE as u32).is_ok());
             self.samples_written = 0;
             self.buffer.clear()
         }

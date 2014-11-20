@@ -3,6 +3,7 @@
 //! This algorithmic reverb filter follows the basic design specified by James
 //! Moorer in his seminal paper, "About This Reverberation Business".
 
+use std::num::Float;
 use std::vec::Vec;
 
 use core::{SAMPLE_RATE, AudioDevice, Sample, Time};

@@ -2,7 +2,7 @@
 
 #![unstable]
 
-use std::num;
+use std::num::Float;
 
 
 /// Compares floating point numbers for equality
@@ -10,7 +10,7 @@ use std::num;
 /// The maximum difference is specified by `epsilon`; that is, `f1` and `f2` are
 /// equal if they differ by at most epsilon
 pub fn flt_eq(f1: f32, f2: f32, epsilon: f32) -> bool {
-    num::abs(f1 - f2) < epsilon
+    (f1 - f2).abs() < epsilon
 }
 
 /// Converts a decibel multiplier to a power ratio
