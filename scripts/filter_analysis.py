@@ -16,7 +16,7 @@ def load_audio_data(filter_type):
     return (filename, x.astype(float) / 32767.0)
 
 
-def plot_spectra(title, xs):
+def plot_spectra(title, x):
     Xmag = np.absolute(np.fft.fft(x, 5000))
     X = 20*np.log10(Xmag/max(Xmag)) # convert to decibels
     fs = np.fft.fftfreq(len(X), 1.0/44100) # get freq labels

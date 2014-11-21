@@ -8,6 +8,7 @@ use std::vec::Vec;
 
 use core::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use core::components::InputArray;
+use core::init;
 use io::{BUFFER_SIZE, PORTAUDIO_T};
 
 
@@ -25,9 +26,9 @@ pub struct Speaker {
 impl Speaker {
     /// Opens a portaudio stream writing `num_channels` outputs
     pub fn new(num_channels: uint) -> Speaker {
-        // Initialize portaudio
-        if portaudio::pa::initialize().is_err() {
-            panic!("failed to initialize portaudio");
+        // Check for initialization
+        if !init::is_initialized() {
+            panic!("Must initialize oxcable first");
         }
 
         // Open a stream
@@ -47,11 +48,9 @@ impl Speaker {
     }
 
     /// Closes the portaudio stream
-    #[experimental="this should be replaced with a destructor"]
-    pub fn stop(&mut self) { 
+    pub fn stop(&mut self) {
         assert!(self.pa_stream.stop().is_ok());
         assert!(self.pa_stream.close().is_ok());
-        assert!(portaudio::pa::terminate().is_ok());
     }
 }
 

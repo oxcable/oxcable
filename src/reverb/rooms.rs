@@ -26,8 +26,8 @@ pub struct Room {
 pub fn hall() -> Room {
     Room {
         // For these parameters, see pg. 24 from Moorer paper
-        tapped_delays: vec![190, 948, 992, 1182, 1191, 1314, 2020, 2523, 2589,
-            2624, 2699, 3118, 3122, 3202, 3268, 3321, 3515],
+        tapped_delays: vec![190, 948, 992, 1182, 1191, 1314, 2020, 2139, 2523,
+            2589, 2624, 2699, 3118, 3122, 3202, 3268, 3321, 3515],
         tapped_gains: vec![0.841, 0.504, 0.491, 0.379, 0.380, 0.346, 0.289, 0.272,
             192.0, 0.193, 0.217, 0.181, 0.180, 0.181, 0.176, 0.142, 0.167, 0.134],
         // For these parameters, see pg. 18 from Moorer

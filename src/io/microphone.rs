@@ -1,11 +1,12 @@
 //! Provides an input audio stream.
 
-#![experimental="should use destructor for closing portaudio"]
+#![experimental]
 
 extern crate portaudio;
 
 use core::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use core::components::OutputArray;
+use core::init;
 use io::{BUFFER_SIZE, PORTAUDIO_T};
 
 
@@ -23,11 +24,11 @@ pub struct Microphone {
 impl Microphone {
     /// Opens a portaudio stream reading `num_channels` inputs
     pub fn new(num_channels: uint) -> Microphone {
-        // Initialize portaudio
-        if portaudio::pa::initialize().is_err() {
-            panic!("failed to initialize portaudio");
+        // Check for initialization
+        if !init::is_initialized() {
+            panic!("Must initialize oxcable first");
         }
-
+        
         // Open a stream
         let mut pa_stream = portaudio::pa::Stream::new(PORTAUDIO_T);
         assert!(pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,
@@ -45,11 +46,9 @@ impl Microphone {
     }
 
     /// Closes the portaudio stream
-    #[experimental="this should be replaced with a destructor"]
-    pub fn stop(&mut self) { 
+    pub fn stop(&mut self) {
         assert!(self.pa_stream.stop().is_ok());
         assert!(self.pa_stream.close().is_ok());
-        assert!(portaudio::pa::terminate().is_ok());
     }
 }
 

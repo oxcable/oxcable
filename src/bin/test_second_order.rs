@@ -9,9 +9,9 @@ fn main() {
     use oxcable::io::wav;
     use oxcable::filters::second_order;
     use oxcable::filters::second_order::Filter;
-    println!("Writing second order filters to wav files...");
 
     // Initialize objects
+    println!("Initializing signal chain..."); 
     let mut wav_in = wav::WavReader::new("wav/delta.wav");
 
     let cutoff = 1000.0;
@@ -35,6 +35,7 @@ fn main() {
     }
 
     // Write files
+    println!("Writing second order filters to wav files...");
     for t in range(0, 44100) {
         wav_in.tick(t);
         for i in range(0, filters.len()) {

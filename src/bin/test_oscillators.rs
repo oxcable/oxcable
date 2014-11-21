@@ -9,9 +9,9 @@ fn main() {
     use oxcable::io::wav::WavWriter;
     use oxcable::oscillator;
     use oxcable::oscillator::Oscillator;
-    println!("Writing oscillators to wav files...");
 
     // Initialize objects
+    println!("Initializing signal chain..."); 
     let freq = 8000.0;
     let mut oscs = Vec::<oscillator::Oscillator>::new();
     let mut wavs = Vec::<WavWriter>::new();
@@ -35,6 +35,7 @@ fn main() {
     wavs.push(WavWriter::new("wav/test_pulse_train.wav", 1));
 
     // Link oscillators to wav outs
+    println!("Writing oscillators to wav files...");
     for i in range(0u, oscs.len()) {
         wavs[i].inputs.set_channel(0, oscs[i].output.get_channel(0));
     }
