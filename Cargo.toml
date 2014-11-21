@@ -7,8 +7,8 @@ authors = ["Michael Nye <thenyeguy@gmail.com>"]
 name = "oxcable"
 path = "src/oxcable.rs"
 
-[dependencies.rust-portaudio]
-git = "https://github.com/jeremyletang/rust-portaudio.git"
+[dependencies]
+portaudio = "~0.3.0"
 
 [dependencies.portmidi]
 git = "https://github.com/musitdev/rust-portmidi.git"

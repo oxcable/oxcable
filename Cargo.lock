@@ -2,17 +2,17 @@
 name = "OxilaryCable"
 version = "0.0.1"
 dependencies = [
+ "portaudio 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "portmidi 0.0.1 (git+https://github.com/musitdev/rust-portmidi.git)",
- "rust-portaudio 0.3.0 (git+https://github.com/jeremyletang/rust-portaudio.git)",
 ]
+
+[[package]]
+name = "portaudio"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "portmidi"
 version = "0.0.1"
 source = "git+https://github.com/musitdev/rust-portmidi.git#1b51ed0a25cfe9a39a1e8f05e95dadc8ab480139"
-
-[[package]]
-name = "rust-portaudio"
-version = "0.3.0"
-source = "git+https://github.com/jeremyletang/rust-portaudio.git#4d4f1cf934c8d9287560046f267434cbbcb386e2"
 
