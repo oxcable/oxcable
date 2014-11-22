@@ -1,4 +1,4 @@
-//! Device for adding multiple channels into one
+//! `Device` for adding multiple channels into one.
 
 #![experimental]
 
@@ -6,18 +6,20 @@ use core::components::{InputArray, OutputArray};
 use core::types::{Device, Sample, Time};
 
 
-/// Sums all its inputs into a single output
+/// An adder.
+///
+/// The adder sums all its inputs into a single output.
 pub struct Adder {
-    /// The input array, receiving many signals
+    /// Input audio channels
     pub inputs: InputArray<Sample>,
-    /// The output array, with a single channel
+    /// A single output audio channel
     pub output: OutputArray<Sample>,
 
     num_inputs: uint, 
 }
 
 impl Adder {
-    /// Returns a new adder with `num_inputs` input channels
+    /// Returns a new adder with `num_inputs` input channels.
     pub fn new(num_inputs: uint) -> Adder {
         Adder {
             inputs: InputArray::new(num_inputs),

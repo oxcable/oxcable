@@ -1,4 +1,4 @@
-//! An oscillator that generates periodic waveforms.
+//! Provides an oscillator that generates periodic waveforms.
 
 #![experimental]
 
@@ -15,17 +15,21 @@ use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
 /// Antialiasing method for certain waveforms.
 ///
 /// Aliased waveforms will use naive methods that produce aliasing.
-/// PolyBlep uses offsets to round off sharp edges and reduce aliasing.
+/// PolyBLEP (Polynomial Bandlimited Step) uses offsets to round off sharp edges
+/// and reduce aliasing.
 pub enum AntialiasType {
-    Aliased, PolyBlep
+    /// Naive, aliasing waveforms.
+    Aliased, 
+    /// Antialiasing using PolyBLEP.
+    PolyBlep
 }
 
 /// Oscillator waveforms.
 ///
-/// Saw, Square, and Tri provide both aliased waveforms, and antialiased
+/// `Saw`, `Square`, and `Tri` provides either aliased waveforms, or antialiased
 /// waveforms using PolyBLEP. Aliased waveformsare useful for control signals,
 /// but not for raw audio signals. For audible signals, instead used the
-/// corresponding PolyBlep waveforms.
+/// corresponding `PolyBlep` waveforms.
 pub enum Waveform {
     Sine, 
     Saw(AntialiasType), 
@@ -35,9 +39,9 @@ pub enum Waveform {
     PulseTrain
 }
 
-/// Generates a periodic waveform.
+/// An oscillator that generates a periodic waveform.
 pub struct Oscillator {
-    /// The oscillator output array, with a single output channel.
+    /// A single output audio channel
     pub output: OutputArray<Sample>,
 
     waveform: Waveform,
@@ -48,7 +52,7 @@ pub struct Oscillator {
 
 impl Oscillator {
     /// Returns an oscillator with the specified waveform at the specified
-    /// frequency.
+    /// frequency, in Hz.
     pub fn new(waveform: Waveform, freq: f32) -> Oscillator {
         Oscillator { 
             output: OutputArray::new(1),

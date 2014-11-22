@@ -1,4 +1,4 @@
-//! Provides first order IIR filters
+//! Provides first order IIR filters.
 //!
 //! A `LowPass` or `HighPass` filter will provide a 3dB attenuation at the
 //! cutoff frequency, and roughly 6dB per octave rolloff in the attenuation
@@ -22,12 +22,12 @@ use core::util::decibel_to_ratio;
 use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf};
 
 
-/// Specifies the mode for a first order `Filter`
+/// Specifies the mode for a first order `Filter`.
 ///
-/// `LowPass` and `HighPass` filters specify the cutoff frequency in Hz
+/// `LowPass` and `HighPass` filters specify the cutoff frequency in Hz.
 ///
 /// `LowShelf` and `HighShelf` filters specify the cutoff frequency in Hz, and 
-/// the gain for the shelf region in decibels
+/// the gain for the shelf region in decibels.
 pub enum FilterMode {
     LowPass(f32),       // cutoff
     HighPass(f32),
@@ -38,7 +38,9 @@ pub enum FilterMode {
 /// A filter that uses a first order all pass filter to perform the specified
 /// mode. Each of the channels will be filtered independently.
 pub struct Filter {
+    /// Input audio channels
     pub inputs: InputArray<Sample>,
+    /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
     num_channels: uint, 

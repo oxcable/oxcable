@@ -1,4 +1,4 @@
-//! Device for selecting one of several channels
+//! `Device` for selecting one of several channels.
 
 #![experimental]
 
@@ -6,11 +6,13 @@ use core::components::{InputArray, OutputArray};
 use core::types::{Device, Sample, Time};
 
 
-/// Mirrors one of its inputs into a single output
+/// A multiplexer.
+///
+/// Mirrors one of its inputs into a single output while ignoring the rest.
 pub struct Multiplexer {
-    /// The input array, receiving many signals
+    /// Input audio channels
     pub inputs: InputArray<Sample>,
-    /// The output array, with a single channel
+    /// A single output audio channel
     pub output: OutputArray<Sample>,
 
     num_inputs: uint, 
@@ -18,7 +20,7 @@ pub struct Multiplexer {
 }
 
 impl Multiplexer {
-    /// Returns a new multiplexer with `num_inputs` input channels
+    /// Returns a new multiplexer with `num_inputs` input channels.
     pub fn new(num_inputs: uint) -> Multiplexer {
         Multiplexer {
             inputs: InputArray::new(num_inputs),
@@ -30,7 +32,7 @@ impl Multiplexer {
 
     /// Mirror channel `i` to the output.
     ///
-    /// Returns Err if the channel is out of range
+    /// Returns Err if the channel is out of range.
     pub fn select_input(&mut self, i: uint) -> Result<(),()> {
         if i < self.num_inputs {
             self.selected = i;

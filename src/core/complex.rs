@@ -1,7 +1,4 @@
-//! A complex number type and corresponding arithmetic.
-//!
-//! This module provides operator overloads for addition, subtraction,
-//! multiplication and negation.
+//! Provides a complex number type and corresponding arithmetic.
 
 #![unstable="operator overloads in rust are not yet stable"]
 
@@ -9,8 +6,10 @@ use std::fmt;
 use std::num::{Float, FloatMath};
 
 
-/// A complex number, stored to in rectangular form to 64-bit precision.
-#[unstable="operator overloads in rust are not yet stable"]
+/// A complex number, stored in rectangular form to 64-bit precision.
+///
+/// This type has operator overloads for addition, subtraction, multiplication
+/// and negation.
 pub struct Complex {
     r: f32,
     i: f32,

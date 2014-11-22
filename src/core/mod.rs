@@ -1,4 +1,5 @@
-//! Core definitions, components, and functions for creating audio devices.
+//! Provides core types, components, and utility functions for creating audio
+//! and MIDI devices.
 
 #![experimental]
 

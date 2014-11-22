@@ -8,8 +8,7 @@ fn main() {
     use oxcable::core::init;
     use oxcable::core::types::Device;
     use oxcable::delay::Delay;
-    use oxcable::io::microphone::Microphone;
-    use oxcable::io::speaker::Speaker;
+    use oxcable::io::audio::{AudioIn, AudioOut};
     use oxcable::mixers::Gain;
     use oxcable::oscillator;
     use oxcable::oscillator::Oscillator;
@@ -17,7 +16,7 @@ fn main() {
     println!("Setting up signal chain...");
     assert!(init::initialize().is_ok());
 
-    let mut mic = Microphone::new(1);
+    let mut mic = AudioIn::new(1);
     let mut del = Delay::new(0.5, 0.5, 0.5, 1);
     del.inputs.set_channel(0, mic.outputs.get_channel(0));
 
@@ -25,7 +24,7 @@ fn main() {
     let mut gain = Gain::new(-12.0, 1);
     gain.inputs.set_channel(0, osc.output.get_channel(0));
 
-    let mut spk = Speaker::new(2);
+    let mut spk = AudioOut::new(2);
     spk.inputs.set_channel(0, del.outputs.get_channel(0));
     spk.inputs.set_channel(1, gain.outputs.get_channel(0));
 

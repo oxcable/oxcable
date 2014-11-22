@@ -26,15 +26,15 @@ use core::util::decibel_to_ratio;
 use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf, Peak};
 
 
-/// Specifies the mode for a first order `Filter`
+/// Specifies the mode for a first order `Filter`.
 ///
-/// `LowPass` and `HighPass` filters specify the cutoff frequency in Hz
+/// `LowPass` and `HighPass` filters specify the cutoff frequency in Hz.
 ///
 /// `LowShelf` and `HighShelf` filters specify the cutoff frequency in Hz, and 
-/// the gain for the shelf region in decibels
+/// the gain for the shelf region in decibels.
 ///
 /// `Peak` filters specify the center frequency in Hz, the gain for the peak in
-/// decibels, and the filter Q
+/// decibels, and the filter Q.
 pub enum FilterMode {
     LowPass(f32),        // cutoff
     HighPass(f32),
@@ -46,7 +46,9 @@ pub enum FilterMode {
 /// A filter that uses a second order all pass filter to perform the specified
 /// mode. Each of the channels will be filtered independently.
 pub struct Filter {
+    /// Input audio channels
     pub inputs: InputArray<Sample>,
+    /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
     num_channels: uint, 

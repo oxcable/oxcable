@@ -1,4 +1,4 @@
-//! Provides a compression filter
+//! Provides a compression filter.
 
 #![experimental]
 
@@ -10,9 +10,11 @@ use core::util::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
 
 
-/// A compressor
+/// A compression filter.
 pub struct Compressor {
+    /// Input audio channels
     pub inputs: InputArray<Sample>,
+    /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
     level_detectors: Vec<LevelDetector>,
@@ -25,10 +27,12 @@ pub struct Compressor {
 impl Compressor {
     /// Creates a new compressor.
     ///
-    /// The threshold specifies the decibel level at which compression begins.
-    /// 
-    /// Additionally, the specified gain (in decibels) will be applied to the
-    /// signal after compression.
+    /// * `threshold` specifies the decibel level at which compression begins.
+    /// * `ratio` specifies the ratio of attenuation above the threshold. For
+    ///   example, a compression ratio of 0 provides NO attenuation;
+    ///   a compression ratio of 1 forces the output down to the threshold.
+    /// * The specified `gain` (in decibels) will be applied to the
+    ///   signal after compression.
     pub fn new(threshold: f32, compression_ratio: f32, gain: f32, 
                num_channels: uint) -> Compressor {
         // Create our level detectors

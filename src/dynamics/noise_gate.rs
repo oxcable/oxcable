@@ -1,4 +1,4 @@
-//! Provides a noise gate filter
+//! Provides a noise gate filter.
 
 #![experimental]
 
@@ -12,7 +12,9 @@ use dynamics::level_detector::LevelDetector;
 
 /// A noise gate
 pub struct NoiseGate {
+    /// Input audio channels
     pub inputs: InputArray<Sample>,
+    /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
     level_detectors: Vec<LevelDetector>,
@@ -26,12 +28,12 @@ pub struct NoiseGate {
 impl NoiseGate {
     /// Creates a new compressor.
     ///
-    /// The noise gate will pass audio once it hits the on_threshold (in
+    /// The noise gate will pass audio once it hits the `on_threshold` (in
     /// decibels), and continue passing until the signal level drops below the
-    /// off_threshold (also in decibels).
+    /// `off_threshold` (also in decibels).
     /// 
-    /// Additionally, the specified gain (in decibels) will be applied to the
-    /// signal after compression.
+    /// The specified `gain` (in decibels) will be applied to the signal after
+    /// compression.
     pub fn new(on_threshold: f32, off_threshold: f32, gain: f32, 
                num_channels: uint) -> NoiseGate {
         // Create our level detectors

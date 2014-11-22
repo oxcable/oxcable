@@ -1,19 +1,18 @@
-//! A generic ring buffer
-//!
-//! A ring buffer can continue adding data on to the end of itself indefinitely.
-//! However, it has a limited capacity; when that capacity is reached, it will
-//! remove the oldest data to make space.
+//! Provides a generic ring buffer
 
 #![unstable]
 
 use std::clone::Clone;
-use std::num::Num;
 use std::vec::Vec;
 
 use core::types::Time;
 
 
 /// A generic ring buffer
+///
+/// A ring buffer can continue adding data on to the end of itself indefinitely.
+/// However, it has a limited capacity; when that capacity is reached, it will
+/// remove the oldest data to make space.
 pub struct RingBuffer<T: Clone> {
     buf: Vec<T>,
     capacity: uint,
@@ -70,9 +69,9 @@ impl<T: Clone> RingBuffer<T> {
     }
 }
 
-impl<T: Num+Clone> RingBuffer<T> {
-    /// Attempts to add to the value at time `t` to `data`. If the requested
-    /// time is not in the buffer, instead returns `Err`.
+impl<T: Add<T,T>+Clone> RingBuffer<T> {
+    /// Attempts to add to the provided value to the current value at time `t`.
+    /// If the requested time is not in the buffer, instead returns `Err`.
     pub fn add(&mut self, t: Time, data: T) -> Result<(),()> {
         if self.start_t <= t && t < self.end_t {
             let i = (t % self.capacity as Time) as uint;

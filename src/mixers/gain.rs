@@ -1,4 +1,4 @@
-//! Device for changing channel levels
+//! `Device` for changing channel levels.
 
 #![experimental]
 
@@ -7,13 +7,16 @@ use core::types::{Device, Sample, Time};
 use core::util::decibel_to_ratio;
 
 
-/// Scales each input by the gain, and puts it in the corresponding output.
+/// A gain filter.
 ///
-/// For example, for a 3dB stereo gain, channel 0 in inputs will be multiplied
-/// by 2 then placed in channel 0 of the outputs; channel 1 in the inputs will
-/// be scaled by 2 then placed in channel 1 of the outputs.
+/// Scales each input by the gain, and puts it in the corresponding output.  For
+/// example, for a 3dB stereo gain, channel 0 in inputs will be multiplied by
+/// 2 then placed in channel 0 of the outputs; channel 1 in the inputs will be
+/// scaled by 2 then placed in channel 1 of the outputs.
 pub struct Gain {
+    /// Input audio channels.
     pub inputs: InputArray<Sample>,
+    /// Output audio channels.
     pub outputs: OutputArray<Sample>,
 
     num_channels: uint, 
@@ -23,7 +26,7 @@ pub struct Gain {
 impl Gain {
     /// Returns a new gain filter.
     ///
-    /// `gain` should be in decibels
+    /// `gain` should be in decibels.
     pub fn new(gain: f32, num_channels: uint) -> Gain {
         Gain {
             inputs: InputArray::new(num_channels),

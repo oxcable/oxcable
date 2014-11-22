@@ -1,8 +1,8 @@
-//! Efficient fast Fourier transform computation.
+//! Provides an efficient Fast Fourier transform.
 //!
 //! A `Transformer` must first be created that stores precomputed information to
-//! speed up the transform. A `Transformer` can only perform FFTs of the chosen
-//! size.
+//! speed up the transform. This `Transformer` can then be used only to perform
+//! FFTs of the chosen size.
 
 #![stable]
 
@@ -74,7 +74,8 @@ impl Transformer {
         self.transform(input, output, true)
     }
 
-    /// Performs a transform on `input`, placing the result in `output`.
+    /// Performs the actual transform on `input`, placing the result in
+    /// `output`.
     /// 
     /// This function performs both forward and backwards transforms, since
     /// there are only minor algorithmic differences in the beginning and end

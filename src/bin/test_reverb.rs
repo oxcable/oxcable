@@ -7,16 +7,15 @@ extern crate oxcable;
 fn main() {
     use oxcable::core::init;
     use oxcable::core::types::Device;
-    use oxcable::io::microphone::Microphone;
-    use oxcable::io::speaker::Speaker;
+    use oxcable::io::audio::{AudioIn, AudioOut};
     use oxcable::reverb::{MoorerReverb, rooms};
 
     println!("Initializing signal chain..."); 
     assert!(init::initialize().is_ok());
 
-    let mut mic = Microphone::new(1);
+    let mut mic = AudioIn::new(1);
     let mut rev = MoorerReverb::new(rooms::hall(), 1.0, -3.0, 0.5, 1);
-    let mut spk = Speaker::new(1);
+    let mut spk = AudioOut::new(1);
     rev.inputs.set_channel(0, mic.outputs.get_channel(0));
     spk.inputs.set_channel(0, rev.outputs.get_channel(0));
 

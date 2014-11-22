@@ -1,4 +1,4 @@
-//! Provides a limiter filter
+//! Provides a limiter filter.
 
 #![experimental]
 
@@ -10,9 +10,11 @@ use core::util::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
 
 
-/// A limiter
+/// A limiter.
 pub struct Limiter {
+    /// Input audio channels
     pub inputs: InputArray<Sample>,
+    /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
     level_detectors: Vec<LevelDetector>,
@@ -24,10 +26,9 @@ pub struct Limiter {
 impl Limiter {
     /// Creates a new limiter.
     ///
-    /// The threshold specifies the decibel level to limit the signal at.
-    /// 
-    /// Additionally, the specified gain (in decibels) will be applied to the
-    /// signal after compression.
+    /// * `threshold` specifies the decibel level to limit the signal to.
+    /// * The specified `gain` (in decibels) will be applied to the
+    ///   signal after compression.
     pub fn new(threshold: f32, gain: f32, num_channels: uint) -> Limiter {
         // Create our level detectors
         let mut levels = Vec::with_capacity(num_channels);

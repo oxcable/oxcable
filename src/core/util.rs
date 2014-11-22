@@ -1,24 +1,24 @@
-//! A collection of small utility functions
+//! A collection of small utility functions.
 
 #![unstable]
 
 use std::num::Float;
 
 
-/// Compares floating point numbers for equality
+/// Compares floating point numbers for equality.
 ///
 /// The maximum difference is specified by `epsilon`; that is, `f1` and `f2` are
-/// equal if they differ by at most epsilon
+/// equal if they differ by at most epsilon.
 pub fn flt_eq(f1: f32, f2: f32, epsilon: f32) -> bool {
     (f1 - f2).abs() < epsilon
 }
 
-/// Converts a decibel multiplier to a power ratio
+/// Converts a decibel multiplier to a power ratio.
 pub fn decibel_to_ratio(db: f32) -> f32 {
     10.0.powf(db/10.0)
 }
 
-/// Converts a power ratio to decibels
+/// Converts a power ratio to decibels.
 pub fn ratio_to_decibel(ratio: f32) -> f32 {
     10.0*ratio.log10()
 }
@@ -29,7 +29,7 @@ mod tests {
     use super::flt_eq;
     static EPSILON: f32 = 1e-6;
 
-    /// Tests some basic decibel vaulues
+    /// Tests some basic decibel values.
     #[test]
     fn test_decibel_to_ratio() {
         use super::decibel_to_ratio;
@@ -40,7 +40,7 @@ mod tests {
         assert!(flt_eq(decibel_to_ratio(10.0), 10.0, EPSILON));
     }
 
-    /// Tests some basic ratio vaulues
+    /// Tests some basic ratio values.
     #[test]
     fn test_ratio_to_decibel() {
         use super::ratio_to_decibel;

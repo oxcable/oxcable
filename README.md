@@ -1,7 +1,9 @@
-OxilaryCable
-=============
+oxcable
+=======
 
-A simple audio processing and MIDI framework in Rust.
+A simple audio processing and MIDI framework in Rust. The name is a play on
+words, referencing auxilary cables used for audio signals, and iron oxide (aka
+rust).
 
 This is a personal project of mine, with two goals:
  1. To learn Rust.
@@ -12,10 +14,11 @@ I am still fleshing out the core libraries, so interfaces are very unstable.
 Installing
 ----------
 
-Currently. OxilaryCable requires PortAudio be installed on your machine. On Mac,
-this is available on Homebrew. To install, run:
+Currently oxcable requires PortAudio and PortMIDI be installed on your machine.
+On Mac, these are available on Homebrew. To install, run:
 
     brew install portaudio
+    brew install portmidi
 
 Scripts
 -------

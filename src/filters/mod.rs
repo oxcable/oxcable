@@ -1,4 +1,4 @@
-//! Defines Devices for IIR filters
+//! Defines `Device`s for IIR filters.
 
 #![experimental]
 

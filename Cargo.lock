@@ -1,6 +1,6 @@
 [root]
-name = "OxilaryCable"
-version = "0.0.1"
+name = "oxcable"
+version = "0.1.0"
 dependencies = [
  "portaudio 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "portmidi 0.0.1 (git+https://github.com/musitdev/rust-portmidi.git)",

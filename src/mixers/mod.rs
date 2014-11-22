@@ -1,4 +1,4 @@
-//! Defines Devices for mixing signals
+//! Defines `Device`s for mixing signals
 
 #![experimental]
 

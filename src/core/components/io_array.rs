@@ -1,4 +1,4 @@
-//! Time synchronized input and output arrays
+//! Provides time synchronized input and output arrays.
 
 #![experimental]
 
@@ -7,11 +7,15 @@ use std::default::Default;
 use std::rc::Rc;
 use std::vec::Vec;
 
-use core::components::channel::{Channel, ChannelRef};
+use core::components::channel::Channel;
 use core::types::Time;
 
 
-/// Stores generated audio data and manages access to that data.
+/// A reference to a channel, used to link outputs to inputs.
+pub type ChannelRef<T> = Rc<RefCell<Channel<T>>>;
+
+
+/// Stores generated frame data and manages access to that data.
 #[experimental]
 pub struct OutputArray<T> {
     chs: Vec<ChannelRef<T>>
@@ -20,7 +24,7 @@ pub struct OutputArray<T> {
 impl<T: Clone+Default> OutputArray<T> {
     /// Creates a new output array with `num_channels` channels.
     ///
-    /// These channels are initialized at time 0.
+    /// These channels are initialized to time `t=0`.
     pub fn new(num_channels: uint) -> OutputArray<T> {
         let mut chs = Vec::with_capacity(num_channels);
         for _ in range(0, num_channels) {
@@ -39,26 +43,26 @@ impl<T: Clone+Default> OutputArray<T> {
         self.chs[i].clone()
     }
 
-    /// Attempts to get the sample from time `t` in channel `i`.
+    /// Attempts to get the data frame for time `t` in channel `i`.
     pub fn get(&self, i: uint, t: Time) -> Option<T> {
         self.chs[i].borrow_mut().get(t)
     }
 
-    /// Pushes the next sample to channel `i`.
-    pub fn push(&self, i: uint, s: T) {
-        self.chs[i].borrow_mut().push(s);
+    /// Pushes the next data frame to channel `i`.
+    pub fn push(&self, i: uint, f: T) {
+        self.chs[i].borrow_mut().push(f);
     }
 }
 
 
-/// Holds references to channels to draw input audio data from.
+/// Holds references to channels to draw input data frames from.
 #[experimental]
 pub struct InputArray<T> {
     chs: Vec<Option<ChannelRef<T>>>
 }
 
 impl<T: Clone+Default> InputArray<T> {
-    /// Creates a new input array that can receive from `num_channels channels.
+    /// Creates a new input array that can receive from `num_channels` channels.
     /// 
     /// These channels are initialized as empty, and must be filled to return
     /// input data.

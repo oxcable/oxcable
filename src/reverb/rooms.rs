@@ -1,4 +1,8 @@
 //! Provides parameter sets to simulate different reverberant environments.
+//!
+//! These parameter sets use vectors, which can't easily be provided statically,
+//! so instead we use functions that generate a fixed set of parameters for each
+//! model.
 
 #![unstable]
 
@@ -7,7 +11,7 @@ use std::vec::Vec;
 use core::types::Time;
 
 
-/// A room defines three sets of numbers.
+/// Provides parameter sets meant to simulate different environments.
 ///
 /// The tapped delays and tapped gains specify the start of the reverb, and must
 /// be the same length. They represent the initial multipaths, and are used to
@@ -21,8 +25,10 @@ pub struct Room {
     pub comb_delays: Vec<Time>
 }
 
-// A simulation of a concert hall, originally designed by James Moorer for his
-// paper, "About This Reverberation Business".
+/// A simulation of a concert hall.
+///
+/// Originally designed by James Moorer for his paper, "About This Reverberation
+/// Business".
 pub fn hall() -> Room {
     Room {
         // For these parameters, see pg. 24 from Moorer paper

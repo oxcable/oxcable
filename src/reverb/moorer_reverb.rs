@@ -14,7 +14,9 @@ use reverb::rooms::Room;
 
 /// A multichannel reverb filter, that operates on each channel indepedently.
 pub struct MoorerReverb {
+    /// Input audio channels
     pub inputs: InputArray<Sample>,
+    /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
     num_channels: uint,

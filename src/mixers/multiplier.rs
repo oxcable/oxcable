@@ -1,4 +1,4 @@
-//! Device for multiplying multiple channels into one
+//! `Device` for multiplying multiple channels into one.
 
 #![experimental]
 
@@ -6,11 +6,13 @@ use core::components::{InputArray, OutputArray};
 use core::types::{Device, Sample, Time};
 
 
-/// Multiplies all its inputs into a single output
+/// A multiplier.
+///
+/// Multiplies all its inputs into a single output.
 pub struct Multiplier {
-    /// The input array, receiving many signals
+    /// Input audio channels
     pub inputs: InputArray<Sample>,
-    /// The output array, with a single channel
+    /// A single audio output channel.
     pub output: OutputArray<Sample>,
 
     num_inputs: uint, 

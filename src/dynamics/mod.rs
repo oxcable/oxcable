@@ -1,4 +1,4 @@
-//! Defines Devices for dynamics processing
+//! Provides `Device`s that perform dynamics processing.
 
 #![experimental]
 

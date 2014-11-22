@@ -1,4 +1,4 @@
-//! Provides Devices for reading/writing wav files
+//! Provides audio IO from wav files.
 
 #![experimental]
 
@@ -8,12 +8,12 @@ use core::components::{InputArray, OutputArray};
 use core::types::{SAMPLE_RATE, Device, Time, Sample};
 
 
-/// Reads audio from a wav file
+/// Reads audio from a wav file.
 ///
 /// The reader will continue until it runs out of samples. When it does, the
 /// reader will return silence until it is reset to the beginning of the file.
 pub struct WavReader {
-    /// The wav file output
+    /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
     num_channels: uint,
@@ -23,7 +23,7 @@ pub struct WavReader {
 }
 
 impl WavReader {
-    /// Returns a `WavReader` reading the provided file
+    /// Returns a `WavReader` reading the provided file.
     ///
     /// This function panics if the file can't be opened, or is not a valid wav
     /// file.
@@ -41,17 +41,17 @@ impl WavReader {
         }
     }
 
-    /// Returns the number of audio samples in the wav file
+    /// Returns the number of audio samples in the wav file.
     pub fn get_num_samples(&self) -> uint {
         self.num_samples
     }
 
-    /// Returns true if we have read the entire wav file
+    /// Returns true if we have read the entire wav file.
     pub fn is_done(&self) -> bool {
         self.samples_read >= self.num_samples
     }
 
-    /// Resets the reader to begin reading from the start of the file
+    /// Resets the reader to begin reading from the start of the file.
     pub fn restart(&mut self) -> IoResult<()> {
         self.samples_read = 0;
         self.file.seek(44, SeekSet)
@@ -78,7 +78,7 @@ impl Device for WavReader {
 /// The writer initializes the data_size to be 0. This will not be overwritten
 /// with the proper size until `update_data_size` is called.
 pub struct WavWriter {
-    /// The wav file input
+    /// Input audio channels
     pub inputs: InputArray<Sample>,
 
     num_channels: uint,

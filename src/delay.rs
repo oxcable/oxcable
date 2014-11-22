@@ -1,4 +1,4 @@
-//! A simple delay module
+//! Provides a simple delay module.
 
 #![experimental]
 
@@ -10,14 +10,16 @@ use core::ringbuffer::RingBuffer;
 use core::types::{SAMPLE_RATE, Device, Sample, Time};
 
 
-/// A delay that feeds back each channel independently
+/// A delay that feeds back each channel independently.
 ///
 /// The delay filter plays back delayed copies of its input. The first delay is
 /// played at full amplitude, and is then decayed linearly by the feedback
 /// multiplier. The output is mixed with the raw input using the wetness
 /// percentage.
 pub struct Delay {
+    /// Input audio channels
     pub inputs: InputArray<Sample>,
+    /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
     num_channels: uint,
