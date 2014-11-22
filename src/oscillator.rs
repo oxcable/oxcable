@@ -6,7 +6,7 @@ use std::f32::consts::PI;
 use std::num::FloatMath;
 use std::rand;
 
-use core::components::OutputArray;
+use core::components::OutputElement;
 use core::types::{SAMPLE_RATE, Device, Sample, Time};
 
 use self::AntialiasType::PolyBlep;
@@ -42,7 +42,7 @@ pub enum Waveform {
 /// An oscillator that generates a periodic waveform.
 pub struct Oscillator {
     /// A single output audio channel
-    pub output: OutputArray<Sample>,
+    pub output: OutputElement<Sample>,
 
     waveform: Waveform,
     phase: f32,
@@ -55,7 +55,7 @@ impl Oscillator {
     /// frequency, in Hz.
     pub fn new(waveform: Waveform, freq: f32) -> Oscillator {
         Oscillator { 
-            output: OutputArray::new(1),
+            output: OutputElement::new(),
             waveform: waveform, 
             phase: 0.0, 
             phase_delta: freq*2.0*PI/(SAMPLE_RATE as f32),
@@ -131,7 +131,7 @@ impl Device for Oscillator {
         };
 
         // Push the sample out
-        self.output.push(0, s);
+        self.output.push(s);
     }
 }
 
@@ -210,15 +210,15 @@ mod test {
         let mut osc = Oscillator::new(Waveform::Square(AntialiasType::Aliased),
                                       4410.0);
 
-        osc.tick(0); assert!(osc.output.get(0, 0).unwrap() == 1.0);
-        osc.tick(1); assert!(osc.output.get(0, 1).unwrap() == 1.0);
-        osc.tick(2); assert!(osc.output.get(0, 2).unwrap() == 1.0);
-        osc.tick(3); assert!(osc.output.get(0, 3).unwrap() == 1.0);
-        osc.tick(4); assert!(osc.output.get(0, 4).unwrap() == -1.0);
-        osc.tick(5); assert!(osc.output.get(0, 5).unwrap() == -1.0);
-        osc.tick(6); assert!(osc.output.get(0, 6).unwrap() == -1.0);
-        osc.tick(7); assert!(osc.output.get(0, 7).unwrap() == -1.0);
-        osc.tick(8); assert!(osc.output.get(0, 8).unwrap() == -1.0);
+        osc.tick(0); assert!(osc.output.get(0).unwrap() == 1.0);
+        osc.tick(1); assert!(osc.output.get(1).unwrap() == 1.0);
+        osc.tick(2); assert!(osc.output.get(2).unwrap() == 1.0);
+        osc.tick(3); assert!(osc.output.get(3).unwrap() == 1.0);
+        osc.tick(4); assert!(osc.output.get(4).unwrap() == -1.0);
+        osc.tick(5); assert!(osc.output.get(5).unwrap() == -1.0);
+        osc.tick(6); assert!(osc.output.get(6).unwrap() == -1.0);
+        osc.tick(7); assert!(osc.output.get(7).unwrap() == -1.0);
+        osc.tick(8); assert!(osc.output.get(8).unwrap() == -1.0);
     }
 
     /// Tests saw wave
@@ -229,23 +229,14 @@ mod test {
         let mut osc = Oscillator::new(Waveform::Saw(AntialiasType::Aliased),
                                       4410.0);
 
-        osc.tick(0); assert!(flt_eq(osc.output.get(0, 0).unwrap(), 
-                                    -0.8, EPSILON));
-        osc.tick(1); assert!(flt_eq(osc.output.get(0, 1).unwrap(),
-                                    -0.6, EPSILON));
-        osc.tick(2); assert!(flt_eq(osc.output.get(0, 2).unwrap(),
-                                    -0.4, EPSILON));
-        osc.tick(3); assert!(flt_eq(osc.output.get(0, 3).unwrap(),
-                                    -0.2, EPSILON));
-        osc.tick(4); assert!(flt_eq(osc.output.get(0, 4).unwrap(),
-                                    0.0, EPSILON));
-        osc.tick(5); assert!(flt_eq(osc.output.get(0, 5).unwrap(),
-                                    0.2, EPSILON));
-        osc.tick(6); assert!(flt_eq(osc.output.get(0, 6).unwrap(),
-                                    0.4, EPSILON));
-        osc.tick(7); assert!(flt_eq(osc.output.get(0, 7).unwrap(),
-                                    0.6, EPSILON));
-        osc.tick(8); assert!(flt_eq(osc.output.get(0, 8).unwrap(),
-                                    0.8, EPSILON));
+        osc.tick(0); assert!(flt_eq(osc.output.get(0).unwrap(), -0.8, EPSILON));
+        osc.tick(1); assert!(flt_eq(osc.output.get(1).unwrap(), -0.6, EPSILON));
+        osc.tick(2); assert!(flt_eq(osc.output.get(2).unwrap(), -0.4, EPSILON));
+        osc.tick(3); assert!(flt_eq(osc.output.get(3).unwrap(), -0.2, EPSILON));
+        osc.tick(4); assert!(flt_eq(osc.output.get(4).unwrap(), 0.0, EPSILON));
+        osc.tick(5); assert!(flt_eq(osc.output.get(5).unwrap(), 0.2, EPSILON));
+        osc.tick(6); assert!(flt_eq(osc.output.get(6).unwrap(), 0.4, EPSILON));
+        osc.tick(7); assert!(flt_eq(osc.output.get(7).unwrap(), 0.6, EPSILON));
+        osc.tick(8); assert!(flt_eq(osc.output.get(8).unwrap(), 0.8, EPSILON));
     }
 }

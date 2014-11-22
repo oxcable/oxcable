@@ -22,7 +22,7 @@ fn main() {
 
     let mut osc = Oscillator::new(oscillator::Sine, 440.0);
     let mut gain = Gain::new(-12.0, 1);
-    gain.inputs.set_channel(0, osc.output.get_channel(0));
+    gain.inputs.set_channel(0, osc.output.get_channel());
 
     let mut spk = AudioOut::new(2);
     spk.inputs.set_channel(0, del.outputs.get_channel(0));

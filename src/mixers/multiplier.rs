@@ -2,7 +2,7 @@
 
 #![experimental]
 
-use core::components::{InputArray, OutputArray};
+use core::components::{InputArray, OutputElement};
 use core::types::{Device, Sample, Time};
 
 
@@ -13,7 +13,7 @@ pub struct Multiplier {
     /// Input audio channels
     pub inputs: InputArray<Sample>,
     /// A single audio output channel.
-    pub output: OutputArray<Sample>,
+    pub output: OutputElement<Sample>,
 
     num_inputs: uint, 
 }
@@ -23,7 +23,7 @@ impl Multiplier {
     pub fn new(num_inputs: uint) -> Multiplier {
         Multiplier {
             inputs: InputArray::new(num_inputs),
-            output: OutputArray::new(1),
+            output: OutputElement::new(),
             num_inputs: num_inputs
         }
     }
@@ -35,6 +35,6 @@ impl Device for Multiplier {
         for i in range(0, self.num_inputs) {
             s *= self.inputs.get(i, t).unwrap_or(0.0);
         }
-        self.output.push(0, s);
+        self.output.push(s);
     }
 }

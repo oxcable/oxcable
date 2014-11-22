@@ -7,12 +7,8 @@ use std::default::Default;
 use std::rc::Rc;
 use std::vec::Vec;
 
-use core::components::channel::Channel;
+use core::components::channel::{Channel, ChannelRef};
 use core::types::Time;
-
-
-/// A reference to a channel, used to link outputs to inputs.
-pub type ChannelRef<T> = Rc<RefCell<Channel<T>>>;
 
 
 /// Stores generated frame data and manages access to that data.

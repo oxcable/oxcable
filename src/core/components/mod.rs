@@ -14,6 +14,8 @@
 #![experimental]
 
 pub use self::io_array::{InputArray, OutputArray};
+pub use self::io_elements::{InputElement, OutputElement};
 
 pub mod channel;
 pub mod io_array;
+pub mod io_elements;

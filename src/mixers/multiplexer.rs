@@ -2,7 +2,7 @@
 
 #![experimental]
 
-use core::components::{InputArray, OutputArray};
+use core::components::{InputArray, OutputElement};
 use core::types::{Device, Sample, Time};
 
 
@@ -13,7 +13,7 @@ pub struct Multiplexer {
     /// Input audio channels
     pub inputs: InputArray<Sample>,
     /// A single output audio channel
-    pub output: OutputArray<Sample>,
+    pub output: OutputElement<Sample>,
 
     num_inputs: uint, 
     selected: uint,
@@ -24,7 +24,7 @@ impl Multiplexer {
     pub fn new(num_inputs: uint) -> Multiplexer {
         Multiplexer {
             inputs: InputArray::new(num_inputs),
-            output: OutputArray::new(1),
+            output: OutputElement::new(),
             num_inputs: num_inputs,
             selected: 0
         }
@@ -46,6 +46,6 @@ impl Multiplexer {
 impl Device for Multiplexer {
     fn tick(&mut self, t: Time) {
         let s = self.inputs.get(self.selected, t).unwrap_or(0.0);
-        self.output.push(0, s);
+        self.output.push(s);
     }
 }

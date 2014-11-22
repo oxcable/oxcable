@@ -2,9 +2,15 @@
 
 #![experimental]
 
+use std::cell::RefCell;
 use std::default::Default;
+use std::rc::Rc;
 
 use core::types::Time;
+
+
+/// A reference to a channel, used to link outputs to inputs.
+pub type ChannelRef<T> = Rc<RefCell<Channel<T>>>;
 
 
 /// Container for a single channel of data.
