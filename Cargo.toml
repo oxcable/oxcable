@@ -2,6 +2,9 @@
 name = "OxilaryCable"
 version = "0.0.1"
 authors = ["Michael Nye <thenyeguy@gmail.com>"]
+license = "Creative Commons BY-NC-SA 4.0"
+repository = "https://github.com/thenyeguy/OxilaryCable"
+description = "A simple audio processing and MIDI framework in Rust."
 
 [lib]
 name = "oxcable"
