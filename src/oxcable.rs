@@ -1,5 +1,6 @@
 #![crate_name = "oxcable"]
 
+pub mod adsr;
 pub mod core;
 pub mod delay;
 pub mod dynamics;
