@@ -4,16 +4,16 @@
 
 use std::vec::Vec;
 
-use core::{AudioDevice, Time};
 use core::components::{InputArray, OutputArray};
+use core::types::{Device, Sample, Time};
 use core::util::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
 
 
 /// A compressor
 pub struct Compressor {
-    pub inputs: InputArray,
-    pub outputs: OutputArray,
+    pub inputs: InputArray<Sample>,
+    pub outputs: OutputArray<Sample>,
 
     level_detectors: Vec<LevelDetector>,
     num_channels: uint, 
@@ -49,7 +49,7 @@ impl Compressor {
     }
 }
 
-impl AudioDevice for Compressor {
+impl Device for Compressor {
     fn tick(&mut self, t: Time) {
         for i in range(0, self.num_channels) {
             let s = self.inputs.get(i, t).unwrap_or(0.0);

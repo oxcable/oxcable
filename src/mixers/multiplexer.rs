@@ -2,16 +2,16 @@
 
 #![experimental]
 
-use core::{AudioDevice, Time};
 use core::components::{InputArray, OutputArray};
+use core::types::{Device, Sample, Time};
 
 
 /// Mirrors one of its inputs into a single output
 pub struct Multiplexer {
     /// The input array, receiving many signals
-    pub inputs: InputArray,
+    pub inputs: InputArray<Sample>,
     /// The output array, with a single channel
-    pub output: OutputArray,
+    pub output: OutputArray<Sample>,
 
     num_inputs: uint, 
     selected: uint,
@@ -41,7 +41,7 @@ impl Multiplexer {
     }
 }
 
-impl AudioDevice for Multiplexer {
+impl Device for Multiplexer {
     fn tick(&mut self, t: Time) {
         let s = self.inputs.get(self.selected, t).unwrap_or(0.0);
         self.output.push(0, s);

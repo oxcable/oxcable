@@ -5,7 +5,8 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use oxcable::core::{AudioDevice, init};
+    use oxcable::core::init;
+    use oxcable::core::types::Device;
     use oxcable::io::microphone::Microphone;
     use oxcable::io::speaker::Speaker;
     use oxcable::reverb::{MoorerReverb, rooms};

@@ -5,7 +5,7 @@ extern crate oxcable;
 #[cfg(not(test))]
 fn main() {
     use std::vec::Vec;
-    use oxcable::core::AudioDevice;
+    use oxcable::core::types::Device;
     use oxcable::io::wav;
     use oxcable::filters::second_order;
     use oxcable::filters::second_order::Filter;

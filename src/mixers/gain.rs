@@ -2,8 +2,8 @@
 
 #![experimental]
 
-use core::{AudioDevice, Time};
 use core::components::{InputArray, OutputArray};
+use core::types::{Device, Sample, Time};
 use core::util::decibel_to_ratio;
 
 
@@ -13,8 +13,8 @@ use core::util::decibel_to_ratio;
 /// by 2 then placed in channel 0 of the outputs; channel 1 in the inputs will
 /// be scaled by 2 then placed in channel 1 of the outputs.
 pub struct Gain {
-    pub inputs: InputArray,
-    pub outputs: OutputArray,
+    pub inputs: InputArray<Sample>,
+    pub outputs: OutputArray<Sample>,
 
     num_channels: uint, 
     gain: f32,
@@ -34,7 +34,7 @@ impl Gain {
     }
 }
 
-impl AudioDevice for Gain {
+impl Device for Gain {
     fn tick(&mut self, t: Time) {
         for i in range(0, self.num_channels) {
             let s = self.inputs.get(i, t).unwrap_or(0.0);

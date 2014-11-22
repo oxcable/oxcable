@@ -15,8 +15,8 @@ use std::f32::consts::PI;
 use std::num::FloatMath;
 use std::vec::Vec;
 
-use core::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use core::components::{InputArray, OutputArray};
+use core::types::{SAMPLE_RATE, Device, Sample, Time};
 use core::util::decibel_to_ratio;
 
 use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf};
@@ -38,8 +38,8 @@ pub enum FilterMode {
 /// A filter that uses a first order all pass filter to perform the specified
 /// mode. Each of the channels will be filtered independently.
 pub struct Filter {
-    pub inputs: InputArray,
-    pub outputs: OutputArray,
+    pub inputs: InputArray<Sample>,
+    pub outputs: OutputArray<Sample>,
 
     num_channels: uint, 
     x_last: Vec<Sample>,
@@ -113,7 +113,7 @@ fn compute_parameters(mode: FilterMode) -> (f32, f32) {
     }
 }
 
-impl AudioDevice for Filter {
+impl Device for Filter {
     fn tick(&mut self, t: Time) {
         for i in range(0, self.num_channels) {
             let x = self.inputs.get(i, t).unwrap_or(0.0);

@@ -6,8 +6,8 @@ use std::f32::consts::PI;
 use std::num::FloatMath;
 use std::rand;
 
-use core::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use core::components::OutputArray;
+use core::types::{SAMPLE_RATE, Device, Sample, Time};
 
 use self::AntialiasType::PolyBlep;
 use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
@@ -38,7 +38,7 @@ pub enum Waveform {
 /// Generates a periodic waveform.
 pub struct Oscillator {
     /// The oscillator output array, with a single output channel.
-    pub output: OutputArray,
+    pub output: OutputArray<Sample>,
 
     waveform: Waveform,
     phase: f32,
@@ -60,7 +60,7 @@ impl Oscillator {
     }
 }
 
-impl AudioDevice for Oscillator {
+impl Device for Oscillator {
     fn tick(&mut self, _t: Time) {
         // Tick the phase
         self.phase += self.phase_delta;
@@ -202,7 +202,7 @@ mod test {
     #[test]
     fn test_naive_square() {
         use super::{AntialiasType, Waveform, Oscillator};
-        use core::AudioDevice;
+        use core::types::Device;
         let mut osc = Oscillator::new(Waveform::Square(AntialiasType::Aliased),
                                       4410.0);
 
@@ -221,7 +221,7 @@ mod test {
     #[test]
     fn test_naive_saw() {
         use super::{AntialiasType, Waveform, Oscillator};
-        use core::AudioDevice;
+        use core::types::Device;
         let mut osc = Oscillator::new(Waveform::Saw(AntialiasType::Aliased),
                                       4410.0);
 

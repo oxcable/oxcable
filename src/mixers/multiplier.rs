@@ -2,16 +2,16 @@
 
 #![experimental]
 
-use core::{AudioDevice, Time};
 use core::components::{InputArray, OutputArray};
+use core::types::{Device, Sample, Time};
 
 
 /// Multiplies all its inputs into a single output
 pub struct Multiplier {
     /// The input array, receiving many signals
-    pub inputs: InputArray,
+    pub inputs: InputArray<Sample>,
     /// The output array, with a single channel
-    pub output: OutputArray,
+    pub output: OutputArray<Sample>,
 
     num_inputs: uint, 
 }
@@ -27,7 +27,7 @@ impl Multiplier {
     }
 }
 
-impl AudioDevice for Multiplier {
+impl Device for Multiplier {
     fn tick(&mut self, t: Time) {
         let mut s = 1.0;
         for i in range(0, self.num_inputs) {

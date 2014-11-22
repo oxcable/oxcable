@@ -10,7 +10,7 @@ use std::clone::Clone;
 use std::num::Num;
 use std::vec::Vec;
 
-use core::Time;
+use core::types::Time;
 
 
 /// A generic ring buffer

@@ -5,9 +5,9 @@
 
 use std::vec::Vec;
 
-use core::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use core::components::{InputArray, OutputArray};
 use core::ringbuffer::RingBuffer;
+use core::types::{SAMPLE_RATE, Device, Sample, Time};
 
 
 /// A delay that feeds back each channel independently
@@ -17,8 +17,8 @@ use core::ringbuffer::RingBuffer;
 /// multiplier. The output is mixed with the raw input using the wetness
 /// percentage.
 pub struct Delay {
-    pub inputs: InputArray,
-    pub outputs: OutputArray,
+    pub inputs: InputArray<Sample>,
+    pub outputs: OutputArray<Sample>,
 
     num_channels: uint,
     delay_buffers: Vec<RingBuffer<Sample>>,
@@ -57,7 +57,7 @@ impl Delay {
     }
 }
 
-impl AudioDevice for Delay {
+impl Device for Delay {
     fn tick(&mut self, t: Time) {
         for i in range(0, self.num_channels) {
             let s = self.inputs.get(i, t).unwrap_or(0.0);

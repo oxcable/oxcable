@@ -1,4 +1,4 @@
-//! Defines AudioDevices for mixing signals
+//! Defines Devices for mixing signals
 
 #![experimental]
 

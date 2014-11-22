@@ -4,7 +4,8 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use oxcable::core::{AudioDevice, init};
+    use oxcable::core::init;
+    use oxcable::core::types::Device;
     use oxcable::io::microphone::Microphone;
     use oxcable::io::speaker::Speaker;
 
@@ -16,7 +17,7 @@ fn main() {
     spk.inputs.set_channel(0, mic.outputs.get_channel(0));
 
     println!("Mirroring microphone input to speaker...");
-    let mut t: oxcable::core::Time = 0;
+    let mut t = 0;
     loop {
         mic.tick(t);
         spk.tick(t);

@@ -3,6 +3,7 @@
 #![experimental]
 
 extern crate portaudio;
+extern crate portmidi;
 
 static mut INITIALIZED: bool = false;
 
@@ -15,6 +16,9 @@ pub fn initialize() -> Result<(), &'static str> {
 
     if portaudio::pa::initialize().is_err() {
         return Result::Err("failed to initialize portaudio");
+    }
+    if portmidi::midi::initialize() != portmidi::midi::PmError::PmNoError {
+        return Result::Err("failed to initialize portmidi");
     }
 
     unsafe { INITIALIZED = true; }
@@ -34,6 +38,9 @@ pub fn terminate() -> Result<(), &'static str> {
 
     if portaudio::pa::terminate().is_err() {
         return Result::Err("failed to terminate portaudio");
+    }
+    if portmidi::midi::terminate() != portmidi::midi::PmError::PmNoError {
+        return Result::Err("failed to terminate portmidi");
     }
 
     unsafe { INITIALIZED = false; }

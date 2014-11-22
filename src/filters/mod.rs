@@ -1,4 +1,4 @@
-//! Defines AudioDevices for IIR filters
+//! Defines Devices for IIR filters
 
 #![experimental]
 

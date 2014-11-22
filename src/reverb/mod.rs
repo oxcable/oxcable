@@ -1,4 +1,4 @@
-//! Defines AudioDevices for reverberation effects
+//! Defines Devices for reverberation effects
 
 #![experimental]
 

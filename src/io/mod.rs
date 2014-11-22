@@ -1,4 +1,4 @@
-//! Defines AudioDevices for getting audio into and out of oxcable.
+//! Defines Devices for getting audio into and out of oxcable.
 
 #![experimental]
 

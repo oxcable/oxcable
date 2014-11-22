@@ -6,7 +6,7 @@
 use std::num::Float;
 use std::vec::Vec;
 
-use core::{SAMPLE_RATE, AudioDevice, Sample, Time};
+use core::types::{SAMPLE_RATE, Device, Sample, Time};
 use core::components::{InputArray, OutputArray};
 use core::ringbuffer::RingBuffer;
 use core::util::decibel_to_ratio;
@@ -14,8 +14,8 @@ use reverb::rooms::Room;
 
 /// A multichannel reverb filter, that operates on each channel indepedently.
 pub struct MoorerReverb {
-    pub inputs: InputArray,
-    pub outputs: OutputArray,
+    pub inputs: InputArray<Sample>,
+    pub outputs: OutputArray<Sample>,
 
     num_channels: uint,
     gain: f32,
@@ -104,7 +104,7 @@ impl MoorerReverb {
     }
 }
 
-impl AudioDevice for MoorerReverb {
+impl Device for MoorerReverb {
     fn tick(&mut self, t: Time) {
         for i in range(0, self.num_channels) {
             let x = self.inputs.get(i, t).unwrap_or(0.0);

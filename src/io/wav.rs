@@ -1,11 +1,11 @@
-//! Provides AudioDevices for reading/writing wav files
+//! Provides Devices for reading/writing wav files
 
 #![experimental]
 
 use std::io::{IoResult, File, Truncate, ReadWrite, SeekEnd, SeekSet};
 
-use core::{SAMPLE_RATE, AudioDevice, Time, Sample};
 use core::components::{InputArray, OutputArray};
+use core::types::{SAMPLE_RATE, Device, Time, Sample};
 
 
 /// Reads audio from a wav file
@@ -14,7 +14,7 @@ use core::components::{InputArray, OutputArray};
 /// reader will return silence until it is reset to the beginning of the file.
 pub struct WavReader {
     /// The wav file output
-    pub outputs: OutputArray,
+    pub outputs: OutputArray<Sample>,
 
     num_channels: uint,
     num_samples: uint,
@@ -58,7 +58,7 @@ impl WavReader {
     }
 }
 
-impl AudioDevice for WavReader {
+impl Device for WavReader {
     fn tick(&mut self, _t: Time) {
         for i in range(0, self.num_channels) {
             let s = if self.samples_read < self.num_samples {
@@ -79,7 +79,7 @@ impl AudioDevice for WavReader {
 /// with the proper size until `update_data_size` is called.
 pub struct WavWriter {
     /// The wav file input
-    pub inputs: InputArray,
+    pub inputs: InputArray<Sample>,
 
     num_channels: uint,
     file: File,
@@ -116,7 +116,7 @@ impl WavWriter {
     }
 }
 
-impl AudioDevice for WavWriter {
+impl Device for WavWriter {
     fn tick(&mut self, t: Time) {
         for i in range(0, self.num_channels) {
             let mut s = self.inputs.get(i, t).unwrap_or(0.0);

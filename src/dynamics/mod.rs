@@ -1,4 +1,4 @@
-//! Defines AudioDevices for dynamics processing
+//! Defines Devices for dynamics processing
 
 #![experimental]
 

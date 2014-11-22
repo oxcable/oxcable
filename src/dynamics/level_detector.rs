@@ -4,7 +4,7 @@
 
 use std::num::Float;
 
-use core::{SAMPLE_RATE, Sample};
+use core::types::{SAMPLE_RATE, Sample};
 
 
 /// Provides envelope estimation for a signal.

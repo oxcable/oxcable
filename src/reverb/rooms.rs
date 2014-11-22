@@ -4,7 +4,7 @@
 
 use std::vec::Vec;
 
-use core::Time;
+use core::types::Time;
 
 
 /// A room defines three sets of numbers.
