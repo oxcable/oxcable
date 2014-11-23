@@ -19,26 +19,35 @@ use std::vec::Vec;
 
 /// A component that receives messages
 pub struct MessageReceiver<T> {
-    msgs: Arc<Mutex<Vec<T>>>
+    msgs: Arc<Mutex<Vec<T>>>,
+    num_senders: uint
 }
 
 impl<T: Clone+Send+Sync> MessageReceiver<T> {
     /// Creates a new receiver with no inputs
     pub fn new() -> MessageReceiver<T> {
-        MessageReceiver { msgs: Arc::new(Mutex::new(Vec::new())) }
+        MessageReceiver { 
+            msgs: Arc::new(Mutex::new(Vec::new())),
+            num_senders: 0
+        }
     }
 
     /// Returns a sender that writes messages only to this receiver
-    pub fn get_sender(&self) -> MessageSender<T> {
+    pub fn get_sender(&mut self) -> MessageSender<T> {
+        self.num_senders += 1;
         MessageSender { msgs: self.msgs.clone() }
     }
 
     /// Returns all the current messages and clears our input queue
     pub fn receive(&mut self) -> Vec<T> {
-        let mut msgs = self.msgs.lock();
-        let messages = msgs.clone();
-        msgs.clear();
-        messages
+        if self.num_senders == 0 {
+            Vec::new()
+        } else {
+            let mut msgs = self.msgs.lock();
+            let messages = msgs.clone();
+            msgs.clear();
+            messages
+        }
     }
 }
 

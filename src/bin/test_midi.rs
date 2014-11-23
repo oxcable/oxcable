@@ -6,7 +6,7 @@ extern crate oxcable;
 fn main() {
     use oxcable::adsr;
     use oxcable::core::init;
-    use oxcable::core::types::{Device, MidiEventType};
+    use oxcable::core::types::{Device, MidiMessage};
     use oxcable::io::audio::AudioOut;
     use oxcable::io::midi::MidiIn;
     use oxcable::oscillator;
@@ -31,10 +31,11 @@ fn main() {
         match midi.output.get(t) {
             Some(ref events) if events.len() > 0 => {
                 for event in events.iter() {
-                    match event.get_type() {
-                        MidiEventType::NoteOn => 
+                    println!("{}", event);
+                    match event.payload {
+                        MidiMessage::NoteOn(_,_) => 
                             adsr_msg.send(adsr::AdsrMessage::NoteDown),
-                        MidiEventType::NoteOff => 
+                        MidiMessage::NoteOff(_,_) => 
                             adsr_msg.send(adsr::AdsrMessage::NoteUp),
                         _ => ()
                     }

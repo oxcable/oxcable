@@ -6,7 +6,7 @@ extern crate portmidi;
 
 use std::vec::Vec;
 
-use core::types::{Device, MidiEvent, Time};
+use core::types::{Device, MidiEvent, MidiMessage, Time};
 use core::components::OutputElement;
 use core::init;
 
@@ -15,12 +15,40 @@ use core::init;
 static BUFFER_SIZE: int = 256;
 
 
+/// Converts a raw portmidi message to an oxcable MIDI event
 fn midievent_from_portmidi(event: portmidi::midi::PmEvent) -> MidiEvent {
-    MidiEvent { 
-        status: event.message.status as u8,
-        byte1: event.message.data1 as u8,
-        byte2: event.message.data2 as u8
-    }
+    let msg = event.message;
+    let channel = (msg.status & 0x0F) as u8;
+    let payload = match (msg.status as u8) >> 4 {
+        0b1000 => {
+            let note = msg.data1 as u8;
+            let velocity = (msg.data2 as f32) / 127.0;
+            MidiMessage::NoteOff(note, velocity)
+        },
+        0b1001 => {
+            let note = msg.data1 as u8;
+            let velocity = (msg.data2 as f32) / 127.0;
+            MidiMessage::NoteOn(note, velocity)
+        }
+        0b1110 => {
+            let int_value = (msg.data2 as i16 << 7) | (msg.data1 as i16);
+            let bend = (int_value - 0x2000) as f32 / 
+                (0x2000i16) as f32;
+            MidiMessage::PitchBend(bend)
+        }
+        0b1010 => {
+            let note = msg.data1 as u8;
+            let pressure = (msg.data2 as f32) / 127.0;
+            MidiMessage::KeyPressure(note, pressure)
+        }
+        0b1011 => MidiMessage::ControlChange(msg.data1 as u8, msg.data2 as u8),
+        0b1100 => MidiMessage::ProgramChange(msg.data1 as u8),
+        0b1101 => MidiMessage::ChannelPressure(msg.data1 as f32 / 127.0),
+        _ => MidiMessage::Other(msg.status as u8, msg.data1 as u8, 
+                                msg.data2 as u8)
+    };
+
+    MidiEvent { channel: channel, payload: payload }
 }
 
 

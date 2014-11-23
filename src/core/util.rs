@@ -23,6 +23,11 @@ pub fn ratio_to_decibel(ratio: f32) -> f32 {
     10.0*ratio.log10()
 }
 
+/// Converts a MIDI note number to frequency in Hz
+pub fn midi_note_to_freq(note: u8) -> f32 {
+    440.0*2.0.powf((note as f32 - 69.0) / 12.0)
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -49,5 +54,16 @@ mod tests {
         assert!(flt_eq(ratio_to_decibel(1.0), 0.0, EPSILON));
         assert!(flt_eq(ratio_to_decibel(1.995262315), 3.0, EPSILON));
         assert!(flt_eq(ratio_to_decibel(10.0), 10.0, EPSILON));
+    }
+
+    /// Tests some MIDI notes
+    #[test]
+    fn test_midi_note_to_freq() {
+        use super::midi_note_to_freq;
+        let epsilon = 1e-2f32; // use a smaller epsilon for imprecise freqs
+        assert!(flt_eq(midi_note_to_freq(21),    27.50, epsilon)); // A0
+        assert!(flt_eq(midi_note_to_freq(60),   261.63, epsilon)); // C4
+        assert!(flt_eq(midi_note_to_freq(69),   440.00, epsilon)); // A4
+        assert!(flt_eq(midi_note_to_freq(108), 4186.00, epsilon)); // C8
     }
 }
