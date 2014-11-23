@@ -22,8 +22,6 @@ fn main() {
     adsr.inputs.set_channel(0, osc.output.get_channel());
     spk.inputs.set_channel(0, adsr.outputs.get_channel(0));
 
-    let mut adsr_msg = adsr.messages.get_sender();
-
     println!("Playing...");
     let mut t = 0;
     loop {
@@ -34,9 +32,9 @@ fn main() {
                     println!("{}", event);
                     match event.payload {
                         MidiMessage::NoteOn(_,_) => 
-                            adsr_msg.send(adsr::AdsrMessage::NoteDown),
+                            adsr.handle_message(adsr::AdsrMessage::NoteDown, t),
                         MidiMessage::NoteOff(_,_) => 
-                            adsr_msg.send(adsr::AdsrMessage::NoteUp),
+                            adsr.handle_message(adsr::AdsrMessage::NoteUp, t),
                         _ => ()
                     }
                 }

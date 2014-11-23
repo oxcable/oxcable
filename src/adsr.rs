@@ -2,7 +2,7 @@
 
 #![experimental]
 
-use core::components::{InputArray, OutputArray, MessageReceiver};
+use core::components::{InputArray, OutputArray};
 use core::types::{SAMPLE_RATE,Device, Sample, Time};
 use core::util::decibel_to_ratio;
 
@@ -40,8 +40,6 @@ pub struct Adsr {
     pub inputs: InputArray<Sample>,
     /// Output audio channels
     pub outputs: OutputArray<Sample>,
-    /// AdsrMessage receiver
-    pub messages: MessageReceiver<AdsrMessage>,
 
     // Remember parameter values
     num_channels: uint,
@@ -78,7 +76,6 @@ impl Adsr {
         Adsr {
             inputs: InputArray::new(num_channels),
             outputs: OutputArray::new(num_channels),
-            messages: MessageReceiver::new(),
             num_channels: num_channels,
             attack_time: attack_samples,
             decay_time: decay_samples,
@@ -98,8 +95,8 @@ impl Adsr {
     }
 
     /// Applies the message to our Adsr
-    fn handle_message(&mut self, msg: &AdsrMessage, t: Time) {
-        match *msg {
+    pub fn handle_message(&mut self, msg: AdsrMessage, t: Time) {
+        match msg {
             AdsrMessage::NoteDown => 
                 self.handle_state_change(AdsrState::Attack, t),
             AdsrMessage::NoteUp => 
@@ -146,12 +143,6 @@ impl Adsr {
 
 impl Device for Adsr {
     fn tick(&mut self, t: Time) {
-        // Handle any received messages
-        let messages = self.messages.receive();
-        for message in messages.iter() {
-            self.handle_message(message, t);
-        }
-
         // Handle any state changes
         if self.next_state_change == t { 
             let next_state = self.current_state.next();
