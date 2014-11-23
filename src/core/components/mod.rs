@@ -30,8 +30,10 @@
 pub use self::io_array::{InputArray, OutputArray};
 pub use self::io_elements::{InputElement, OutputElement};
 pub use self::messages::{MessageSender, MessageReceiver};
+pub use self::voice_array::{Voice, VoiceArray};
 
 pub mod channel;
 pub mod io_array;
 pub mod io_elements;
 pub mod messages;
+pub mod voice_array;
