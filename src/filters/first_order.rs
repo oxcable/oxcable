@@ -19,7 +19,7 @@ use core::components::{InputArray, OutputArray};
 use core::types::{SAMPLE_RATE, Device, Sample, Time};
 use core::util::decibel_to_ratio;
 
-use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf};
+pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf};
 
 
 /// Specifies the mode for a first order `Filter`.
@@ -28,6 +28,7 @@ use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf};
 ///
 /// `LowShelf` and `HighShelf` filters specify the cutoff frequency in Hz, and 
 /// the gain for the shelf region in decibels.
+#[deriving(Clone, Copy, Show)]
 pub enum FilterMode {
     LowPass(f32),       // cutoff
     HighPass(f32),
@@ -63,7 +64,7 @@ impl Filter {
         }
 
         // Compute the parameter values. H0 is ignored for Pass filters
-        let (alpha, H0) = compute_parameters(mode);
+        let (alpha, H0) = compute_parameters(mode.clone());
 
         Filter {
             inputs: InputArray::new(num_channels),

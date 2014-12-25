@@ -220,7 +220,7 @@ mod test {
         assert!(t.fft(&impulse, &mut out).is_ok());
 
         for c in out.iter() {
-            assert!(c.eq(&one))
+            assert!(c.eq(one))
         }
     }
 
@@ -243,9 +243,9 @@ mod test {
         let t = Transformer::new(8);
         assert!(t.ifft(&impulse, &mut out).is_ok());
 
-        assert!(out[0].eq(&one));
+        assert!(out[0].eq(one));
         for c in out.slice(1,8).iter() {
-            assert!(c.eq(&zero));
+            assert!(c.eq(zero));
         }
     }
 

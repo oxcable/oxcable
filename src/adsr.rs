@@ -8,7 +8,7 @@ use core::util::decibel_to_ratio;
 
 
 /// Defines the messages that the ADSR supports
-#[deriving(Clone)]
+#[deriving(Clone, Copy)]
 pub enum AdsrMessage { 
     /// Triggers an attack
     NoteDown, 

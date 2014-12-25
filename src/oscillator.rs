@@ -9,14 +9,22 @@ use std::rand;
 use core::components::OutputElement;
 use core::types::{SAMPLE_RATE, Device, Sample, Time};
 
-use self::AntialiasType::PolyBlep;
-use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
+pub use self::AntialiasType::{Aliased, PolyBlep};
+pub use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
+
+/// Defines the messages that the Oscillator supports
+#[deriving(Clone, Copy, Show)]
+pub enum OscillatorMessage { 
+    /// Sets the frequency in Hz
+    SetFreq(f32)
+}
 
 /// Antialiasing method for certain waveforms.
 ///
 /// Aliased waveforms will use naive methods that produce aliasing.
 /// PolyBLEP (Polynomial Bandlimited Step) uses offsets to round off sharp edges
 /// and reduce aliasing.
+#[deriving(Clone, Copy, Show)]
 pub enum AntialiasType {
     /// Naive, aliasing waveforms.
     Aliased, 
@@ -30,6 +38,7 @@ pub enum AntialiasType {
 /// waveforms using PolyBLEP. Aliased waveformsare useful for control signals,
 /// but not for raw audio signals. For audible signals, instead used the
 /// corresponding `PolyBlep` waveforms.
+#[deriving(Clone, Copy, Show)]
 pub enum Waveform {
     Sine, 
     Saw(AntialiasType), 
@@ -62,6 +71,15 @@ impl Oscillator {
             last_sample: 0.0
         }
     }
+
+    /// Applies the message to the oscillator
+    pub fn handle_message(&mut self, msg: OscillatorMessage) {
+        match msg {
+            OscillatorMessage::SetFreq(freq) => {
+                self.phase_delta = freq*2.0*PI/(SAMPLE_RATE as f32);
+            }
+        }
+    }
 }
 
 impl Device for Oscillator {
@@ -73,7 +91,7 @@ impl Device for Oscillator {
         }
 
         // Compute the next sample
-        let s: Sample = match self.waveform {
+        let s: Sample = match self.waveform.clone() {
             Sine => self.phase.sin(),
             Saw(aa) => {
                 let mut out = self.phase/PI -1.0;

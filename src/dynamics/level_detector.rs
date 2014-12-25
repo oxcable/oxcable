@@ -16,6 +16,7 @@ use core::types::{SAMPLE_RATE, Sample};
 /// This means the attack value can be set very low to respond quickly to bursts
 /// in signal power, while the release value can be high in order to coast
 /// through periodic troughs in the signal.
+#[deriving(Clone, Copy, Show)]
 pub struct LevelDetector {
     attack_alpha: f32,
     release_alpha: f32,

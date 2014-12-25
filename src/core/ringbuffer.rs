@@ -75,7 +75,7 @@ impl<T: Add<T,T>+Clone> RingBuffer<T> {
     pub fn add(&mut self, t: Time, data: T) -> Result<(),()> {
         if self.start_t <= t && t < self.end_t {
             let i = (t % self.capacity as Time) as uint;
-            self.buf[i] = self.buf[i] + data;
+            self.buf[i] = self.buf[i].clone() + data;
             Ok(())
         } else {
             Err(())

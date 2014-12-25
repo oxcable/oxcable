@@ -10,6 +10,7 @@ use std::num::{Float, FloatMath};
 ///
 /// This type has operator overloads for addition, subtraction, multiplication
 /// and negation.
+#[deriving(Clone, Copy)]
 pub struct Complex {
     r: f32,
     i: f32,
@@ -32,38 +33,45 @@ impl Complex {
     }
 
     /// Returns the real part.
+    #[inline]
     pub fn real(&self) -> f32 {
         self.r
     }
 
     /// Returns the imaginary part.
+    #[inline]
     pub fn imag(&self) -> f32 {
         self.i
     }
 
     /// Returns the complex conjugate.
+    #[inline]
     pub fn conj(&self) -> Complex {
         Complex { r: self.r, i: -self.i }
     }
 
     /// Returns the absolute value.
+    #[inline]
     pub fn abs(&self) -> f32 {
         (self.r*self.r + self.i*self.i).sqrt()
     }
 
     /// Multiplies the complex number by the scalar `s`.
+    #[inline]
     pub fn scale(&self, s: f32) -> Complex {
         Complex { r: self.r*s, i: self.i*s }
     }
 
     /// For a complex number `c`, returns `e^c`.
+    #[inline]
     pub fn exp(&self) -> Complex {
         Complex { r: self.i.cos(), i: self.i.sin() }.scale(self.r.exp())
     }
 
     /// Returns true if the two complex numbers are equal.
-    pub fn eq(&self, other: &Complex) -> bool {
-        self.r == other.r && self.i == other.i
+    #[inline]
+    pub fn eq(self, rhs: Complex) -> bool {
+        self.r == rhs.r && self.i == rhs.i
     }
 }
 
@@ -83,26 +91,30 @@ impl fmt::Show for Complex {
 }
 
 impl Neg<Complex> for Complex {
-    fn neg(&self) -> Complex {
+    #[inline]
+    fn neg(self) -> Complex {
         Complex { r: -self.r, i: -self.i }
     }
 }
 
 impl Add<Complex, Complex> for Complex {
-    fn add(&self, other: &Complex) -> Complex {
-        Complex {r: self.r + other.r, i: self.i + other.i}
+    #[inline]
+    fn add(self, rhs: Complex) -> Complex {
+        Complex {r: self.r + rhs.r, i: self.i + rhs.i}
     }
 }
 
 impl Sub<Complex, Complex> for Complex {
-    fn sub(&self, other: &Complex) -> Complex {
-        Complex {r: self.r - other.r, i: self.i - other.i}
+    #[inline]
+    fn sub(self, rhs: Complex) -> Complex {
+        Complex {r: self.r - rhs.r, i: self.i - rhs.i}
     }
 }
 
 impl Mul<Complex, Complex> for Complex {
-    fn mul(&self, other: &Complex) -> Complex {
-        Complex {r: self.r*other.r - self.i*other.i, 
-                 i: self.r*other.i + self.i*other.r}
+    #[inline]
+    fn mul(self, rhs: Complex) -> Complex {
+        Complex {r: self.r*rhs.r - self.i*rhs.i, 
+                 i: self.r*rhs.i + self.i*rhs.r}
     }
 }

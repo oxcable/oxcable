@@ -16,7 +16,7 @@ static BUFFER_SIZE: int = 256;
 
 
 /// Converts a raw portmidi message to an oxcable MIDI event
-fn midievent_from_portmidi(event: portmidi::midi::PmEvent) -> MidiEvent {
+fn midievent_from_portmidi(event: portmidi::PmEvent) -> MidiEvent {
     let msg = event.message;
     let channel = (msg.status & 0x0F) as u8;
     let payload = match (msg.status as u8) >> 4 {
@@ -57,7 +57,7 @@ pub struct MidiIn {
     /// Output midi channel
     pub output: OutputElement<Vec<MidiEvent>>,
 
-    pm_stream: portmidi::midi::PmInputPort,
+    pm_stream: portmidi::PmInputPort,
 }
 
 impl MidiIn {
@@ -69,8 +69,8 @@ impl MidiIn {
         }
         
         // Open a stream. For now, use firs device
-        let mut pm_stream = portmidi::midi::PmInputPort::new(1, BUFFER_SIZE);
-        assert_eq!(pm_stream.open(), portmidi::midi::PmError::PmNoError);
+        let mut pm_stream = portmidi::PmInputPort::new(1, BUFFER_SIZE);
+        assert_eq!(pm_stream.open(), portmidi::PmError::PmNoError);
 
         MidiIn {
             output: OutputElement::new(),
@@ -80,14 +80,14 @@ impl MidiIn {
 
     /// Closes the portmidi stream
     pub fn stop(&mut self) {
-        assert_eq!(self.pm_stream.close(), portmidi::midi::PmError::PmNoError);
+        assert_eq!(self.pm_stream.close(), portmidi::PmError::PmNoError);
     }
 }
 
 impl Device for MidiIn {
     fn tick(&mut self, _t: Time) {
         let mut events = Vec::new();
-        while self.pm_stream.poll() == portmidi::midi::PmError::PmGotData {
+        while self.pm_stream.poll() == portmidi::PmError::PmGotData {
             let pm_message = self.pm_stream.read().unwrap();
             let event = midievent_from_portmidi(pm_message);
             events.push(event);

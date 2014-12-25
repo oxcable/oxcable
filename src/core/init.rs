@@ -24,7 +24,7 @@ pub fn initialize() -> Result<(), &'static str> {
     if portaudio::pa::initialize().is_err() {
         return Result::Err("failed to initialize portaudio");
     }
-    if portmidi::midi::initialize() != portmidi::midi::PmError::PmNoError {
+    if portmidi::initialize() != portmidi::PmError::PmNoError {
         return Result::Err("failed to initialize portmidi");
     }
 
@@ -52,7 +52,7 @@ pub fn terminate() -> Result<(), &'static str> {
     if portaudio::pa::terminate().is_err() {
         return Result::Err("failed to terminate portaudio");
     }
-    if portmidi::midi::terminate() != portmidi::midi::PmError::PmNoError {
+    if portmidi::terminate() != portmidi::PmError::PmNoError {
         return Result::Err("failed to terminate portmidi");
     }
 

@@ -10,8 +10,8 @@ use core::init;
 
 
 /// Defines the audio format for Portaudio.
-static PORTAUDIO_T: portaudio::types::SampleFormat = 
-    portaudio::types::SampleFormat::Float32;
+static PORTAUDIO_T: portaudio::pa::SampleFormat = 
+    portaudio::pa::SampleFormat::Float32;
 
 /// Defines the buffer size for Portaudio
 static BUFFER_SIZE: uint = 256;
@@ -22,7 +22,7 @@ pub struct AudioIn {
     /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
-    pa_stream: portaudio::pa::Stream<Sample>,
+    pa_stream: portaudio::pa::Stream<Sample, Sample>,
     num_channels: uint, 
     buffer: Vec<Sample>,
     samples_read: uint,
@@ -37,7 +37,7 @@ impl AudioIn {
         }
         
         // Open a stream
-        let mut pa_stream = portaudio::pa::Stream::new(PORTAUDIO_T);
+        let mut pa_stream = portaudio::pa::Stream::new();
         assert!(pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,
                                        num_channels as i32, 0i32,
                                        PORTAUDIO_T).is_ok());
@@ -84,7 +84,7 @@ pub struct AudioOut {
     /// Input audio channels
     pub inputs: InputArray<Sample>,
 
-    pa_stream: portaudio::pa::Stream<Sample>,
+    pa_stream: portaudio::pa::Stream<Sample, Sample>,
     num_channels: uint, 
     buffer: Vec<Sample>,
     samples_written: uint,
@@ -99,7 +99,7 @@ impl AudioOut {
         }
 
         // Open a stream
-        let mut pa_stream = portaudio::pa::Stream::new(PORTAUDIO_T);
+        let mut pa_stream = portaudio::pa::Stream::new();
         assert!(pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,
                                        0i32, num_channels as i32,
                                        PORTAUDIO_T).is_ok());
