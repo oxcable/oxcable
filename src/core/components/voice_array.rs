@@ -2,7 +2,7 @@
 
 #![experimental]
 
-use std::collections::{HashMap, RingBuf};
+use std::collections::{RingBuf, VecMap};
 use std::vec::Vec;
 
 use core::components::channel::ChannelRef;
@@ -16,7 +16,7 @@ pub trait Voice {
     fn get_channel(&self) -> ChannelRef<Sample>;
 
     /// Handle the provided MIDI event
-    fn handle_event(&mut self, event: MidiEvent);
+    fn handle_event(&mut self, event: &MidiEvent, t: Time);
 }
 
 
@@ -32,12 +32,12 @@ pub struct VoiceArray<T> {
 
     /// All the voices are contained in the voices vector
     voices: Vec<T>,
-    /// The voice_queue contains the indices of all voices, with free voices in
-    /// front, and the most recently triggered notes in the back.
-    voice_queue: RingBuf<uint>,
-    /// The note_to_voice maps MIDI note numbers to currently triggered voice
-    /// indices.
-    note_to_voice: HashMap<u8, uint>
+    /// Maps MIDI note numbers to currently triggered voice indices
+    note_to_voice: VecMap<uint>,
+    /// Maps voice indices to MIDI note numbers
+    voice_to_note: VecMap<uint>,
+    /// Places the most recently mapped voices at the end
+    voice_queue: RingBuf<uint>
 }
 
 impl<T: Device+Voice> VoiceArray<T> {
@@ -47,17 +47,18 @@ impl<T: Device+Voice> VoiceArray<T> {
     pub fn new(voices: Vec<T>) -> VoiceArray<T> {
         let num_voices = voices.len();
         let mut adder = Adder::new(num_voices);
-        let mut voice_queue = RingBuf::with_capacity(num_voices);
+        let mut voice_queue = RingBuf::new();
         for i in range(0, num_voices) {
-            voice_queue.push_back(i);
             adder.inputs.set_channel(i, voices[i].get_channel());
+            voice_queue.push_back(i);
         }
 
         VoiceArray {
             output: adder,
             voices: voices,
-            voice_queue: voice_queue,
-            note_to_voice: HashMap::new()
+            note_to_voice: VecMap::new(),
+            voice_to_note: VecMap::new(),
+            voice_queue: voice_queue
         }
     }
 
@@ -66,37 +67,73 @@ impl<T: Device+Voice> VoiceArray<T> {
     /// For NoteOn events, we select a voice to handle the event. For NoteOff
     /// events, we find the voice that was handling the NoteOn event. For all
     /// other events, we send the event to every voice.
-    pub fn handle_event(&mut self, event: MidiEvent) {
+    pub fn handle_event(&mut self, event: &MidiEvent, t: Time) {
         match event.payload {
-            MidiMessage::NoteOn(note,_) => self.handle_note_on(note, event),
-            MidiMessage::NoteOff(note,_) => self.handle_note_off(note, event),
-            _ => self.handle_other_event(event)
+            MidiMessage::NoteOn(note,_) => 
+                self.handle_note_on(note as uint, event, t),
+            MidiMessage::NoteOff(note,_) => 
+                self.handle_note_off(note as uint, event, t),
+            _ => self.handle_other_event(event, t)
         }
     }
 
-    /// Select a voice, move it to the back of our queue and trigger it
-    fn handle_note_on(&mut self, note: u8, event: MidiEvent) {
-        let i = if self.note_to_voice.contains_key(&note) {
-            // TODO: move this note to the back of voice_queu
-            *self.note_to_voice.get(&note).unwrap()
-        } else {
-            let i = self.voice_queue.pop_front().unwrap();
-            self.voice_queue.push_back(i);
-            i
+    /// Selects a voice to handle this event, and triggers the note
+    fn handle_note_on(&mut self, note: uint, event: &MidiEvent, t: Time) {
+        let i = match self.note_to_voice.remove(&note) {
+            Some(i) => {
+                // This note is already being played, so retrigger it and move
+                // it to the back of the queue
+                self.remove_from_queue(i);
+                i
+            },
+            None => {
+                // This note is not being played, so get the next voice
+                let i = self.voice_queue.pop_front().unwrap();
+
+                // Remove the mapping between the voice and its old note
+                match self.voice_to_note.remove(&i) {
+                    Some(n) => { self.note_to_voice.remove(&n); },
+                    None => ()
+                }
+
+                // Map this voice to its new note
+                self.note_to_voice.insert(note, i);
+                self.voice_to_note.insert(i, note);
+                i
+            }
         };
-        self.voices[i].handle_event(event);
+        // Finally, push the voice to the back of the queue and handle the event
+        self.voice_queue.push_back(i);
+        self.voices[i].handle_event(event, t);
     }
 
-    fn handle_note_off(&mut self, note: u8, event: MidiEvent) {
+    // Find the voice playing this note and stop it
+    fn handle_note_off(&mut self, note: uint, event: &MidiEvent, t: Time) {
         match self.note_to_voice.remove(&note) {
-            Some(i) => self.voices[i].handle_event(event),
+            Some(i) => {
+                self.remove_from_queue(i);
+                self.voice_to_note.remove(&i);
+                self.voice_queue.push_front(i);
+                self.voices[i].handle_event(event, t);
+            },
             None => ()
         }
     }
 
-    fn handle_other_event(&mut self, event: MidiEvent) {
+    // Pass any other event to all the voices
+    fn handle_other_event(&mut self, event: &MidiEvent, t: Time) {
         for voice in self.voices.iter_mut() {
-            voice.handle_event(event);
+            voice.handle_event(event, t);
+        }
+    }
+
+    // Finds a voice in the queue and removes it
+    fn remove_from_queue(&mut self, voice: uint) {
+        for i in range(0, self.voice_queue.len()) {
+            if *self.voice_queue.get(i).unwrap() == voice {
+                self.voice_queue.remove(i);
+                break;
+            }
         }
     }
 }
