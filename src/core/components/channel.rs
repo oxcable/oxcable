@@ -27,6 +27,7 @@ impl<T: Clone+Default> Channel<T> {
     /// Attempts to return the data frame for time `t`.
     ///
     /// Returns `None` if we don't have the requested time.
+    #[inline]
     pub fn get(&self, t: Time) -> Option<T> {
         if t != self.next_t-1 {
             None
@@ -36,6 +37,7 @@ impl<T: Clone+Default> Channel<T> {
     }
 
     /// Add the next frame to the channel.
+    #[inline]
     pub fn push(&mut self, f: T) {
         self.data = f.clone();
         self.next_t += 1;
@@ -56,10 +58,12 @@ impl<T: Clone+Default> ChannelRef<T> {
         }
     }
 
+    #[inline]
     pub fn get(&self, t: Time) -> Option<T> {
         self.ch.borrow().get(t)
     }
 
+    #[inline]
     pub fn push(&self, f: T) {
         self.ch.borrow_mut().push(f);
     }

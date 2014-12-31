@@ -38,11 +38,13 @@ impl<T: Clone+Default> OutputArray<T> {
     }
 
     /// Attempts to get the data frame for time `t` in channel `i`.
+    #[inline]
     pub fn get(&self, i: uint, t: Time) -> Option<T> {
         self.chs[i].get(t)
     }
 
     /// Pushes the next data frame to channel `i`.
+    #[inline]
     pub fn push(&self, i: uint, f: T) {
         self.chs[i].push(f);
     }
@@ -87,6 +89,7 @@ impl<T: Clone+Default> InputArray<T> {
     ///
     /// Returns `None` if either channel `i` is empty, or if channel `i` could
     /// not return the sample for time `t`.
+    #[inline]
     pub fn get(&self, i: uint, t: Time) -> Option<T> {
         match self.chs[i] {
             Some(ref ch) => ch.get(t),

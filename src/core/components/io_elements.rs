@@ -26,11 +26,13 @@ impl<T: Clone+Default> OutputElement<T> {
     }
 
     /// Attempts to get the data frame for time `t`.
+    #[inline]
     pub fn get(&self, t: Time) -> Option<T> {
         self.ch.get(t)
     }
 
     /// Pushes the next data frame.
+    #[inline]
     pub fn push(&self, f: T) {
         self.ch.push(f);
     }
@@ -63,6 +65,7 @@ impl<T: Clone+Default> InputElement<T> {
     ///
     /// Returns `None` if either the channel is empty, or if the channel could
     /// not return the sample for time `t`.
+    #[inline]
     pub fn get(&self, t: Time) -> Option<T> {
         match self.ch {
             Some(ref ch) => ch.get(t),
