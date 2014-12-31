@@ -2,15 +2,13 @@
 
 #![experimental]
 
+extern crate test;
+
 use std::cell::RefCell;
 use std::default::Default;
 use std::rc::Rc;
 
 use core::types::Time;
-
-
-/// A reference to a channel, used to link outputs to inputs.
-pub type ChannelRef<T> = Rc<RefCell<Channel<T>>>;
 
 
 /// Container for a single channel of data.
@@ -41,5 +39,49 @@ impl<T: Clone+Default> Channel<T> {
     pub fn push(&mut self, f: T) {
         self.data = f.clone();
         self.next_t += 1;
+    }
+}
+
+
+/// A reference to a channel, used to link outputs to inputs.
+#[deriving(Clone)]
+pub struct ChannelRef<T>  {
+    ch: Rc<RefCell<Channel<T>>>
+}
+
+impl<T: Clone+Default> ChannelRef<T> {
+    pub fn new() -> ChannelRef<T> {
+        ChannelRef {
+            ch: Rc::new(RefCell::new(Channel::new()))
+        }
+    }
+
+    pub fn get(&self, t: Time) -> Option<T> {
+        self.ch.borrow().get(t)
+    }
+
+    pub fn push(&self, f: T) {
+        self.ch.borrow_mut().push(f);
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::test::Bencher;
+    use core::types::Sample;
+    use super::ChannelRef;
+
+    #[bench]
+    fn bench_ref_get(b: &mut Bencher) {
+        let ch: ChannelRef<Sample> = ChannelRef::new();
+        ch.push(0.0);
+        b.iter(|| ch.get(0));
+    }
+
+    #[bench]
+    fn bench_ref_push(b: &mut Bencher) {
+        let ch: ChannelRef<Sample> = ChannelRef::new();
+        b.iter(|| ch.push(0.0));
     }
 }

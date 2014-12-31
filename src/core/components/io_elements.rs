@@ -2,11 +2,9 @@
 
 #![experimental]
 
-use std::cell::RefCell;
 use std::default::Default;
-use std::rc::Rc;
 
-use core::components::channel::{Channel, ChannelRef};
+use core::components::channel::ChannelRef;
 use core::types::Time;
 
 
@@ -19,7 +17,7 @@ pub struct OutputElement<T> {
 impl<T: Clone+Default> OutputElement<T> {
     /// Creates a new output element, initialized to time `t=0`.
     pub fn new() -> OutputElement<T> {
-        OutputElement { ch: Rc::new(RefCell::new(Channel::new())) }
+        OutputElement { ch: ChannelRef::new() }
     }
 
     /// Returns a reference to the channel.
@@ -29,12 +27,12 @@ impl<T: Clone+Default> OutputElement<T> {
 
     /// Attempts to get the data frame for time `t`.
     pub fn get(&self, t: Time) -> Option<T> {
-        self.ch.borrow_mut().get(t)
+        self.ch.get(t)
     }
 
     /// Pushes the next data frame.
     pub fn push(&self, f: T) {
-        self.ch.borrow_mut().push(f);
+        self.ch.push(f);
     }
 }
 
@@ -67,7 +65,7 @@ impl<T: Clone+Default> InputElement<T> {
     /// not return the sample for time `t`.
     pub fn get(&self, t: Time) -> Option<T> {
         match self.ch {
-            Some(ref ch) => ch.borrow().get(t),
+            Some(ref ch) => ch.get(t),
             None => None
         }
     }

@@ -2,12 +2,10 @@
 
 #![experimental]
 
-use std::cell::RefCell;
 use std::default::Default;
-use std::rc::Rc;
 use std::vec::Vec;
 
-use core::components::channel::{Channel, ChannelRef};
+use core::components::channel::ChannelRef;
 use core::types::Time;
 
 
@@ -24,7 +22,7 @@ impl<T: Clone+Default> OutputArray<T> {
     pub fn new(num_channels: uint) -> OutputArray<T> {
         let mut chs = Vec::with_capacity(num_channels);
         for _ in range(0, num_channels) {
-            chs.push(Rc::new(RefCell::new(Channel::new())));
+            chs.push(ChannelRef::new());
         }
         OutputArray { chs: chs }
     }
@@ -41,12 +39,12 @@ impl<T: Clone+Default> OutputArray<T> {
 
     /// Attempts to get the data frame for time `t` in channel `i`.
     pub fn get(&self, i: uint, t: Time) -> Option<T> {
-        self.chs[i].borrow_mut().get(t)
+        self.chs[i].get(t)
     }
 
     /// Pushes the next data frame to channel `i`.
     pub fn push(&self, i: uint, f: T) {
-        self.chs[i].borrow_mut().push(f);
+        self.chs[i].push(f);
     }
 }
 
@@ -91,7 +89,7 @@ impl<T: Clone+Default> InputArray<T> {
     /// not return the sample for time `t`.
     pub fn get(&self, i: uint, t: Time) -> Option<T> {
         match self.chs[i] {
-            Some(ref ch) => ch.borrow().get(t),
+            Some(ref ch) => ch.get(t),
             None => None
         }
     }
