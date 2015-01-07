@@ -46,7 +46,7 @@ impl<T: Clone+Default> Channel<T> {
 
 
 /// A reference to a channel, used to link outputs to inputs.
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct ChannelRef<T>  {
     ch: Rc<RefCell<Channel<T>>>
 }

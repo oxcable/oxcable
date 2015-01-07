@@ -3,6 +3,7 @@
 #![unstable]
 
 use std::clone::Clone;
+use std::ops::Add;
 use std::vec::Vec;
 
 use core::types::Time;
@@ -69,13 +70,14 @@ impl<T: Clone> RingBuffer<T> {
     }
 }
 
-impl<T: Add<T,T>+Clone> RingBuffer<T> {
+impl<T: Add+Clone> RingBuffer<T> where T: Add<Output = T> {
     /// Attempts to add to the provided value to the current value at time `t`.
     /// If the requested time is not in the buffer, instead returns `Err`.
     pub fn add(&mut self, t: Time, data: T) -> Result<(),()> {
         if self.start_t <= t && t < self.end_t {
             let i = (t % self.capacity as Time) as uint;
-            self.buf[i] = self.buf[i].clone() + data;
+            let res: T = self.buf[i].clone() + data;
+            self.buf[i] = res;
             Ok(())
         } else {
             Err(())

@@ -13,7 +13,7 @@ pub use self::AntialiasType::{Aliased, PolyBlep};
 pub use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
 
 /// Defines the messages that the Oscillator supports
-#[deriving(Clone, Copy, Show)]
+#[derive(Clone, Copy, Show)]
 pub enum OscillatorMessage { 
     /// Sets the frequency in Hz
     SetFreq(f32)
@@ -24,7 +24,7 @@ pub enum OscillatorMessage {
 /// Aliased waveforms will use naive methods that produce aliasing.
 /// PolyBLEP (Polynomial Bandlimited Step) uses offsets to round off sharp edges
 /// and reduce aliasing.
-#[deriving(Clone, Copy, Show)]
+#[derive(Clone, Copy, Show)]
 pub enum AntialiasType {
     /// Naive, aliasing waveforms.
     Aliased, 
@@ -38,7 +38,7 @@ pub enum AntialiasType {
 /// waveforms using PolyBLEP. Aliased waveformsare useful for control signals,
 /// but not for raw audio signals. For audible signals, instead used the
 /// corresponding `PolyBlep` waveforms.
-#[deriving(Clone, Copy, Show)]
+#[derive(Clone, Copy, Show)]
 pub enum Waveform {
     Sine, 
     Saw(AntialiasType), 

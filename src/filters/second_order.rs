@@ -35,7 +35,7 @@ pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf, Peak};
 ///
 /// `Peak` filters specify the center frequency in Hz, the gain for the peak in
 /// decibels, and the filter Q.
-#[deriving(Clone, Copy, Show)]
+#[derive(Clone, Copy, Show)]
 pub enum FilterMode {
     LowPass(f32),        // cutoff
     HighPass(f32),

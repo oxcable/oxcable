@@ -136,7 +136,7 @@ static FMT_: u32 = 0x20746d66;
 static DATA: u32 = 0x61746164;
 
 /// A struct container for the wav header
-#[deriving(Show)]
+#[derive(Show)]
 struct WavHeader {
     riff_hdr: u32,
     file_size: u32,

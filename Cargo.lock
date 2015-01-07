@@ -3,16 +3,16 @@ name = "oxcable"
 version = "0.1.0"
 dependencies = [
  "portmidi 0.0.1 (git+https://github.com/musitdev/rust-portmidi.git)",
- "rust-portaudio 0.3.0 (git+https://github.com/jeremyletang/rust-portaudio.git)",
+ "rust-portaudio 0.3.0 (git+https://github.com/thenyeguy/rust-portaudio.git)",
 ]
 
 [[package]]
 name = "portmidi"
 version = "0.0.1"
-source = "git+https://github.com/musitdev/rust-portmidi.git#04937ed855c8c7f716e161ebc4b2065a8ef54f8a"
+source = "git+https://github.com/musitdev/rust-portmidi.git#3bd5c1378e56b8ce076be8a7a583509092026893"
 
 [[package]]
 name = "rust-portaudio"
 version = "0.3.0"
-source = "git+https://github.com/jeremyletang/rust-portaudio.git#79724cc15f06a67a8a7023c10b005a49a49ba2a2"
+source = "git+https://github.com/thenyeguy/rust-portaudio.git#d2770eea376a77fb42bd15db33a352152f4f4878"
 

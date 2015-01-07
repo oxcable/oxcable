@@ -4,13 +4,14 @@
 
 use std::fmt;
 use std::num::{Float, FloatMath};
+use std::ops::{Neg, Add, Sub, Mul};
 
 
 /// A complex number, stored in rectangular form to 64-bit precision.
 ///
 /// This type has operator overloads for addition, subtraction, multiplication
 /// and negation.
-#[deriving(Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct Complex {
     r: f32,
     i: f32,
@@ -90,28 +91,32 @@ impl fmt::Show for Complex {
     }
 }
 
-impl Neg<Complex> for Complex {
+impl Neg for Complex {
+    type Output = Complex;
     #[inline]
     fn neg(self) -> Complex {
         Complex { r: -self.r, i: -self.i }
     }
 }
 
-impl Add<Complex, Complex> for Complex {
+impl Add for Complex {
+    type Output = Complex;
     #[inline]
     fn add(self, rhs: Complex) -> Complex {
         Complex {r: self.r + rhs.r, i: self.i + rhs.i}
     }
 }
 
-impl Sub<Complex, Complex> for Complex {
+impl Sub for Complex {
+    type Output = Complex;
     #[inline]
     fn sub(self, rhs: Complex) -> Complex {
         Complex {r: self.r - rhs.r, i: self.i - rhs.i}
     }
 }
 
-impl Mul<Complex, Complex> for Complex {
+impl Mul for Complex {
+    type Output = Complex;
     #[inline]
     fn mul(self, rhs: Complex) -> Complex {
         Complex {r: self.r*rhs.r - self.i*rhs.i, 

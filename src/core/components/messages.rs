@@ -43,7 +43,7 @@ impl<T: Clone+Send+Sync> MessageReceiver<T> {
         if self.num_senders == 0 {
             Vec::new()
         } else {
-            let mut msgs = self.msgs.lock();
+            let mut msgs = self.msgs.lock().unwrap();
             let messages = msgs.clone();
             msgs.clear();
             messages
@@ -53,7 +53,6 @@ impl<T: Clone+Send+Sync> MessageReceiver<T> {
 
 
 /// A component that sends messages to a single receiver.
-#[deriving(Send)]
 pub struct MessageSender<T> {
     msgs: Arc<Mutex<Vec<T>>>
 }
@@ -61,6 +60,6 @@ pub struct MessageSender<T> {
 impl<T: Clone+Send+Sync> MessageSender<T> {
     /// Sends the provided message to our receiver.
     pub fn send(&mut self, msg: T) {
-        self.msgs.lock().push(msg.clone());
+        self.msgs.lock().unwrap().push(msg.clone());
     }
 }

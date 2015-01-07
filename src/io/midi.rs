@@ -12,11 +12,11 @@ use core::init;
 
 
 /// Defines the maximum event buffer size for portmidi
-static BUFFER_SIZE: int = 256;
+static BUFFER_SIZE: i32 = 256;
 
 
 /// Converts a raw portmidi message to an oxcable MIDI event
-fn midievent_from_portmidi(event: portmidi::PmEvent) -> MidiEvent {
+fn midievent_from_portmidi(event: portmidi::MidiEvent) -> MidiEvent {
     let msg = event.message;
     let channel = (msg.status & 0x0F) as u8;
     let payload = match (msg.status as u8) >> 4 {
@@ -31,7 +31,7 @@ fn midievent_from_portmidi(event: portmidi::PmEvent) -> MidiEvent {
             MidiMessage::NoteOn(note, velocity)
         }
         0b1110 => {
-            let int_value = (msg.data2 as i16 << 7) | (msg.data1 as i16);
+            let int_value = ((msg.data2 as i16) << 7) | (msg.data1 as i16);
             let bend = (int_value - 0x2000) as f32 / 
                 (0x2000i16) as f32;
             MidiMessage::PitchBend(bend)
@@ -57,7 +57,7 @@ pub struct MidiIn {
     /// Output midi channel
     pub output: OutputElement<Vec<MidiEvent>>,
 
-    pm_stream: portmidi::PmInputPort,
+    pm_stream: portmidi::InputPort,
 }
 
 impl MidiIn {
@@ -69,8 +69,8 @@ impl MidiIn {
         }
         
         // Open a stream. For now, use firs device
-        let mut pm_stream = portmidi::PmInputPort::new(1, BUFFER_SIZE);
-        assert_eq!(pm_stream.open(), portmidi::PmError::PmNoError);
+        let mut pm_stream = portmidi::InputPort::new(1, BUFFER_SIZE);
+        assert!(pm_stream.open().is_ok());
 
         MidiIn {
             output: OutputElement::new(),
@@ -80,17 +80,19 @@ impl MidiIn {
 
     /// Closes the portmidi stream
     pub fn stop(&mut self) {
-        assert_eq!(self.pm_stream.close(), portmidi::PmError::PmNoError);
+        assert!(self.pm_stream.close().is_ok());
     }
 }
 
 impl Device for MidiIn {
     fn tick(&mut self, _t: Time) {
         let mut events = Vec::new();
-        while self.pm_stream.poll() == portmidi::PmError::PmGotData {
-            let pm_message = self.pm_stream.read().unwrap();
-            let event = midievent_from_portmidi(pm_message);
-            events.push(event);
+        loop {
+            match self.pm_stream.read().unwrap() {
+                Some(pm_event) => 
+                    events.push(midievent_from_portmidi(pm_event)),
+                None => break
+            }
         }
         self.output.push(events);
     }
