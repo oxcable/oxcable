@@ -30,7 +30,7 @@ impl Transformer {
         // Populate the bit reverses
         // We only use the lower log2(size) bits to express the index
         let mut bit_reverses = Vec::with_capacity(bufsize);
-        for i in range(0, size) {
+        for i in (0 .. size) {
             let br = bit_reverse(i as u32, int_log(bufsize as u32));
             bit_reverses.push(br as usize);
         }
@@ -39,7 +39,7 @@ impl Transformer {
         // w_n = exp(-j*2*pi*n/N)
         let mut twiddles = Vec::with_capacity(bufsize);
         let exponent = Complex::new(0.0, -2.0*PI/(bufsize as f32));
-        for i in range(0, bufsize) {
+        for i in (0 .. bufsize) {
             twiddles.push(exponent.scale(i as f32).exp());
         }
 
@@ -94,7 +94,7 @@ impl Transformer {
 
         // Copy the input into bit reverse order, zero padding if necessary,
         // conjugating if we are inverse transforming
-        for i in range(0, input.len()) {
+        for i in (0 .. input.len()) {
             output[self.bit_reverses[i]] = 
                 if inverse { 
                     input[i].conj()
@@ -110,9 +110,9 @@ impl Transformer {
         let mut n = 2;
         while n <= self.size {
             // For each of the small FFTs
-            for set in range(0, self.size/n) {
+            for set in (0 .. self.size/n) {
                 // For each pair of n
-                for i in range(0, n/2) {
+                for i in (0 .. n/2) {
                     let ilo = n*set + i;
                     let ihi = ilo + n/2;
 
@@ -132,7 +132,7 @@ impl Transformer {
 
         // If we are inverse transforming, conjugate and normalize the output
         if inverse {
-            for i in range(0, self.size) {
+            for i in (0 .. self.size) {
                 output[i] = output[i].conj().scale(1.0/(self.size as f32));
             }
         }
@@ -211,7 +211,7 @@ mod test {
 
         let mut impulse = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
-        for i in range(0u, 8) {
+        for i in (0 .. 8) {
             impulse.push(if i == 0 { one } else { zero });
             out.push(Complex::zero());
         }
@@ -235,7 +235,7 @@ mod test {
 
         let mut impulse = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
-        for _i in range(0u, 8) {
+        for _i in (0 .. 8) {
             impulse.push(one);
             out.push(zero);
         }
@@ -258,7 +258,7 @@ mod test {
         let mut input = Vec::with_capacity(8);
         let mut fft = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
-        for i in range(0u, 8) {
+        for i in (0 .. 8) {
             input.push(Complex::from_real((i+1) as f32));
             fft.push(zero);
             out.push(zero);
@@ -268,7 +268,7 @@ mod test {
         assert!(t.fft(&input, &mut fft).is_ok());
         assert!(t.ifft(&fft, &mut out).is_ok());
 
-        for i in range(0u,7) {
+        for i in (0 .. 7) {
             println!("{}",out[i].real() - ((i+1) as f32));
             assert!(out[i].real() - ((i+1) as f32) < epsilon);
             assert!(out[i].imag() < epsilon);
@@ -285,7 +285,7 @@ mod test {
         let mut input = Vec::with_capacity(7);
         let mut fft = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
-        for i in range(0u, 8) {
+        for i in (0 .. 8) {
             if i < 7 {
                 input.push(Complex::from_real((i+1) as f32));
             } 
@@ -297,7 +297,7 @@ mod test {
         assert!(t.fft(&input, &mut fft).is_ok());
         assert!(t.ifft(&fft, &mut out).is_ok());
 
-        for i in range(0u,7) {
+        for i in (0 .. 7) {
             println!("{}",out[i].real() - ((i+1) as f32));
             assert!(out[i].real() - ((i+1) as f32) < epsilon);
             assert!(out[i].imag() < epsilon);
@@ -311,7 +311,7 @@ mod test {
 
         let mut input = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(7);
-        for i in range(0u, 8) {
+        for i in (0 .. 8) {
             input.push(zero);
             if i < 7 {
                 out.push(zero);

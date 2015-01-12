@@ -39,7 +39,7 @@ impl Gain {
 
 impl Device for Gain {
     fn tick(&mut self, t: Time) {
-        for i in range(0, self.num_channels) {
+        for i in (0 .. self.num_channels) {
             let s = self.inputs.get(i, t).unwrap_or(0.0);
             self.outputs.push(i, s*self.gain);
         }

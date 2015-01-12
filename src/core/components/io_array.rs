@@ -21,7 +21,7 @@ impl<T: Clone+Default> OutputArray<T> {
     /// These channels are initialized to time `t=0`.
     pub fn new(num_channels: usize) -> OutputArray<T> {
         let mut chs = Vec::with_capacity(num_channels);
-        for _ in range(0, num_channels) {
+        for _ in (0 .. num_channels) {
             chs.push(ChannelRef::new());
         }
         OutputArray { chs: chs }
@@ -64,7 +64,7 @@ impl<T: Clone+Default> InputArray<T> {
     /// input data.
     pub fn new(num_channels: usize) -> InputArray<T> {
         let mut chs = Vec::with_capacity(num_channels);
-        for _ in range(0, num_channels) {
+        for _ in (0 .. num_channels) {
             chs.push(None);
         }
         InputArray { chs: chs }

@@ -48,7 +48,7 @@ impl<T: Device+Voice> VoiceArray<T> {
         let num_voices = voices.len();
         let mut adder = Adder::new(num_voices);
         let mut voice_queue = RingBuf::new();
-        for i in range(0, num_voices) {
+        for i in (0 .. num_voices) {
             adder.inputs.set_channel(i, voices[i].get_channel());
             voice_queue.push_back(i);
         }
@@ -129,7 +129,7 @@ impl<T: Device+Voice> VoiceArray<T> {
 
     // Finds a voice in the queue and removes it
     fn remove_from_queue(&mut self, voice: usize) {
-        for i in range(0, self.voice_queue.len()) {
+        for i in (0 .. self.voice_queue.len()) {
             if *self.voice_queue.get(i).unwrap() == voice {
                 self.voice_queue.remove(i);
                 break;

@@ -153,7 +153,7 @@ impl Device for Adsr {
         self.multiplier += self.multiplier_delta;
 
         // Apply the envelope
-        for i in range(0, self.num_channels) {
+        for i in (0 .. self.num_channels) {
             let s = self.inputs.get(i, t).unwrap_or(0.0);
             self.outputs.push(i, s*self.gain*self.multiplier);
         }

@@ -32,7 +32,7 @@ impl Multiplier {
 impl Device for Multiplier {
     fn tick(&mut self, t: Time) {
         let mut s = 1.0;
-        for i in range(0, self.num_inputs) {
+        for i in (0 .. self.num_inputs) {
             s *= self.inputs.get(i, t).unwrap_or(0.0);
         }
         self.output.push(s);

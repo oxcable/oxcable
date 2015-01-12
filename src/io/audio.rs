@@ -70,7 +70,7 @@ impl Device for AudioIn {
             self.samples_read = 0;
         }
 
-        for i in range(0, self.num_channels) {
+        for i in (0 .. self.num_channels) {
             let s = self.buffer[self.samples_read*self.num_channels + i];
             self.outputs.push(i, s);
         }
@@ -123,7 +123,7 @@ impl AudioOut {
 
 impl Device for AudioOut {
     fn tick(&mut self, t: Time) {
-        for i in range(0, self.num_channels) {
+        for i in (0 .. self.num_channels) {
             let mut s = self.inputs.get(i, t).unwrap_or(0.0);
             if s > 1.0 { s = 1.0; }
             if s < -1.0 { s = -1.0; }

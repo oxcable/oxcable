@@ -53,7 +53,7 @@ impl MoorerReverb {
 
         // Calculate comb gains based on reverberation time
         let mut comb_gains = Vec::with_capacity(room.comb_delays.len());
-        for i in range(0, room.comb_delays.len()) {
+        for i in (0 .. room.comb_delays.len()) {
             let gain = 10.0.powf(-3.0*(room.comb_delays[i] as f32) *
                                  rev_time / (SAMPLE_RATE as f32));
             comb_gains.push(gain);
@@ -62,28 +62,28 @@ impl MoorerReverb {
 
         // Allocate tapped delay lines
         let mut tapped_delay_lines = Vec::with_capacity(num_channels);
-        for _i in range(0, num_channels) {
+        for _i in (0 .. num_channels) {
             let mut rb = RingBuffer::new(max_tapped_delay as usize + 1);
-            for _t in range(0, max_tapped_delay) { rb.push(0.0); }
+            for _t in (0 .. max_tapped_delay) { rb.push(0.0); }
             tapped_delay_lines.push(rb);
         }
 
         // Allocate comb delay lines
         let mut comb_delay_lines = Vec::with_capacity(num_channels);
-        for _i in range(0, num_channels) {
+        for _i in (0 .. num_channels) {
             let mut channel_lines = Vec::with_capacity(room.comb_delays.len());
-            for j in range(0, room.comb_delays.len()) {
+            for j in (0 .. room.comb_delays.len()) {
                 let delay = room.comb_delays[j];
                 let mut rb = RingBuffer::new((delay+1) as usize);
-                for _t in range(0, delay) { rb.push(0.0); }
+                for _t in (0 .. delay) { rb.push(0.0); }
                 channel_lines.push(rb);
             }
             comb_delay_lines.push(channel_lines);
         }
         let mut comb_out_buffer = Vec::with_capacity(num_channels);
-        for _i in range(0, num_channels) {
+        for _i in (0 .. num_channels) {
             let mut rb = RingBuffer::new((comb_out_delay+1) as usize);
-            for _t in range(0, comb_out_delay) { rb.push(0.0); }
+            for _t in (0 .. comb_out_delay) { rb.push(0.0); }
             comb_out_buffer.push(rb);
         }
 
@@ -108,7 +108,7 @@ impl MoorerReverb {
 
 impl Device for MoorerReverb {
     fn tick(&mut self, t: Time) {
-        for i in range(0, self.num_channels) {
+        for i in (0 .. self.num_channels) {
             let x = self.inputs.get(i, t).unwrap_or(0.0);
 
             // Advance tapped delay line
@@ -123,7 +123,7 @@ impl Device for MoorerReverb {
 
             // Update comb filters
             let mut comb_out = 0.0;
-            for j in range(0, self.comb_delays.len()) {
+            for j in (0 .. self.comb_delays.len()) {
                 let gain  = self.comb_gains[j];
                 let feedback = self.comb_delay_lines[i][j].get(t).unwrap();
                 self.comb_delay_lines[i][j].push(tapped_out + gain * feedback);

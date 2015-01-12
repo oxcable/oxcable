@@ -38,7 +38,7 @@ impl NoiseGate {
                num_channels: usize) -> NoiseGate {
         // Create our level detectors
         let mut levels = Vec::with_capacity(num_channels);
-        for _ in range(0, num_channels) {
+        for _ in (0 .. num_channels) {
             levels.push(LevelDetector::default());
         }
 
@@ -57,7 +57,7 @@ impl NoiseGate {
 
 impl Device for NoiseGate {
     fn tick(&mut self, t: Time) {
-        for i in range(0, self.num_channels) {
+        for i in (0 .. self.num_channels) {
             let mut s = self.inputs.get(i, t).unwrap_or(0.0);
 
             // Look for a state change

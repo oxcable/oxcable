@@ -41,9 +41,9 @@ impl Delay {
         // Create the delay buffers, starting with silence
         let delay_samples = (delay * SAMPLE_RATE as f32) as u32;
         let mut bufs = Vec::with_capacity(num_channels);
-        for i in range(0, num_channels) {
+        for i in (0 .. num_channels) {
             bufs.push(RingBuffer::new(delay_samples as usize));
-            for _ in range(0, delay_samples) {
+            for _ in (0 .. delay_samples) {
                 bufs[i].push(0.0);
             }
         }
@@ -61,7 +61,7 @@ impl Delay {
 
 impl Device for Delay {
     fn tick(&mut self, t: Time) {
-        for i in range(0, self.num_channels) {
+        for i in (0 .. self.num_channels) {
             let s = self.inputs.get(i, t).unwrap_or(0.0);
 
             // Get our delayed signal and feed it back with our input

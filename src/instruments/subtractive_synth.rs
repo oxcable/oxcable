@@ -27,7 +27,7 @@ impl SubtractiveSynth {
     /// time.
     pub fn new(num_voices: usize) -> SubtractiveSynth {
         let mut voices = Vec::with_capacity(num_voices);
-        for _i in range(0, num_voices) {
+        for _i in (0 .. num_voices) {
             voices.push(SubtractiveSynthVoice::new());
         }
         let voice_array = VoiceArray::new(voices);

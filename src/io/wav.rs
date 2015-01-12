@@ -60,7 +60,7 @@ impl WavReader {
 
 impl Device for WavReader {
     fn tick(&mut self, _t: Time) {
-        for i in range(0, self.num_channels) {
+        for i in (0 .. self.num_channels) {
             let s = if self.samples_read < self.num_samples {
                 (self.file.read_le_i16().unwrap() as Sample) / 32768.0
             } else {
@@ -118,7 +118,7 @@ impl WavWriter {
 
 impl Device for WavWriter {
     fn tick(&mut self, t: Time) {
-        for i in range(0, self.num_channels) {
+        for i in (0 .. self.num_channels) {
             let mut s = self.inputs.get(i, t).unwrap_or(0.0);
             if s > 0.999f32 { s = 0.999f32; }
             if s < -0.999f32 { s = -0.999f32; }

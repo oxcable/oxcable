@@ -58,7 +58,7 @@ impl Filter {
         // Populate the last vectors
         let mut x_last = Vec::<f32>::with_capacity(num_channels);
         let mut y1_last = Vec::<f32>::with_capacity(num_channels);
-        for _ in range(0, num_channels) {
+        for _ in (0 .. num_channels) {
             x_last.push(0.0);
             y1_last.push(0.0);
         }
@@ -118,7 +118,7 @@ fn compute_parameters(mode: FilterMode) -> (f32, f32) {
 
 impl Device for Filter {
     fn tick(&mut self, t: Time) {
-        for i in range(0, self.num_channels) {
+        for i in (0 .. self.num_channels) {
             let x = self.inputs.get(i, t).unwrap_or(0.0);
 
             // Run the all pass filter, and feedback the result
