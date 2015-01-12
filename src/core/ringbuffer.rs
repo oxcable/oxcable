@@ -92,7 +92,7 @@ mod tests {
 
     #[test]
     fn test_push() {
-        let mut rb = RingBuffer::<int>::new(2);
+        let mut rb = RingBuffer::<i32>::new(2);
 
         rb.push(13);
         assert_eq!(rb.size, 1);
@@ -117,7 +117,7 @@ mod tests {
 
     #[test]
     fn test_get() {
-        let mut rb: RingBuffer<int> = RingBuffer { 
+        let mut rb: RingBuffer<i32> = RingBuffer { 
             buf: vec![7,13], 
             capacity: 2, 
             size: 2,
@@ -141,7 +141,7 @@ mod tests {
 
     #[test]
     fn test_update() {
-        let mut rb: RingBuffer<int> = RingBuffer { 
+        let mut rb: RingBuffer<i32> = RingBuffer { 
             buf: vec![7,13], 
             capacity: 2, 
             size: 2,
@@ -162,7 +162,7 @@ mod tests {
 
     #[test]
     fn test_add() {
-        let mut rb: RingBuffer<int> = RingBuffer { 
+        let mut rb: RingBuffer<i32> = RingBuffer { 
             buf: vec![7,13], 
             capacity: 2, 
             size: 2,

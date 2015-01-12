@@ -251,7 +251,7 @@ mod test {
         assert!(t.ifft(&impulse, &mut out).is_ok());
 
         assert!(out[0].eq(one));
-        for c in out.slice(1,8).iter() {
+        for c in out[1 .. 8].iter() {
             assert!(c.eq(zero));
         }
     }
