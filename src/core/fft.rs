@@ -14,6 +14,7 @@ use core::complex::Complex;
 
 
 /// A container for precomputed values to perform FFTs of a fixed size.
+#[stable]
 pub struct Transformer {
     size: usize,
     bit_reverses: Vec<usize>,
@@ -21,9 +22,11 @@ pub struct Transformer {
 }
 
 #[allow(unstable)] // PI naming unstable
+#[stable]
 impl Transformer {
     /// Returns a set precomputed information used to perform FFTs of the
     /// provided size.
+    #[stable]
     pub fn new(size: usize) -> Transformer {
         // Only operate in powers of two
         let bufsize = size.next_power_of_two();
@@ -49,6 +52,7 @@ impl Transformer {
     }
 
     /// Returns the size FFTs this Transformer performs
+    #[stable]
     pub fn get_size(&self) -> usize {
         self.size
     }
@@ -59,6 +63,7 @@ impl Transformer {
     /// truncated if more than `size` samples are provided.
     ///
     /// Returns `Error` if `output` is too small to hold the result.
+    #[stable]
     pub fn fft(&self, input: &Vec<Complex>, output: &mut Vec<Complex>) -> 
         Result<(),()> {
         self.transform(input, output, false)
@@ -70,6 +75,7 @@ impl Transformer {
     /// truncated if more than `size` samples are provided.
     ///
     /// Returns `Error` if `output` is too small to hold the result.
+    #[stable]
     pub fn ifft(&self, input: &Vec<Complex>, output: &mut Vec<Complex>) ->
         Result<(),()> {
         self.transform(input, output, true)

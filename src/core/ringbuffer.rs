@@ -1,6 +1,6 @@
 //! Provides a generic ring buffer
 
-#![unstable]
+#![stable]
 
 use std::clone::Clone;
 use std::ops::Add;

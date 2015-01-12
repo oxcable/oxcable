@@ -11,8 +11,10 @@ use core::types::{Device, Sample, Time};
 /// Mirrors one of its inputs into a single output while ignoring the rest.
 pub struct Multiplexer {
     /// Input audio channels
+    #[stable]
     pub inputs: InputArray<Sample>,
     /// A single output audio channel
+    #[stable]
     pub output: OutputElement<Sample>,
 
     num_inputs: usize, 
@@ -21,6 +23,7 @@ pub struct Multiplexer {
 
 impl Multiplexer {
     /// Returns a new multiplexer with `num_inputs` input channels.
+    #[stable]
     pub fn new(num_inputs: usize) -> Multiplexer {
         Multiplexer {
             inputs: InputArray::new(num_inputs),

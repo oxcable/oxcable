@@ -53,15 +53,19 @@ fn midievent_from_portmidi(event: portmidi::MidiEvent) -> MidiEvent {
 
 
 /// Reads audio from the OS's default midi device.
+#[stable]
 pub struct MidiIn {
     /// Output midi channel
+    #[stable]
     pub output: OutputElement<Vec<MidiEvent>>,
 
     pm_stream: portmidi::InputPort,
 }
 
+#[stable]
 impl MidiIn {
     /// Opens a midi input stream.
+    #[stable]
     pub fn new() -> MidiIn {
         // Check for initialization
         if !init::is_initialized() {
@@ -79,6 +83,7 @@ impl MidiIn {
     }
 
     /// Closes the portmidi stream
+    #[stable]
     pub fn stop(&mut self) {
         assert!(self.pm_stream.close().is_ok());
     }

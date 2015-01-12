@@ -11,8 +11,10 @@ use core::types::{Device, Sample, Time};
 /// Multiplies all its inputs into a single output.
 pub struct Multiplier {
     /// Input audio channels
+    #[stable]
     pub inputs: InputArray<Sample>,
     /// A single audio output channel.
+    #[stable]
     pub output: OutputElement<Sample>,
 
     num_inputs: usize, 
@@ -20,6 +22,7 @@ pub struct Multiplier {
 
 impl Multiplier {
     /// Returns a new multiplier with `num_inputs` input channels
+    #[stable]
     pub fn new(num_inputs: usize) -> Multiplier {
         Multiplier {
             inputs: InputArray::new(num_inputs),

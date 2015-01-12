@@ -1,6 +1,6 @@
 //! Provides audio IO from wav files.
 
-#![unstable="std::io::File interface unstable"]
+#![unstable]
 #![allow(unstable)]
 
 use std::io::{IoResult, File, Truncate, ReadWrite, SeekEnd, SeekSet};
@@ -13,8 +13,10 @@ use core::types::{SAMPLE_RATE, Device, Time, Sample};
 ///
 /// The reader will continue until it runs out of samples. When it does, the
 /// reader will return silence until it is reset to the beginning of the file.
+#[stable]
 pub struct WavReader {
     /// Output audio channels
+    #[stable]
     pub outputs: OutputArray<Sample>,
 
     num_channels: usize,
@@ -28,6 +30,7 @@ impl WavReader {
     ///
     /// This function panics if the file can't be opened, or is not a valid wav
     /// file.
+    #[stable]
     pub fn new(filename: &str) -> WavReader {
         let mut file = File::open(&Path::new(filename)).unwrap();
         let header = WavHeader::read_from_file(&mut file).unwrap();
@@ -43,16 +46,19 @@ impl WavReader {
     }
 
     /// Returns the number of audio samples in the wav file.
+    #[stable]
     pub fn get_num_samples(&self) -> usize {
         self.num_samples
     }
 
     /// Returns true if we have read the entire wav file.
+    #[stable]
     pub fn is_done(&self) -> bool {
         self.samples_read >= self.num_samples
     }
 
     /// Resets the reader to begin reading from the start of the file.
+    #[stable]
     pub fn restart(&mut self) -> IoResult<()> {
         self.samples_read = 0;
         self.file.seek(44, SeekSet)
@@ -78,8 +84,10 @@ impl Device for WavReader {
 ///
 /// The writer initializes the data_size to be 0. This will not be overwritten
 /// with the proper size until `update_data_size` is called.
+#[stable]
 pub struct WavWriter {
     /// Input audio channels
+    #[stable]
     pub inputs: InputArray<Sample>,
 
     num_channels: usize,
@@ -91,6 +99,7 @@ impl WavWriter {
     /// Returns a `WavWriting` writing to the provided file
     ///
     /// This function panics if the file can't be opened or written to
+    #[stable]
     pub fn new(filename: &str, num_channels: usize) -> WavWriter {
         let mut file = File::open_mode(&Path::new(filename), Truncate, 
                                       ReadWrite).unwrap();

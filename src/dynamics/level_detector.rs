@@ -1,6 +1,6 @@
 //! Provides envelope estimation for a signal.
 
-#![unstable]
+#![stable]
 
 use std::num::Float;
 
@@ -16,6 +16,7 @@ use core::types::{SAMPLE_RATE, Sample};
 /// This means the attack value can be set very low to respond quickly to bursts
 /// in signal power, while the release value can be high in order to coast
 /// through periodic troughs in the signal.
+#[stable]
 #[derive(Clone, Copy, Show)]
 pub struct LevelDetector {
     attack_alpha: f32,
@@ -23,6 +24,7 @@ pub struct LevelDetector {
     last_power: f32
 }
 
+#[stable]
 impl LevelDetector {
     /// Returns a new level detector.
     ///
@@ -30,6 +32,7 @@ impl LevelDetector {
     ///   in milliseconds.
     /// * `release_tau` specifies the time constant when the signal id decaying,
     ///   in milliseconds.
+    #[stable]
     pub fn new(attack_tau: f32, release_tau: f32) -> LevelDetector {
         LevelDetector {
             attack_alpha: time_constant_to_multiplier(attack_tau),
@@ -40,12 +43,14 @@ impl LevelDetector {
 
     /// Returns a level detector with default `tau` values tuned for reasonable
     /// performance.
+    #[stable]
     pub fn default() -> LevelDetector {
         LevelDetector::new(1.0, 100.0)
     }
 
     /// Given the next input sample, computes the current estimate of the
     /// envelope value.
+    #[stable]
     pub fn compute_next_level(&mut self, s: Sample) -> f32 {
         // Perform leaky integration on the signal power
         let pow = s*s;

@@ -4,7 +4,7 @@
 //! so instead we use functions that generate a fixed set of parameters for each
 //! model.
 
-#![unstable]
+#![unstable="needs more rooms"]
 
 use std::vec::Vec;
 
@@ -19,6 +19,7 @@ use core::types::Time;
 ///
 /// The comb delays are used to fill out the reverberations and create a steady
 /// decay; they sculpt the character of the room.
+#[stable]
 pub struct Room {
     pub tapped_delays: Vec<Time>,
     pub tapped_gains: Vec<f32>,
@@ -29,6 +30,7 @@ pub struct Room {
 ///
 /// Originally designed by James Moorer for his paper, "About This Reverberation
 /// Business".
+#[stable]
 pub fn hall() -> Room {
     Room {
         // For these parameters, see pg. 24 from Moorer paper

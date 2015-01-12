@@ -14,8 +14,10 @@ use oscillator::{AntialiasType, Oscillator, OscillatorMessage, Waveform};
 /// A polyphonic subtractive synthesizer
 pub struct SubtractiveSynth {
     /// Input MIDI channel
+    #[stable]
     pub input: InputElement<Vec<MidiEvent>>,
     /// Output audio channel
+    #[stable]
     pub output: Gain,
 
     /// Our voice manager
@@ -25,6 +27,7 @@ pub struct SubtractiveSynth {
 impl SubtractiveSynth {
     /// Returns a new subtractive synth that can play `num_voices` notes at one
     /// time.
+    #[stable]
     pub fn new(num_voices: usize) -> SubtractiveSynth {
         let mut voices = Vec::with_capacity(num_voices);
         for _i in (0 .. num_voices) {

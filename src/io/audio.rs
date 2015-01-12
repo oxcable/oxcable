@@ -1,6 +1,6 @@
 //! Provides audio IO from OS sound devices.
 
-#![unstable]
+#![stable]
 
 extern crate portaudio;
 
@@ -18,8 +18,10 @@ static BUFFER_SIZE: usize = 256;
 
 
 /// Reads audio from the OS's default input device.
+#[stable]
 pub struct AudioIn {
     /// Output audio channels
+    #[stable]
     pub outputs: OutputArray<Sample>,
 
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
@@ -28,8 +30,10 @@ pub struct AudioIn {
     samples_read: usize,
 }
 
+#[stable]
 impl AudioIn {
     /// Opens an audio input stream reading `num_channels` inputs.
+    #[stable]
     pub fn new(num_channels: usize) -> AudioIn {
         // Check for initialization
         if !init::is_initialized() {
@@ -53,6 +57,7 @@ impl AudioIn {
     }
 
     /// Closes the portaudio stream
+    #[stable]
     pub fn stop(&mut self) {
         assert!(self.pa_stream.stop().is_ok());
         assert!(self.pa_stream.close().is_ok());
@@ -80,8 +85,10 @@ impl Device for AudioIn {
 
 
 /// Writes audio to the OS's default output device.
+#[stable]
 pub struct AudioOut {
     /// Input audio channels
+    #[stable]
     pub inputs: InputArray<Sample>,
 
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
@@ -90,8 +97,10 @@ pub struct AudioOut {
     samples_written: usize,
 }
 
+#[stable]
 impl AudioOut {
     /// Opens an output stream writing `num_channels` outputs.
+    #[stable]
     pub fn new(num_channels: usize) -> AudioOut {
         // Check for initialization
         if !init::is_initialized() {
@@ -115,6 +124,7 @@ impl AudioOut {
     }
 
     /// Closes the portaudio stream
+    #[stable]
     pub fn stop(&mut self) {
         assert!(self.pa_stream.stop().is_ok());
         assert!(self.pa_stream.close().is_ok());
