@@ -76,7 +76,8 @@ impl Complex {
     }
 }
 
-impl fmt::Show for Complex {
+#[allow(unstable)]
+impl fmt::String for Complex {
     /// Prints the complex number in rectangular form.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if self.i == 0.0 {

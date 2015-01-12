@@ -64,7 +64,7 @@ impl Device for AudioIn {
         if self.samples_read == BUFFER_SIZE {
             let result = self.pa_stream.read(BUFFER_SIZE as u32);
             match result {
-                Ok(v) => self.buffer.clone_from(&v),
+                Ok(v) => self.buffer = v.clone(),
                 Err(e) => panic!(e)
             }
             self.samples_read = 0;

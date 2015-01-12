@@ -1,7 +1,8 @@
 //! Provides a time synchronous container for data.
 
-#![experimental]
+#![unstable]
 
+#[allow(unstable)]
 extern crate test;
 
 use std::cell::RefCell;

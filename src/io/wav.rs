@@ -1,6 +1,7 @@
 //! Provides audio IO from wav files.
 
-#![experimental]
+#![unstable="std::io::File interface unstable"]
+#![allow(unstable)]
 
 use std::io::{IoResult, File, Truncate, ReadWrite, SeekEnd, SeekSet};
 

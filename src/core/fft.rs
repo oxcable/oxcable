@@ -20,6 +20,7 @@ pub struct Transformer {
     twiddles: Vec<Complex>,    
 }
 
+#[allow(unstable)] // PI naming unstable
 impl Transformer {
     /// Returns a set precomputed information used to perform FFTs of the
     /// provided size.
@@ -102,7 +103,7 @@ impl Transformer {
                     input[i]
                 }
         }
-        for i in self.bit_reverses.slice(input.len(), self.size).iter() {
+        for i in self.bit_reverses[input.len() .. self.size].iter() {
             output[*i] = Complex::from_real(0.0);
         }
 

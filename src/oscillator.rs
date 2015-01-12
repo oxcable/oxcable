@@ -1,6 +1,7 @@
 //! Provides an oscillator that generates periodic waveforms.
 
-#![experimental]
+#![unstable="naming scheme for PI unstable"]
+#![allow(unstable)]
 
 use std::f32::consts::PI;
 use std::num::Float;

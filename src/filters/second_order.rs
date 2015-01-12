@@ -89,6 +89,7 @@ impl Filter {
 }
 
 /// Computes the parameters for our filter
+#[allow(unstable)] // PI naming unstable
 fn compute_parameters(mode: FilterMode) -> (f32, f32, f32, f32, f32) {
     let cutoff = match mode {
         LowPass(cutoff) => cutoff,
