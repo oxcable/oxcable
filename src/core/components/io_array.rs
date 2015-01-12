@@ -1,6 +1,6 @@
 //! Provides time synchronized input and output arrays.
 
-#![experimental]
+#![unstable]
 
 use std::default::Default;
 use std::vec::Vec;
@@ -10,7 +10,6 @@ use core::types::Time;
 
 
 /// Stores generated frame data and manages access to that data.
-#[experimental]
 pub struct OutputArray<T> {
     chs: Vec<ChannelRef<T>>
 }
@@ -52,7 +51,6 @@ impl<T: Clone+Default> OutputArray<T> {
 
 
 /// Holds references to channels to draw input data frames from.
-#[experimental]
 pub struct InputArray<T> {
     chs: Vec<Option<ChannelRef<T>>>
 }

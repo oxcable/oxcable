@@ -1,6 +1,6 @@
 //! Provides `Device`s that perform dynamics processing.
 
-#![experimental]
+#![unstable]
 
 pub use self::compressor::Compressor;
 pub use self::limiter::Limiter;

@@ -11,8 +11,7 @@
 //! with the width of the peak determined by the Q (higher Q means a narrower
 //! peak).
 
-#![experimental]
-#![allow(non_snake_case)]
+#![unstable]
 
 
 use std::f32::consts::PI;
@@ -90,6 +89,7 @@ impl Filter {
 
 /// Computes the parameters for our filter
 #[allow(unstable)] // PI naming unstable
+#[allow(non_snake_case)]
 fn compute_parameters(mode: FilterMode) -> (f32, f32, f32, f32, f32) {
     let cutoff = match mode {
         LowPass(cutoff) => cutoff,

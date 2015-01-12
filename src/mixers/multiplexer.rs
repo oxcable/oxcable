@@ -1,6 +1,6 @@
 //! `Device` for selecting one of several channels.
 
-#![experimental]
+#![unstable]
 
 use core::components::{InputArray, OutputElement};
 use core::types::{Device, Sample, Time};

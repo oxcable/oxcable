@@ -1,6 +1,6 @@
 //! Provides polyphonic voice arrays.
 
-#![experimental]
+#![unstable]
 
 use std::collections::{RingBuf, VecMap};
 use std::vec::Vec;

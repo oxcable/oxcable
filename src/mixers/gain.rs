@@ -1,6 +1,6 @@
 //! `Device` for changing channel levels.
 
-#![experimental]
+#![unstable]
 
 use core::components::{InputArray, OutputArray};
 use core::types::{Device, Sample, Time};

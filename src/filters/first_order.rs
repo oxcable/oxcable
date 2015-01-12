@@ -7,7 +7,7 @@
 //! A `LowShelf` or `HighShelf` filter will provide a shelf starting at the
 //! cutoff frequency, and will provide the specified gain in the shelf region.
 
-#![experimental]
+#![unstable]
 #![allow(non_snake_case)]
 
 

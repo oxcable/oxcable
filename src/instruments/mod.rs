@@ -1,6 +1,6 @@
 //! Defines instruments to use
 
-#![experimental]
+#![unstable]
 
 pub use self::subtractive_synth::SubtractiveSynth;
 

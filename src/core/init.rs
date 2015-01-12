@@ -1,6 +1,6 @@
 //! Provides initialization code for drivers used by oxcable
 
-#![experimental]
+#![unstable]
 
 extern crate portaudio;
 extern crate portmidi;

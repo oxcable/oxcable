@@ -13,7 +13,6 @@ use core::types::Time;
 
 
 /// Container for a single channel of data.
-#[experimental]
 pub struct Channel<T> {
     next_t: Time,
     data: T, 

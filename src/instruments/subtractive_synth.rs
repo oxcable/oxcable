@@ -1,6 +1,6 @@
 //! A basic subtractive synthesizer
 
-#![experimental]
+#![unstable]
 
 use adsr::{Adsr, AdsrMessage};
 use core::components::{InputElement, Voice, VoiceArray};

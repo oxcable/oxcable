@@ -1,6 +1,6 @@
 //! `Device` for multiplying multiple channels into one.
 
-#![experimental]
+#![unstable]
 
 use core::components::{InputArray, OutputElement};
 use core::types::{Device, Sample, Time};

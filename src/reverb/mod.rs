@@ -1,6 +1,6 @@
 //! Defines `Device`s for reverberation effects
 
-#![experimental]
+#![unstable]
 
 pub use self::moorer_reverb::MoorerReverb;
 

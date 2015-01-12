@@ -1,6 +1,6 @@
 //! Provides envelope estimation for a signal.
 
-#![experimental]
+#![unstable]
 
 use std::num::Float;
 

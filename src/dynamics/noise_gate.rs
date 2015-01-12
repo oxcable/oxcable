@@ -1,6 +1,6 @@
 //! Provides a noise gate filter.
 
-#![experimental]
+#![unstable]
 
 use std::vec::Vec;
 

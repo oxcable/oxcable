@@ -1,6 +1,6 @@
 //! Provides MIDI input from OS MIDI devices.
 
-#![experimental]
+#![unstable]
 
 extern crate portmidi;
 

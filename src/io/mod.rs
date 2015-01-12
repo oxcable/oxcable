@@ -1,6 +1,6 @@
 //! Defines `Device`s for getting audio into and out of oxcable.
 
-#![experimental]
+#![unstable]
 
 extern crate portaudio;
 

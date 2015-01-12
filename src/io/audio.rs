@@ -1,6 +1,6 @@
 //! Provides audio IO from OS sound devices.
 
-#![experimental]
+#![unstable]
 
 extern crate portaudio;
 

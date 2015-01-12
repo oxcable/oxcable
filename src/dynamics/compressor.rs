@@ -1,6 +1,6 @@
 //! Provides a compression filter.
 
-#![experimental]
+#![unstable]
 
 use std::vec::Vec;
 

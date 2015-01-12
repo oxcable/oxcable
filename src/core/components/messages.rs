@@ -11,7 +11,7 @@
 //! traits. Further, since the payload will be copied multiple times, it is wise
 //! to keep their size minimal.
 
-#![experimental]
+#![unstable]
 
 use std::sync::{Arc, Mutex};
 use std::vec::Vec;

@@ -1,6 +1,6 @@
 //! Provides a simple delay module.
 
-#![experimental]
+#![unstable]
 
 
 use std::vec::Vec;

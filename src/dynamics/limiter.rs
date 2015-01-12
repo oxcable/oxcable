@@ -1,6 +1,6 @@
 //! Provides a limiter filter.
 
-#![experimental]
+#![unstable]
 
 use std::vec::Vec;
 

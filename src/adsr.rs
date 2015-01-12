@@ -1,6 +1,6 @@
 //! Provides an ADSR filter
 
-#![experimental]
+#![unstable]
 
 use core::components::{InputArray, OutputArray};
 use core::types::{SAMPLE_RATE,Device, Sample, Time};

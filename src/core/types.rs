@@ -50,7 +50,6 @@ pub enum MidiMessage {
 
 
 /// An interface for a synchronous processing device.
-#[experimental]
 pub trait Device {
     /// Process a single frame worth of data. This function should be called
     /// once per time step, starting at `t=1`.

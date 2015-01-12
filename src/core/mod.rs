@@ -1,7 +1,7 @@
 //! Provides core types, components, and utility functions for creating audio
 //! and MIDI devices.
 
-#![experimental]
+#![unstable]
 
 pub mod complex;
 pub mod components;

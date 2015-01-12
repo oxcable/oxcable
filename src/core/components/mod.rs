@@ -25,7 +25,7 @@
 //! can use a `MessageReceiver`, which can then create multiple thread-safe
 //! `MessageSender`s to send messages with.
 
-#![experimental]
+#![unstable]
 
 pub use self::io_array::{InputArray, OutputArray};
 pub use self::io_elements::{InputElement, OutputElement};

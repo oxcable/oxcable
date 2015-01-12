@@ -1,6 +1,6 @@
 //! Provides single channel time synchronized input and output.
 
-#![experimental]
+#![unstable]
 
 use std::default::Default;
 
@@ -9,7 +9,6 @@ use core::types::Time;
 
 
 /// Stores generated frame data and manages access to that data.
-#[experimental]
 pub struct OutputElement<T> {
     ch: ChannelRef<T>
 }
@@ -40,7 +39,6 @@ impl<T: Clone+Default> OutputElement<T> {
 
 
 /// Holds references to channels to draw input data frames from.
-#[experimental]
 pub struct InputElement<T> {
     ch: Option<ChannelRef<T>>
 }
