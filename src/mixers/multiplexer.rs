@@ -15,13 +15,13 @@ pub struct Multiplexer {
     /// A single output audio channel
     pub output: OutputElement<Sample>,
 
-    num_inputs: uint, 
-    selected: uint,
+    num_inputs: usize, 
+    selected: usize,
 }
 
 impl Multiplexer {
     /// Returns a new multiplexer with `num_inputs` input channels.
-    pub fn new(num_inputs: uint) -> Multiplexer {
+    pub fn new(num_inputs: usize) -> Multiplexer {
         Multiplexer {
             inputs: InputArray::new(num_inputs),
             output: OutputElement::new(),
@@ -33,7 +33,7 @@ impl Multiplexer {
     /// Mirror channel `i` to the output.
     ///
     /// Returns Err if the channel is out of range.
-    pub fn select_input(&mut self, i: uint) -> Result<(),()> {
+    pub fn select_input(&mut self, i: usize) -> Result<(),()> {
         if i < self.num_inputs {
             self.selected = i;
             Ok(())

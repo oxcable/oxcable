@@ -15,12 +15,12 @@ pub struct Adder {
     /// A single output audio channel
     pub output: OutputElement<Sample>,
 
-    num_inputs: uint, 
+    num_inputs: usize, 
 }
 
 impl Adder {
     /// Returns a new adder with `num_inputs` input channels.
-    pub fn new(num_inputs: uint) -> Adder {
+    pub fn new(num_inputs: usize) -> Adder {
         Adder {
             inputs: InputArray::new(num_inputs),
             output: OutputElement::new(),

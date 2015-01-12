@@ -25,7 +25,7 @@ pub struct SubtractiveSynth {
 impl SubtractiveSynth {
     /// Returns a new subtractive synth that can play `num_voices` notes at one
     /// time.
-    pub fn new(num_voices: uint) -> SubtractiveSynth {
+    pub fn new(num_voices: usize) -> SubtractiveSynth {
         let mut voices = Vec::with_capacity(num_voices);
         for _i in range(0, num_voices) {
             voices.push(SubtractiveSynthVoice::new());

@@ -15,15 +15,15 @@ use core::complex::Complex;
 
 /// A container for precomputed values to perform FFTs of a fixed size.
 pub struct Transformer {
-    size: uint,
-    bit_reverses: Vec<uint>,
+    size: usize,
+    bit_reverses: Vec<usize>,
     twiddles: Vec<Complex>,    
 }
 
 impl Transformer {
     /// Returns a set precomputed information used to perform FFTs of the
     /// provided size.
-    pub fn new(size: uint) -> Transformer {
+    pub fn new(size: usize) -> Transformer {
         // Only operate in powers of two
         let bufsize = size.next_power_of_two();
 
@@ -32,7 +32,7 @@ impl Transformer {
         let mut bit_reverses = Vec::with_capacity(bufsize);
         for i in range(0, size) {
             let br = bit_reverse(i as u32, int_log(bufsize as u32));
-            bit_reverses.push(br as uint);
+            bit_reverses.push(br as usize);
         }
 
         // Populate the twiddle factors w_n^i
@@ -48,7 +48,7 @@ impl Transformer {
     }
 
     /// Returns the size FFTs this Transformer performs
-    pub fn get_size(&self) -> uint {
+    pub fn get_size(&self) -> usize {
         self.size
     }
 
@@ -153,7 +153,7 @@ fn bit_reverse(n: u32, bits: u32) -> u32 {
     i = ((i & 0xF0F0F0F0) >> 4) | ((i & 0x0F0F0F0F) << 4);
     i = ((i & 0xCCCCCCCC) >> 2) | ((i & 0x33333333) << 2);
     i = ((i & 0xAAAAAAAA) >> 1) | ((i & 0x55555555) << 1);
-    i >> ((32 - bits) as uint)
+    i >> ((32 - bits) as u32)
 }
 
 /// Returns the log base 2 of n, rounded up.

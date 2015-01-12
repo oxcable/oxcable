@@ -3,7 +3,7 @@
 #![unstable="operator overloads in rust are not yet stable"]
 
 use std::fmt;
-use std::num::{Float, FloatMath};
+use std::num::Float;
 use std::ops::{Neg, Add, Sub, Mul};
 
 

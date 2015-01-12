@@ -2,7 +2,7 @@
 
 
 /// The global sample rate, in Hz.
-pub static SAMPLE_RATE: uint = 44100;
+pub static SAMPLE_RATE: u32 = 44100;
 
 /// The datatype of a single sample.
 pub type Sample = f32;

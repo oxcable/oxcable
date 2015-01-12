@@ -22,7 +22,7 @@ pub struct Delay {
     /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
-    num_channels: uint,
+    num_channels: usize,
     delay_buffers: Vec<RingBuffer<Sample>>,
     feedback: f32,
     wetness: f32
@@ -37,12 +37,12 @@ impl Delay {
     /// * `wetness`: how much of our input signal to mix into the delayed signal
     ///              in the output
     pub fn new(delay: f32, feedback: f32, wetness: f32, 
-               num_channels: uint) -> Delay {
+               num_channels: usize) -> Delay {
         // Create the delay buffers, starting with silence
-        let delay_samples = (delay * SAMPLE_RATE as f32) as uint;
+        let delay_samples = (delay * SAMPLE_RATE as f32) as u32;
         let mut bufs = Vec::with_capacity(num_channels);
         for i in range(0, num_channels) {
-            bufs.push(RingBuffer::new(delay_samples as uint));
+            bufs.push(RingBuffer::new(delay_samples as usize));
             for _ in range(0, delay_samples) {
                 bufs[i].push(0.0);
             }

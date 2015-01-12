@@ -19,7 +19,7 @@ pub struct Gain {
     /// Output audio channels.
     pub outputs: OutputArray<Sample>,
 
-    num_channels: uint, 
+    num_channels: usize, 
     gain: f32,
 }
 
@@ -27,7 +27,7 @@ impl Gain {
     /// Returns a new gain filter.
     ///
     /// `gain` should be in decibels.
-    pub fn new(gain: f32, num_channels: uint) -> Gain {
+    pub fn new(gain: f32, num_channels: usize) -> Gain {
         Gain {
             inputs: InputArray::new(num_channels),
             outputs: OutputArray::new(num_channels),

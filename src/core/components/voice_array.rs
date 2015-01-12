@@ -33,11 +33,11 @@ pub struct VoiceArray<T> {
     /// All the voices are contained in the voices vector
     voices: Vec<T>,
     /// Maps MIDI note numbers to currently triggered voice indices
-    note_to_voice: VecMap<uint>,
+    note_to_voice: VecMap<usize>,
     /// Maps voice indices to MIDI note numbers
-    voice_to_note: VecMap<uint>,
+    voice_to_note: VecMap<u8>,
     /// Places the most recently mapped voices at the end
-    voice_queue: RingBuf<uint>
+    voice_queue: RingBuf<usize>
 }
 
 impl<T: Device+Voice> VoiceArray<T> {
@@ -70,16 +70,16 @@ impl<T: Device+Voice> VoiceArray<T> {
     pub fn handle_event(&mut self, event: &MidiEvent, t: Time) {
         match event.payload {
             MidiMessage::NoteOn(note,_) => 
-                self.handle_note_on(note as uint, event, t),
+                self.handle_note_on(note as u8, event, t),
             MidiMessage::NoteOff(note,_) => 
-                self.handle_note_off(note as uint, event, t),
+                self.handle_note_off(note as u8, event, t),
             _ => self.handle_other_event(event, t)
         }
     }
 
     /// Selects a voice to handle this event, and triggers the note
-    fn handle_note_on(&mut self, note: uint, event: &MidiEvent, t: Time) {
-        let i = match self.note_to_voice.remove(&note) {
+    fn handle_note_on(&mut self, note: u8, event: &MidiEvent, t: Time) {
+        let i = match self.note_to_voice.remove(&(note as usize)) {
             Some(i) => {
                 // This note is already being played, so retrigger it and move
                 // it to the back of the queue
@@ -92,12 +92,12 @@ impl<T: Device+Voice> VoiceArray<T> {
 
                 // Remove the mapping between the voice and its old note
                 match self.voice_to_note.remove(&i) {
-                    Some(n) => { self.note_to_voice.remove(&n); },
+                    Some(n) => { self.note_to_voice.remove(&(n as usize)); },
                     None => ()
                 }
 
                 // Map this voice to its new note
-                self.note_to_voice.insert(note, i);
+                self.note_to_voice.insert(note as usize, i);
                 self.voice_to_note.insert(i, note);
                 i
             }
@@ -108,8 +108,8 @@ impl<T: Device+Voice> VoiceArray<T> {
     }
 
     // Find the voice playing this note and stop it
-    fn handle_note_off(&mut self, note: uint, event: &MidiEvent, t: Time) {
-        match self.note_to_voice.remove(&note) {
+    fn handle_note_off(&mut self, note: u8, event: &MidiEvent, t: Time) {
+        match self.note_to_voice.remove(&(note as usize)) {
             Some(i) => {
                 self.remove_from_queue(i);
                 self.voice_to_note.remove(&i);
@@ -128,7 +128,7 @@ impl<T: Device+Voice> VoiceArray<T> {
     }
 
     // Finds a voice in the queue and removes it
-    fn remove_from_queue(&mut self, voice: uint) {
+    fn remove_from_queue(&mut self, voice: usize) {
         for i in range(0, self.voice_queue.len()) {
             if *self.voice_queue.get(i).unwrap() == voice {
                 self.voice_queue.remove(i);

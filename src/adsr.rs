@@ -42,7 +42,7 @@ pub struct Adsr {
     pub outputs: OutputArray<Sample>,
 
     // Remember parameter values
-    num_channels: uint,
+    num_channels: usize,
     attack_time: Time,
     decay_time: Time,
     release_time: Time,
@@ -67,7 +67,7 @@ impl Adsr {
     ///   signal after filtering.
     /// * `num_channels` defines how many channels of audio to filter.
     pub fn new(attack_time: f32, decay_time: f32, sustain_level: f32,
-               release_time: f32, gain: f32, num_channels: uint) -> Adsr {
+               release_time: f32, gain: f32, num_channels: usize) -> Adsr {
         // Convert times to samples
         let attack_samples = (attack_time*SAMPLE_RATE as f32) as Time;
         let decay_samples = (decay_time*SAMPLE_RATE as f32) as Time;
@@ -90,7 +90,7 @@ impl Adsr {
     }
 
     /// Returns an ADSR with reasonable default values for the envelope.
-    pub fn default(num_channels: uint) ->Adsr {
+    pub fn default(num_channels: usize) ->Adsr {
         Adsr::new(0.05, 0.1, 0.5, 0.1, 0.0, num_channels)
     }
 

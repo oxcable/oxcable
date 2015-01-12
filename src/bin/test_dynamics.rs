@@ -15,7 +15,7 @@ fn main() {
     let mut wav_in = wav::WavReader::new("wav/volume_up.wav");
     let mut wav_outs = Vec::new();
 
-    let mut comp = box dynamics::Compressor::new(-6.0, 0.5, 0.0, 1);
+    let mut comp = Box::new(dynamics::Compressor::new(-6.0, 0.5, 0.0, 1));
     comp.inputs.set_channel(0, wav_in.outputs.get_channel(0));
     wav_outs.push(wav::WavWriter::new("wav/test_compressor.wav", 1));
     wav_outs[0].inputs.set_channel(0, comp.outputs.get_channel(0));
@@ -38,14 +38,14 @@ fn main() {
         comp.tick(t);
         lim.tick(t);
         gate.tick(t);
-        for i in range(0, wav_outs.len()) {
+        for i in (0 .. wav_outs.len()) {
             wav_outs[i].tick(t);
         }
         t += 1;
     }
 
     // Finish the wav files
-    for i in range(0, wav_outs.len()) {
+    for i in (0 .. wav_outs.len()) {
         wav_outs[i].update_data_size();
     }
     println!("Done");

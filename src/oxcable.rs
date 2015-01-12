@@ -1,5 +1,5 @@
 #![crate_name = "oxcable"]
-#![feature(associated_types)]
+#![allow(unstable)]
 
 pub mod adsr;
 pub mod core;

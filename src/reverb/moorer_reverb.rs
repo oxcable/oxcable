@@ -19,7 +19,7 @@ pub struct MoorerReverb {
     /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
-    num_channels: uint,
+    num_channels: usize,
     gain: f32,
     wetness: f32,
 
@@ -44,7 +44,7 @@ impl MoorerReverb {
     /// * `wetness`: how much of the input signal to mix into the output
     /// * `num_channels`: number of channels to process
     pub fn new(room: Room, rev_time: f32, gain: f32, wetness:f32, 
-           num_channels: uint) -> MoorerReverb {
+           num_channels: usize) -> MoorerReverb {
         assert!(room.tapped_delays.len() == room.tapped_gains.len());
 
         // Calculate delays
@@ -63,7 +63,7 @@ impl MoorerReverb {
         // Allocate tapped delay lines
         let mut tapped_delay_lines = Vec::with_capacity(num_channels);
         for _i in range(0, num_channels) {
-            let mut rb = RingBuffer::new(max_tapped_delay as uint + 1);
+            let mut rb = RingBuffer::new(max_tapped_delay as usize + 1);
             for _t in range(0, max_tapped_delay) { rb.push(0.0); }
             tapped_delay_lines.push(rb);
         }
@@ -74,7 +74,7 @@ impl MoorerReverb {
             let mut channel_lines = Vec::with_capacity(room.comb_delays.len());
             for j in range(0, room.comb_delays.len()) {
                 let delay = room.comb_delays[j];
-                let mut rb = RingBuffer::new((delay+1) as uint);
+                let mut rb = RingBuffer::new((delay+1) as usize);
                 for _t in range(0, delay) { rb.push(0.0); }
                 channel_lines.push(rb);
             }
@@ -82,7 +82,7 @@ impl MoorerReverb {
         }
         let mut comb_out_buffer = Vec::with_capacity(num_channels);
         for _i in range(0, num_channels) {
-            let mut rb = RingBuffer::new((comb_out_delay+1) as uint);
+            let mut rb = RingBuffer::new((comb_out_delay+1) as usize);
             for _t in range(0, comb_out_delay) { rb.push(0.0); }
             comb_out_buffer.push(rb);
         }

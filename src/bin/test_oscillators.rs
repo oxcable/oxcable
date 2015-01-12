@@ -36,20 +36,20 @@ fn main() {
 
     // Link oscillators to wav outs
     println!("Writing oscillators to wav files...");
-    for i in range(0u, oscs.len()) {
+    for i in (0 .. oscs.len()) {
         wavs[i].inputs.set_channel(0, oscs[i].output.get_channel());
     }
 
     // Write files
-    for t in range(0, 44100) {
-        for i in range(0, oscs.len()) {
+    for t in (0 .. 44100) {
+        for i in (0 .. oscs.len()) {
             oscs[i].tick(t);
             wavs[i].tick(t);
         }
     }
 
     // Finish the wav files
-    for i in range(0, wavs.len()) {
+    for i in (0 .. wavs.len()) {
         wavs[i].update_data_size();
     }
     println!("Done");

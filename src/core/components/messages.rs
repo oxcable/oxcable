@@ -20,7 +20,7 @@ use std::vec::Vec;
 /// A component that receives messages
 pub struct MessageReceiver<T> {
     msgs: Arc<Mutex<Vec<T>>>,
-    num_senders: uint
+    num_senders: usize
 }
 
 impl<T: Clone+Send+Sync> MessageReceiver<T> {

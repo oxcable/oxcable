@@ -29,7 +29,7 @@ fn main() {
         match midi.output.get(t) {
             Some(ref events) if events.len() > 0 => {
                 for event in events.iter() {
-                    println!("{}", event);
+                    println!("{:?}", event);
                     match event.payload {
                         MidiMessage::NoteOn(_,_) => 
                             adsr.handle_message(adsr::AdsrMessage::NoteDown, t),

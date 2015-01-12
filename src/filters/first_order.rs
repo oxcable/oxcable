@@ -12,7 +12,7 @@
 
 
 use std::f32::consts::PI;
-use std::num::FloatMath;
+use std::num::Float;
 use std::vec::Vec;
 
 use core::components::{InputArray, OutputArray};
@@ -44,7 +44,7 @@ pub struct Filter {
     /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
-    num_channels: uint, 
+    num_channels: usize, 
     x_last: Vec<Sample>,
     y1_last: Vec<Sample>,
     mode: FilterMode,
@@ -54,7 +54,7 @@ pub struct Filter {
 
 impl Filter {
     /// Creates a new first order filter with the provided mode.
-    pub fn new(mode: FilterMode, num_channels: uint) -> Filter {
+    pub fn new(mode: FilterMode, num_channels: usize) -> Filter {
         // Populate the last vectors
         let mut x_last = Vec::<f32>::with_capacity(num_channels);
         let mut y1_last = Vec::<f32>::with_capacity(num_channels);

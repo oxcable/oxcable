@@ -18,7 +18,7 @@ pub struct Limiter {
     pub outputs: OutputArray<Sample>,
 
     level_detectors: Vec<LevelDetector>,
-    num_channels: uint, 
+    num_channels: usize, 
     threshold: f32,
     gain: f32
 }
@@ -29,7 +29,7 @@ impl Limiter {
     /// * `threshold` specifies the decibel level to limit the signal to.
     /// * The specified `gain` (in decibels) will be applied to the
     ///   signal after compression.
-    pub fn new(threshold: f32, gain: f32, num_channels: uint) -> Limiter {
+    pub fn new(threshold: f32, gain: f32, num_channels: usize) -> Limiter {
         // Create our level detectors
         let mut levels = Vec::with_capacity(num_channels);
         for _ in range(0, num_channels) {

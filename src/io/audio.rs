@@ -14,7 +14,7 @@ static PORTAUDIO_T: portaudio::pa::SampleFormat =
     portaudio::pa::SampleFormat::Float32;
 
 /// Defines the buffer size for Portaudio
-static BUFFER_SIZE: uint = 256;
+static BUFFER_SIZE: usize = 256;
 
 
 /// Reads audio from the OS's default input device.
@@ -23,14 +23,14 @@ pub struct AudioIn {
     pub outputs: OutputArray<Sample>,
 
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
-    num_channels: uint, 
+    num_channels: usize, 
     buffer: Vec<Sample>,
-    samples_read: uint,
+    samples_read: usize,
 }
 
 impl AudioIn {
     /// Opens an audio input stream reading `num_channels` inputs.
-    pub fn new(num_channels: uint) -> AudioIn {
+    pub fn new(num_channels: usize) -> AudioIn {
         // Check for initialization
         if !init::is_initialized() {
             panic!("Must initialize oxcable first");
@@ -85,14 +85,14 @@ pub struct AudioOut {
     pub inputs: InputArray<Sample>,
 
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
-    num_channels: uint, 
+    num_channels: usize, 
     buffer: Vec<Sample>,
-    samples_written: uint,
+    samples_written: usize,
 }
 
 impl AudioOut {
     /// Opens an output stream writing `num_channels` outputs.
-    pub fn new(num_channels: uint) -> AudioOut {
+    pub fn new(num_channels: usize) -> AudioOut {
         // Check for initialization
         if !init::is_initialized() {
             panic!("Must initialize oxcable first");

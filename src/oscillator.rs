@@ -3,7 +3,7 @@
 #![experimental]
 
 use std::f32::consts::PI;
-use std::num::FloatMath;
+use std::num::Float;
 use std::rand;
 
 use core::components::OutputElement;

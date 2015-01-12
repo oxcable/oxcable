@@ -16,7 +16,7 @@
 
 
 use std::f32::consts::PI;
-use std::num::{Float, FloatMath};
+use std::num::Float;
 use std::vec::Vec;
 
 use core::components::{InputArray, OutputArray};
@@ -52,7 +52,7 @@ pub struct Filter {
     /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
-    num_channels: uint, 
+    num_channels: usize, 
     
     x_last1: Vec<Sample>, x_last2: Vec<Sample>, // two time step delay elements
     y_last1: Vec<Sample>, y_last2: Vec<Sample>,
@@ -61,7 +61,7 @@ pub struct Filter {
 
 impl Filter {
     /// Creates a new second order filter with the provided mode.
-    pub fn new(mode: FilterMode, num_channels: uint) -> Filter {
+    pub fn new(mode: FilterMode, num_channels: usize) -> Filter {
         // Populate the delay elements
         let mut x_last1 = Vec::<f32>::with_capacity(num_channels);
         let mut x_last2 = Vec::<f32>::with_capacity(num_channels);

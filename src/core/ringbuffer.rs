@@ -16,15 +16,15 @@ use core::types::Time;
 /// remove the oldest data to make space.
 pub struct RingBuffer<T: Clone> {
     buf: Vec<T>,
-    capacity: uint,
-    size: uint,
+    capacity: usize,
+    size: usize,
     start_t: Time,
     end_t: Time,
 }
 
 impl<T: Clone> RingBuffer<T> {
     /// Returns an empty ring buffer that can hold at most `capacity` elements.
-    pub fn new(capacity: uint) -> RingBuffer<T> {
+    pub fn new(capacity: usize) -> RingBuffer<T> {
         RingBuffer { 
             buf: Vec::with_capacity(capacity), 
             capacity: capacity,
@@ -38,7 +38,7 @@ impl<T: Clone> RingBuffer<T> {
     /// not in the buffer, instead returns `None`.
     pub fn get(&self, t: Time) -> Option<T> {
         if self.start_t <= t && t < self.end_t {
-            Some(self.buf[(t % self.capacity as Time) as uint].clone())
+            Some(self.buf[(t % self.capacity as Time) as usize].clone())
         } else {
             None
         }
@@ -52,7 +52,7 @@ impl<T: Clone> RingBuffer<T> {
             self.size += 1;
             self.end_t += 1;
         } else {
-            self.buf[(self.end_t % self.capacity as Time) as uint] = data;
+            self.buf[(self.end_t % self.capacity as Time) as usize] = data;
             self.start_t += 1;
             self.end_t += 1;
         }
@@ -62,7 +62,7 @@ impl<T: Clone> RingBuffer<T> {
     /// time is not in the buffer, instead returns `Err`.
     pub fn update(&mut self, t: Time, data: T) -> Result<(),()> {
         if self.start_t <= t && t < self.end_t {
-            self.buf[(t % self.capacity as Time) as uint] = data;
+            self.buf[(t % self.capacity as Time) as usize] = data;
             Ok(())
         } else {
             Err(())
@@ -75,7 +75,7 @@ impl<T: Add+Clone> RingBuffer<T> where T: Add<Output = T> {
     /// If the requested time is not in the buffer, instead returns `Err`.
     pub fn add(&mut self, t: Time, data: T) -> Result<(),()> {
         if self.start_t <= t && t < self.end_t {
-            let i = (t % self.capacity as Time) as uint;
+            let i = (t % self.capacity as Time) as usize;
             let res: T = self.buf[i].clone() + data;
             self.buf[i] = res;
             Ok(())

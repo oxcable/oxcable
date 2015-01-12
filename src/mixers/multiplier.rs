@@ -15,12 +15,12 @@ pub struct Multiplier {
     /// A single audio output channel.
     pub output: OutputElement<Sample>,
 
-    num_inputs: uint, 
+    num_inputs: usize, 
 }
 
 impl Multiplier {
     /// Returns a new multiplier with `num_inputs` input channels
-    pub fn new(num_inputs: uint) -> Multiplier {
+    pub fn new(num_inputs: usize) -> Multiplier {
         Multiplier {
             inputs: InputArray::new(num_inputs),
             output: OutputElement::new(),

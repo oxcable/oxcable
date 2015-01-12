@@ -16,9 +16,9 @@ pub struct WavReader {
     /// Output audio channels
     pub outputs: OutputArray<Sample>,
 
-    num_channels: uint,
-    num_samples: uint,
-    samples_read: uint,
+    num_channels: usize,
+    num_samples: usize,
+    samples_read: usize,
     file: File
 }
 
@@ -32,17 +32,17 @@ impl WavReader {
         let header = WavHeader::read_from_file(&mut file).unwrap();
         assert!(header.is_valid());
         WavReader {
-            outputs: OutputArray::new(header.num_channels as uint),
-            num_channels: header.num_channels as uint,
+            outputs: OutputArray::new(header.num_channels as usize),
+            num_channels: header.num_channels as usize,
             num_samples: (header.data_size / ((header.bit_depth/8) as u32) / 
-                (header.num_channels as u32)) as uint,
+                (header.num_channels as u32)) as usize,
             samples_read: 0,
             file: file
         }
     }
 
     /// Returns the number of audio samples in the wav file.
-    pub fn get_num_samples(&self) -> uint {
+    pub fn get_num_samples(&self) -> usize {
         self.num_samples
     }
 
@@ -81,16 +81,16 @@ pub struct WavWriter {
     /// Input audio channels
     pub inputs: InputArray<Sample>,
 
-    num_channels: uint,
+    num_channels: usize,
     file: File,
-    samples_written: uint,
+    samples_written: usize,
 }
 
 impl WavWriter {
     /// Returns a `WavWriting` writing to the provided file
     ///
     /// This function panics if the file can't be opened or written to
-    pub fn new(filename: &str, num_channels: uint) -> WavWriter {
+    pub fn new(filename: &str, num_channels: usize) -> WavWriter {
         let mut file = File::open_mode(&Path::new(filename), Truncate, 
                                       ReadWrite).unwrap();
         let header = WavHeader::new(num_channels as u16, SAMPLE_RATE as u32,

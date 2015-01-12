@@ -29,23 +29,23 @@ fn main() {
     wavs.push(wav::WavWriter::new("wav/test_second_order_peak.wav", 1));
 
     // Link oscillators to wav outs
-    for i in range(0u, filters.len()) {
+    for i in (0 .. filters.len()) {
         filters[i].inputs.set_channel(0, wav_in.outputs.get_channel(0));
         wavs[i].inputs.set_channel(0, filters[i].outputs.get_channel(0));
     }
 
     // Write files
     println!("Writing second order filters to wav files...");
-    for t in range(0, 44100) {
+    for t in (0 .. 44100) {
         wav_in.tick(t);
-        for i in range(0, filters.len()) {
+        for i in (0 .. filters.len()) {
             filters[i].tick(t);
             wavs[i].tick(t);
         }
     }
 
     // Finish the wav files
-    for i in range(0, wavs.len()) {
+    for i in (0 .. wavs.len()) {
         wavs[i].update_data_size();
     }
     println!("Done");
