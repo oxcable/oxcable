@@ -41,7 +41,7 @@ fn main() {
     }
 
     // Write files
-    for t in (0 .. 44100) {
+    for t in (0u64 .. 44100) {
         for i in (0 .. oscs.len()) {
             oscs[i].tick(t);
             wavs[i].tick(t);

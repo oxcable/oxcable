@@ -34,7 +34,7 @@ fn main() {
 
     // Write files
     println!("Writing first order filters to wav files...");
-    for t in (0 .. 44100) {
+    for t in (0u64 .. 44100) {
         wav_in.tick(t);
         for i in (0 .. filters.len()) {
             filters[i].tick(t);

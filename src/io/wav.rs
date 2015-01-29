@@ -3,7 +3,7 @@
 #![unstable]
 #![allow(unstable)]
 
-use std::io::{IoResult, File, Truncate, ReadWrite, SeekEnd, SeekSet};
+use std::old_io::{IoResult, File, Truncate, ReadWrite, SeekEnd, SeekSet};
 
 use core::components::{InputArray, OutputArray};
 use core::types::{SAMPLE_RATE, Device, Time, Sample};
