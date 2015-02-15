@@ -18,7 +18,7 @@ pub type Time   = u64;
 
 /// The datatype of a midi event.
 #[stable]
-#[derive(Clone, Copy, Show)]
+#[derive(Clone, Copy, Debug)]
 pub struct MidiEvent {
     /// The MIDI channel this event was sent to
     pub channel: u8,
@@ -34,7 +34,7 @@ pub struct MidiEvent {
 ///  * Pressures are converted to floats between 0.0 and 1.0
 ///  * Bend is converted to a float from -1.0 to 1.0
 #[unstable="does not support all MIDI"]
-#[derive(Clone, Copy, Show)]
+#[derive(Clone, Copy, Debug)]
 pub enum MidiMessage {
     /// NoteOn(note number, velocity)
     NoteOn(u8, f32),       

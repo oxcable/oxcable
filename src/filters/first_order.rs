@@ -29,7 +29,7 @@ pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf};
 /// `LowShelf` and `HighShelf` filters specify the cutoff frequency in Hz, and 
 /// the gain for the shelf region in decibels.
 #[stable]
-#[derive(Clone, Copy, Show)]
+#[derive(Clone, Copy, Debug)]
 pub enum FilterMode {
     #[stable]
     LowPass(f32),       // cutoff
@@ -89,7 +89,6 @@ impl Filter {
 }
 
 /// Computes the (alpha, H0) parameters for our filter
-#[allow(unstable)] // PI naming unstable
 fn compute_parameters(mode: FilterMode) -> (f32, f32) {
     let cutoff = match mode {
         LowPass(cutoff) => cutoff,

@@ -2,7 +2,6 @@
 
 #![unstable]
 
-#[allow(unstable)]
 extern crate test;
 
 use std::cell::RefCell;

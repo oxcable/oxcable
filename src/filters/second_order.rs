@@ -35,7 +35,7 @@ pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf, Peak};
 /// `Peak` filters specify the center frequency in Hz, the gain for the peak in
 /// decibels, and the filter Q.
 #[stable]
-#[derive(Clone, Copy, Show)]
+#[derive(Clone, Copy, Debug)]
 pub enum FilterMode {
     #[stable]
     LowPass(f32),        // cutoff
@@ -97,7 +97,6 @@ impl Filter {
 }
 
 /// Computes the parameters for our filter
-#[allow(unstable)] // PI naming unstable
 #[allow(non_snake_case)]
 fn compute_parameters(mode: FilterMode) -> (f32, f32, f32, f32, f32) {
     let cutoff = match mode {

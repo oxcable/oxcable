@@ -2,14 +2,34 @@
 name = "oxcable"
 version = "0.1.0"
 dependencies = [
- "portmidi 0.0.4 (git+https://github.com/musitdev/rust-portmidi.git)",
+ "portmidi 0.0.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rust-portaudio 0.3.0 (git+https://github.com/thenyeguy/rust-portaudio.git)",
 ]
 
 [[package]]
+name = "libc"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "log"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "portmidi"
 version = "0.0.4"
-source = "git+https://github.com/musitdev/rust-portmidi.git#8aa88b63e10bd1263e9241629f06ffd674590051"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "rand"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "libc 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "rust-portaudio"

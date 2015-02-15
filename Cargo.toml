@@ -10,8 +10,9 @@ description = "A simple audio processing and MIDI framework in Rust."
 name = "oxcable"
 path = "src/oxcable.rs"
 
+[dependencies]
+rand = "0.1.2"
+portmidi = "0.0.4"
+
 [dependencies.rust-portaudio]
 git = "https://github.com/thenyeguy/rust-portaudio.git"
-
-[dependencies.portmidi]
-git = "https://github.com/musitdev/rust-portmidi.git"

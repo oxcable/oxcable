@@ -21,7 +21,6 @@ pub struct Transformer {
     twiddles: Vec<Complex>,    
 }
 
-#[allow(unstable)] // PI naming unstable
 #[stable]
 impl Transformer {
     /// Returns a set precomputed information used to perform FFTs of the

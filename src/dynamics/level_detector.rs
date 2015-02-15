@@ -17,7 +17,7 @@ use core::types::{SAMPLE_RATE, Sample};
 /// in signal power, while the release value can be high in order to coast
 /// through periodic troughs in the signal.
 #[stable]
-#[derive(Clone, Copy, Show)]
+#[derive(Clone, Copy, Debug)]
 pub struct LevelDetector {
     attack_alpha: f32,
     release_alpha: f32,

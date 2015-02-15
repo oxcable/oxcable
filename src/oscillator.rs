@@ -1,11 +1,11 @@
 //! Provides an oscillator that generates periodic waveforms.
 
 #![unstable="naming scheme for PI unstable"]
-#![allow(unstable)]
+
+extern crate rand;
 
 use std::f32::consts::PI;
 use std::num::Float;
-use std::rand;
 
 use core::components::OutputElement;
 use core::types::{SAMPLE_RATE, Device, Sample, Time};
@@ -15,7 +15,7 @@ pub use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
 
 /// Defines the messages that the Oscillator supports
 #[unstable="needs more modes"]
-#[derive(Clone, Copy, Show)]
+#[derive(Clone, Copy, Debug)]
 pub enum OscillatorMessage { 
     /// Sets the frequency in Hz
     SetFreq(f32)
@@ -27,7 +27,7 @@ pub enum OscillatorMessage {
 /// PolyBLEP (Polynomial Bandlimited Step) uses offsets to round off sharp edges
 /// and reduce aliasing.
 #[stable]
-#[derive(Clone, Copy, Show)]
+#[derive(Clone, Copy, Debug)]
 pub enum AntialiasType {
     /// Naive, aliasing waveforms.
     Aliased, 
@@ -42,7 +42,7 @@ pub enum AntialiasType {
 /// but not for raw audio signals. For audible signals, instead used the
 /// corresponding `PolyBlep` waveforms.
 #[stable]
-#[derive(Clone, Copy, Show)]
+#[derive(Clone, Copy, Debug)]
 pub enum Waveform {
     Sine, 
     Saw(AntialiasType), 
