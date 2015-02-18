@@ -5,8 +5,8 @@
 use std::collections::{RingBuf, VecMap};
 use std::vec::Vec;
 
-use core::components::channel::ChannelRef;
-use core::types::{Device, MidiEvent, MidiMessage, Time, Sample};
+use components::channel::ChannelRef;
+use types::{Device, MidiEvent, MidiMessage, Time, Sample};
 use mixers::Adder;
 
 

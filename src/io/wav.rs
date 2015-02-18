@@ -4,8 +4,8 @@
 
 use std::old_io::{IoResult, File, Truncate, ReadWrite, SeekEnd, SeekSet};
 
-use core::components::{InputArray, OutputArray};
-use core::types::{SAMPLE_RATE, Device, Time, Sample};
+use components::{InputArray, OutputArray};
+use types::{SAMPLE_RATE, Device, Time, Sample};
 
 
 /// Reads audio from a wav file.

@@ -5,8 +5,8 @@
 use std::default::Default;
 use std::vec::Vec;
 
-use core::components::channel::ChannelRef;
-use core::types::Time;
+use components::channel::ChannelRef;
+use types::Time;
 
 
 /// Stores generated frame data and manages access to that data.

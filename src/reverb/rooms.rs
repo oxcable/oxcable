@@ -8,7 +8,7 @@
 
 use std::vec::Vec;
 
-use core::types::Time;
+use types::Time;
 
 
 /// Provides parameter sets meant to simulate different environments.

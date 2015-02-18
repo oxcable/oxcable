@@ -8,10 +8,10 @@
 use std::num::Float;
 use std::vec::Vec;
 
-use core::types::{SAMPLE_RATE, Device, Sample, Time};
-use core::components::{InputArray, OutputArray};
-use core::ringbuffer::RingBuffer;
-use core::util::decibel_to_ratio;
+use types::{SAMPLE_RATE, Device, Sample, Time};
+use components::{InputArray, OutputArray};
+use utils::ringbuffer::RingBuffer;
+use utils::helpers::decibel_to_ratio;
 use reverb::rooms::Room;
 
 /// A multichannel reverb filter, that operates on each channel indepedently.

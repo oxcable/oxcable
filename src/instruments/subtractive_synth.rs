@@ -3,10 +3,10 @@
 #![unstable]
 
 use adsr::{Adsr, AdsrMessage};
-use core::components::{InputElement, Voice, VoiceArray};
-use core::components::channel::ChannelRef;
-use core::types::{Device, MidiEvent, MidiMessage, Time, Sample};
-use core::util::midi_note_to_freq;
+use components::{InputElement, Voice, VoiceArray};
+use components::channel::ChannelRef;
+use types::{Device, MidiEvent, MidiMessage, Time, Sample};
+use utils::helpers::midi_note_to_freq;
 use mixers::Gain;
 use oscillator::{AntialiasType, Oscillator, OscillatorMessage, Waveform};
 

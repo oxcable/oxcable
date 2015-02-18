@@ -6,7 +6,7 @@ use std::clone::Clone;
 use std::ops::Add;
 use std::vec::Vec;
 
-use core::types::Time;
+use types::Time;
 
 
 /// A generic ring buffer

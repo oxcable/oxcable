@@ -8,7 +8,7 @@ use std::cell::RefCell;
 use std::default::Default;
 use std::rc::Rc;
 
-use core::types::Time;
+use types::Time;
 
 
 /// Container for a single channel of data.

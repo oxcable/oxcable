@@ -4,9 +4,9 @@
 
 extern crate portaudio;
 
-use core::types::{SAMPLE_RATE, Device, Sample, Time};
-use core::components::{InputArray, OutputArray};
-use core::init;
+use types::{SAMPLE_RATE, Device, Sample, Time};
+use components::{InputArray, OutputArray};
+use init;
 
 
 /// Defines the audio format for Portaudio.

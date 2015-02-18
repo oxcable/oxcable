@@ -5,9 +5,9 @@
 
 use std::vec::Vec;
 
-use core::components::{InputArray, OutputArray};
-use core::ringbuffer::RingBuffer;
-use core::types::{SAMPLE_RATE, Device, Sample, Time};
+use components::{InputArray, OutputArray};
+use types::{SAMPLE_RATE, Device, Sample, Time};
+use utils::ringbuffer::RingBuffer;
 
 
 /// A delay that feeds back each channel independently.

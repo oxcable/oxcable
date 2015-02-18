@@ -2,9 +2,9 @@
 
 #![unstable]
 
-use core::components::{InputArray, OutputArray};
-use core::types::{SAMPLE_RATE,Device, Sample, Time};
-use core::util::decibel_to_ratio;
+use components::{InputArray, OutputArray};
+use types::{SAMPLE_RATE,Device, Sample, Time};
+use utils::helpers::decibel_to_ratio;
 
 
 /// Defines the messages that the ADSR supports

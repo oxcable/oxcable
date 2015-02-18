@@ -5,8 +5,8 @@ extern crate oxcable;
 #[cfg(not(test))]
 fn main() {
     use oxcable::instruments::subtractive_synth::SubtractiveSynth;
-    use oxcable::core::init;
-    use oxcable::core::types::Device;
+    use oxcable::init;
+    use oxcable::types::Device;
     use oxcable::io::audio::AudioOut;
     use oxcable::io::midi::MidiIn;
 

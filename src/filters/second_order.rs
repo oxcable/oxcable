@@ -18,9 +18,9 @@ use std::f32::consts::PI;
 use std::num::Float;
 use std::vec::Vec;
 
-use core::components::{InputArray, OutputArray};
-use core::types::{SAMPLE_RATE, Device, Sample, Time};
-use core::util::decibel_to_ratio;
+use components::{InputArray, OutputArray};
+use types::{SAMPLE_RATE, Device, Sample, Time};
+use utils::helpers::decibel_to_ratio;
 
 pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf, Peak};
 

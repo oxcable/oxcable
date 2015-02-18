@@ -7,8 +7,8 @@ extern crate rand;
 use std::f32::consts::PI;
 use std::num::Float;
 
-use core::components::OutputElement;
-use core::types::{SAMPLE_RATE, Device, Sample, Time};
+use components::OutputElement;
+use types::{SAMPLE_RATE, Device, Sample, Time};
 
 pub use self::AntialiasType::{Aliased, PolyBlep};
 pub use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};

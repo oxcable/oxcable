@@ -2,8 +2,8 @@
 
 #![unstable]
 
-use core::components::{InputArray, OutputElement};
-use core::types::{Device, Sample, Time};
+use components::{InputArray, OutputElement};
+use types::{Device, Sample, Time};
 
 
 /// A multiplexer.

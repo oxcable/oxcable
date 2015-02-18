@@ -5,7 +5,7 @@ extern crate portaudio;
 
 #[cfg(not(test))]
 fn main() {
-    use oxcable::core::types::Device;
+    use oxcable::types::Device;
     use oxcable::io::wav;
     println!("Mirroring microphone input to speaker...");
 

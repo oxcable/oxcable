@@ -10,7 +10,7 @@ use std::f32::consts::PI;
 use std::num::UnsignedInt;
 use std::vec::Vec;
 
-use core::complex::Complex;
+use utils::complex::Complex;
 
 
 /// A container for precomputed values to perform FFTs of a fixed size.

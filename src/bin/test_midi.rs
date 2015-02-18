@@ -5,8 +5,8 @@ extern crate oxcable;
 #[cfg(not(test))]
 fn main() {
     use oxcable::adsr;
-    use oxcable::core::init;
-    use oxcable::core::types::{Device, MidiMessage};
+    use oxcable::init;
+    use oxcable::types::{Device, MidiMessage};
     use oxcable::io::audio::AudioOut;
     use oxcable::io::midi::MidiIn;
     use oxcable::oscillator;

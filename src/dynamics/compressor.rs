@@ -4,9 +4,9 @@
 
 use std::vec::Vec;
 
-use core::components::{InputArray, OutputArray};
-use core::types::{Device, Sample, Time};
-use core::util::decibel_to_ratio;
+use components::{InputArray, OutputArray};
+use types::{Device, Sample, Time};
+use utils::helpers::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
 
 

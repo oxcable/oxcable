@@ -6,9 +6,9 @@ extern crate portmidi;
 
 use std::vec::Vec;
 
-use core::types::{Device, MidiEvent, MidiMessage, Time};
-use core::components::OutputElement;
-use core::init;
+use types::{Device, MidiEvent, MidiMessage, Time};
+use components::OutputElement;
+use init;
 
 
 /// Defines the maximum event buffer size for portmidi
