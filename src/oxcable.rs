@@ -1,5 +1,11 @@
 #![crate_name = "oxcable"]
 
+#![feature(collections)]
+#![feature(core)]
+#![feature(io)]
+#![feature(path)]
+#![feature(test)]
+
 pub mod adsr;
 pub mod components;
 pub mod delay;
