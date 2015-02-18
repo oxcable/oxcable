@@ -4,7 +4,7 @@ version = "0.1.0"
 dependencies = [
  "portmidi 0.0.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "rust-portaudio 0.3.0 (git+https://github.com/thenyeguy/rust-portaudio.git)",
+ "rust-portaudio 0.3.0 (git+https://github.com/jeremyletang/rust-portaudio.git)",
 ]
 
 [[package]]
@@ -34,5 +34,5 @@ dependencies = [
 [[package]]
 name = "rust-portaudio"
 version = "0.3.0"
-source = "git+https://github.com/thenyeguy/rust-portaudio.git#f39957eb3c4c9315b78f5bf2c83878448b805d58"
+source = "git+https://github.com/jeremyletang/rust-portaudio.git#8454615093f81808d64126988c8aefeb2f882b17"
 
