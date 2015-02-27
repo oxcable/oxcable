@@ -2,7 +2,7 @@
 
 #![unstable]
 
-use std::collections::{RingBuf, VecMap};
+use std::collections::{VecDeque, VecMap};
 use std::vec::Vec;
 
 use components::channel::ChannelRef;
@@ -37,7 +37,7 @@ pub struct VoiceArray<T> {
     /// Maps voice indices to MIDI note numbers
     voice_to_note: VecMap<u8>,
     /// Places the most recently mapped voices at the end
-    voice_queue: RingBuf<usize>
+    voice_queue: VecDeque<usize>
 }
 
 impl<T: Device+Voice> VoiceArray<T> {
@@ -47,7 +47,7 @@ impl<T: Device+Voice> VoiceArray<T> {
     pub fn new(voices: Vec<T>) -> VoiceArray<T> {
         let num_voices = voices.len();
         let mut adder = Adder::new(num_voices);
-        let mut voice_queue = RingBuf::new();
+        let mut voice_queue = VecDeque::new();
         for i in (0 .. num_voices) {
             adder.inputs.set_channel(i, voices[i].get_channel());
             voice_queue.push_back(i);

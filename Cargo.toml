@@ -15,4 +15,4 @@ rand = "0.1.2"
 portmidi = "0.0.4"
 
 [dependencies.rust-portaudio]
-git = "https://github.com/jeremyletang/rust-portaudio.git"
+git = "https://github.com/mitchmindtree/rust-portaudio.git"
