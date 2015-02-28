@@ -71,9 +71,9 @@ impl MidiIn {
         if !init::is_initialized() {
             panic!("Must initialize oxcable first");
         }
-        
+
         // Open a stream. For now, use firs device
-        let mut pm_stream = portmidi::InputPort::new(1, BUFFER_SIZE);
+        let mut pm_stream = portmidi::InputPort::new(0, BUFFER_SIZE);
         assert!(pm_stream.open().is_ok());
 
         MidiIn {
