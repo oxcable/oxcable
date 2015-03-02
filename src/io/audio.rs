@@ -10,7 +10,7 @@ use init;
 
 
 /// Defines the audio format for Portaudio.
-static PORTAUDIO_T: portaudio::pa::SampleFormat = 
+static PORTAUDIO_T: portaudio::pa::SampleFormat =
     portaudio::pa::SampleFormat::Float32;
 
 /// Defines the buffer size for Portaudio
@@ -25,7 +25,7 @@ pub struct AudioIn {
     pub outputs: OutputArray<Sample>,
 
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
-    num_channels: usize, 
+    num_channels: usize,
     buffer: Vec<Sample>,
     samples_read: usize,
 }
@@ -39,7 +39,7 @@ impl AudioIn {
         if !init::is_initialized() {
             panic!("Must initialize oxcable first");
         }
-        
+
         // Open a stream
         let mut pa_stream = portaudio::pa::Stream::new();
         assert!(pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,
@@ -92,7 +92,7 @@ pub struct AudioOut {
     pub inputs: InputArray<Sample>,
 
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
-    num_channels: usize, 
+    num_channels: usize,
     buffer: Vec<Sample>,
     samples_written: usize,
 }
@@ -142,7 +142,7 @@ impl Device for AudioOut {
         self.samples_written += 1;
 
         if self.samples_written == BUFFER_SIZE {
-            assert!(self.pa_stream.write(self.buffer.clone(), 
+            assert!(self.pa_stream.write(self.buffer.clone(),
                                          BUFFER_SIZE as u32).is_ok());
             self.samples_written = 0;
             self.buffer.clear()

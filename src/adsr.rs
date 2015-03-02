@@ -10,11 +10,11 @@ use utils::helpers::decibel_to_ratio;
 /// Defines the messages that the ADSR supports
 #[unstable]
 #[derive(Clone, Copy)]
-pub enum AdsrMessage { 
+pub enum AdsrMessage {
     /// Triggers an attack
-    NoteDown, 
+    NoteDown,
     /// Triggers a release
-    NoteUp 
+    NoteUp
 }
 
 
@@ -104,9 +104,9 @@ impl Adsr {
     #[unstable]
     pub fn handle_message(&mut self, msg: AdsrMessage, t: Time) {
         match msg {
-            AdsrMessage::NoteDown => 
+            AdsrMessage::NoteDown =>
                 self.handle_state_change(AdsrState::Attack, t),
-            AdsrMessage::NoteUp => 
+            AdsrMessage::NoteUp =>
                 self.handle_state_change(AdsrState::Release, t)
         }
     }
@@ -152,7 +152,7 @@ impl Device for Adsr {
     #[stable]
     fn tick(&mut self, t: Time) {
         // Handle any state changes
-        if self.next_state_change == t { 
+        if self.next_state_change == t {
             let next_state = self.current_state.next();
             self.handle_state_change(next_state, t);
         }

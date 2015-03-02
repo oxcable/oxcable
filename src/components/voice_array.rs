@@ -69,9 +69,9 @@ impl<T: Device+Voice> VoiceArray<T> {
     /// other events, we send the event to every voice.
     pub fn handle_event(&mut self, event: &MidiEvent, t: Time) {
         match event.payload {
-            MidiMessage::NoteOn(note,_) => 
+            MidiMessage::NoteOn(note,_) =>
                 self.handle_note_on(note as u8, event, t),
-            MidiMessage::NoteOff(note,_) => 
+            MidiMessage::NoteOff(note,_) =>
                 self.handle_note_off(note as u8, event, t),
             _ => self.handle_other_event(event, t)
         }

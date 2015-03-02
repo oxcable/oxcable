@@ -21,7 +21,7 @@ pub struct Gain {
     #[stable]
     pub outputs: OutputArray<Sample>,
 
-    num_channels: usize, 
+    num_channels: usize,
     gain: f32,
 }
 

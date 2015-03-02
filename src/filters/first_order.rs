@@ -26,7 +26,7 @@ pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf};
 ///
 /// `LowPass` and `HighPass` filters specify the cutoff frequency in Hz.
 ///
-/// `LowShelf` and `HighShelf` filters specify the cutoff frequency in Hz, and 
+/// `LowShelf` and `HighShelf` filters specify the cutoff frequency in Hz, and
 /// the gain for the shelf region in decibels.
 #[stable]
 #[derive(Clone, Copy, Debug)]
@@ -52,7 +52,7 @@ pub struct Filter {
     #[stable]
     pub outputs: OutputArray<Sample>,
 
-    num_channels: usize, 
+    num_channels: usize,
     x_last: Vec<Sample>,
     y1_last: Vec<Sample>,
     mode: FilterMode,

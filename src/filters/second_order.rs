@@ -29,7 +29,7 @@ pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf, Peak};
 ///
 /// `LowPass` and `HighPass` filters specify the cutoff frequency in Hz.
 ///
-/// `LowShelf` and `HighShelf` filters specify the cutoff frequency in Hz, and 
+/// `LowShelf` and `HighShelf` filters specify the cutoff frequency in Hz, and
 /// the gain for the shelf region in decibels.
 ///
 /// `Peak` filters specify the center frequency in Hz, the gain for the peak in
@@ -59,8 +59,8 @@ pub struct Filter {
     #[stable]
     pub outputs: OutputArray<Sample>,
 
-    num_channels: usize, 
-    
+    num_channels: usize,
+
     x_last1: Vec<Sample>, x_last2: Vec<Sample>, // two time step delay elements
     y_last1: Vec<Sample>, y_last2: Vec<Sample>,
     b0: f32, b1: f32, b2: f32, a1: f32, a2: f32
@@ -131,18 +131,18 @@ fn compute_parameters(mode: FilterMode) -> (f32, f32, f32, f32, f32) {
                 let b0 = (1.0 + 2.0.sqrt()*K + K*K) /
                     (1.0 + (2.0*V0).sqrt()*K + V0*K*K);
                 let b1 = 2.0*(K*K - 1.0) / (1.0 + (2.0*V0).sqrt()*K + V0*K*K);
-                let b2 = (1.0 - 2.0.sqrt()*K + K*K) / 
+                let b2 = (1.0 - 2.0.sqrt()*K + K*K) /
                     (1.0 + (2.0*V0).sqrt()*K + V0*K*K);
                 let a1 = 2.0*(V0*K*K - 1.0) / (1.0 + (2.0*V0).sqrt()*K + V0*K*K);
-                let a2 = (1.0 - (2.0*V0).sqrt()*K + V0*K*K) / 
+                let a2 = (1.0 - (2.0*V0).sqrt()*K + V0*K*K) /
                     (1.0 + (2.0*V0).sqrt()*K + V0*K*K);
                 (b0, b1, b2, a1, a2)
             } else { // boost
                 let V0 = decibel_to_ratio(gain/2.0); // amplitude dB
-                let b0 = (1.0 + (2.0*V0).sqrt()*K + V0*K*K) / 
+                let b0 = (1.0 + (2.0*V0).sqrt()*K + V0*K*K) /
                     (1.0 + 2.0.sqrt()*K + K*K);
                 let b1 = 2.0*(V0*K*K - 1.0) / (1.0 + 2.0.sqrt()*K + K*K);
-                let b2 = (1.0 - (2.0*V0).sqrt()*K + V0*K*K) / 
+                let b2 = (1.0 - (2.0*V0).sqrt()*K + V0*K*K) /
                     (1.0 + 2.0.sqrt()*K + K*K);
                 let a1 = 2.0*(K*K - 1.0) / (1.0 + 2.0.sqrt()*K + K*K);
                 let a2 = (1.0 - 2.0.sqrt()*K + K*K) / (1.0 + 2.0.sqrt()*K +
@@ -153,13 +153,13 @@ fn compute_parameters(mode: FilterMode) -> (f32, f32, f32, f32, f32) {
         HighShelf(_, gain) => {
             if gain < 0.0 { // cut
                 let V0 = 1.0 / decibel_to_ratio(gain/2.0); // amplitude dB
-                let b0 = (1.0 + 2.0.sqrt()*K + K*K) / 
+                let b0 = (1.0 + 2.0.sqrt()*K + K*K) /
                     (V0 + (2.0*V0).sqrt()*K + K*K);
                 let b1 = 2.0*(K*K - 1.0) / (V0 + (2.0*V0).sqrt()*K + K*K);
-                let b2 = (1.0 - 2.0.sqrt()*K + K*K) / 
+                let b2 = (1.0 - 2.0.sqrt()*K + K*K) /
                     (V0 + (2.0*V0).sqrt()*K + K*K);
                 let a1 = 2.0*(K*K/V0 - 1.0) / (1.0 + (2.0/V0).sqrt()*K + K*K/V0);
-                let a2 = (1.0 - (2.0/V0).sqrt()*K + K*K/V0) / 
+                let a2 = (1.0 - (2.0/V0).sqrt()*K + K*K/V0) /
                     (1.0 + (2.0/V0).sqrt()*K + K*K/V0);
                 (b0, b1, b2, a1, a2)
             } else { // boost
@@ -167,10 +167,10 @@ fn compute_parameters(mode: FilterMode) -> (f32, f32, f32, f32, f32) {
                 let b0 = (V0 + (2.0*V0).sqrt()*K + K*K) /
                     (1.0 + 2.0.sqrt()*K + K*K);
                 let b1 = 2.0*(K*K - V0) / (1.0 + 2.0.sqrt()*K + K*K);
-                let b2 = (V0 - (2.0*V0).sqrt()*K + K*K) / 
+                let b2 = (V0 - (2.0*V0).sqrt()*K + K*K) /
                     (1.0 + 2.0.sqrt()*K + K*K);
                 let a1 = 2.0*(K*K - 1.0) / (1.0 + 2.0.sqrt()*K + K*K);
-                let a2 = (1.0 - 2.0.sqrt()*K + K*K) / 
+                let a2 = (1.0 - 2.0.sqrt()*K + K*K) /
                     (1.0 + 2.0.sqrt()*K + K*K);
                 (b0, b1, b2, a1, a2)
             }

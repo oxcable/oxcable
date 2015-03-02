@@ -11,7 +11,7 @@ fn main() {
     use oxcable::io::wav;
 
     // Initialize objects
-    println!("Initializing signal chain..."); 
+    println!("Initializing signal chain...");
     let mut wav_in = wav::WavReader::new("wav/volume_up.wav");
     let mut wav_outs = Vec::new();
 
@@ -31,7 +31,7 @@ fn main() {
     wav_outs[2].inputs.set_channel(0, gate.outputs.get_channel(0));
 
     // Write files
-    println!("Writing to wav files..."); 
+    println!("Writing to wav files...");
     let mut t = 0;
     while !wav_in.is_done() {
         wav_in.tick(t);

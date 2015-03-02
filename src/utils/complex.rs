@@ -119,7 +119,7 @@ impl Mul for Complex {
     type Output = Complex;
     #[inline]
     fn mul(self, rhs: Complex) -> Complex {
-        Complex {r: self.r*rhs.r - self.i*rhs.i, 
+        Complex {r: self.r*rhs.r - self.i*rhs.i,
                  i: self.r*rhs.i + self.i*rhs.r}
     }
 }

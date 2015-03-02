@@ -2,7 +2,7 @@
 //!
 //! These components are meant to provide standard building blocks and interface
 //! elements to create `Device`s.
-//! 
+//!
 //! Input/Output Componenets
 //! ------------------------
 //!

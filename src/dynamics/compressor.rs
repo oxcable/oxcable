@@ -20,7 +20,7 @@ pub struct Compressor {
     pub outputs: OutputArray<Sample>,
 
     level_detectors: Vec<LevelDetector>,
-    num_channels: usize, 
+    num_channels: usize,
     threshold: f32,
     compression_ratio: f32,
     gain: f32
@@ -36,7 +36,7 @@ impl Compressor {
     /// * The specified `gain` (in decibels) will be applied to the
     ///   signal after compression.
     #[stable]
-    pub fn new(threshold: f32, compression_ratio: f32, gain: f32, 
+    pub fn new(threshold: f32, compression_ratio: f32, gain: f32,
                num_channels: usize) -> Compressor {
         // Create our level detectors
         let mut levels = Vec::with_capacity(num_channels);
@@ -65,7 +65,7 @@ impl Device for Compressor {
             // correction
             let level = self.level_detectors[i].compute_next_level(s);
             let compression = if level > self.threshold {
-                self.compression_ratio*self.threshold/level + 
+                self.compression_ratio*self.threshold/level +
                     1.0-self.compression_ratio
             } else {
                 1.0

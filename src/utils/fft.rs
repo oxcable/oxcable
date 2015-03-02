@@ -18,7 +18,7 @@ use utils::complex::Complex;
 pub struct Transformer {
     size: usize,
     bit_reverses: Vec<usize>,
-    twiddles: Vec<Complex>,    
+    twiddles: Vec<Complex>,
 }
 
 #[stable]
@@ -46,7 +46,7 @@ impl Transformer {
             twiddles.push(exponent.scale(i as f32).exp());
         }
 
-        Transformer { size: bufsize, bit_reverses: bit_reverses, 
+        Transformer { size: bufsize, bit_reverses: bit_reverses,
             twiddles: twiddles }
     }
 
@@ -63,7 +63,7 @@ impl Transformer {
     ///
     /// Returns `Error` if `output` is too small to hold the result.
     #[stable]
-    pub fn fft(&self, input: &Vec<Complex>, output: &mut Vec<Complex>) -> 
+    pub fn fft(&self, input: &Vec<Complex>, output: &mut Vec<Complex>) ->
         Result<(),()> {
         self.transform(input, output, false)
     }
@@ -82,7 +82,7 @@ impl Transformer {
 
     /// Performs the actual transform on `input`, placing the result in
     /// `output`.
-    /// 
+    ///
     /// This function performs both forward and backwards transforms, since
     /// there are only minor algorithmic differences in the beginning and end
     /// of transformation.
@@ -101,10 +101,10 @@ impl Transformer {
         // Copy the input into bit reverse order, zero padding if necessary,
         // conjugating if we are inverse transforming
         for i in (0 .. input.len()) {
-            output[self.bit_reverses[i]] = 
-                if inverse { 
+            output[self.bit_reverses[i]] =
+                if inverse {
                     input[i].conj()
-                } else { 
+                } else {
                     input[i]
                 }
         }
@@ -294,7 +294,7 @@ mod test {
         for i in (0 .. 8) {
             if i < 7 {
                 input.push(Complex::from_real((i+1) as f32));
-            } 
+            }
             fft.push(zero);
             out.push(zero);
         }
@@ -321,7 +321,7 @@ mod test {
             input.push(zero);
             if i < 7 {
                 out.push(zero);
-            } 
+            }
         }
 
         let t = Transformer::new(8);

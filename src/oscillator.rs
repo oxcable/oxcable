@@ -16,7 +16,7 @@ pub use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
 /// Defines the messages that the Oscillator supports
 #[unstable="needs more modes"]
 #[derive(Clone, Copy, Debug)]
-pub enum OscillatorMessage { 
+pub enum OscillatorMessage {
     /// Sets the frequency in Hz
     SetFreq(f32)
 }
@@ -30,7 +30,7 @@ pub enum OscillatorMessage {
 #[derive(Clone, Copy, Debug)]
 pub enum AntialiasType {
     /// Naive, aliasing waveforms.
-    Aliased, 
+    Aliased,
     /// Antialiasing using PolyBLEP.
     PolyBlep
 }
@@ -44,11 +44,11 @@ pub enum AntialiasType {
 #[stable]
 #[derive(Clone, Copy, Debug)]
 pub enum Waveform {
-    Sine, 
-    Saw(AntialiasType), 
-    Square(AntialiasType), 
-    Tri(AntialiasType), 
-    WhiteNoise, 
+    Sine,
+    Saw(AntialiasType),
+    Square(AntialiasType),
+    Tri(AntialiasType),
+    WhiteNoise,
     PulseTrain
 }
 
@@ -69,10 +69,10 @@ impl Oscillator {
     /// frequency, in Hz.
     #[stable]
     pub fn new(waveform: Waveform, freq: f32) -> Oscillator {
-        Oscillator { 
+        Oscillator {
             output: OutputElement::new(),
-            waveform: waveform, 
-            phase: 0.0, 
+            waveform: waveform,
+            phase: 0.0,
             phase_delta: freq*2.0*PI/(SAMPLE_RATE as f32),
             last_sample: 0.0
         }
@@ -103,7 +103,7 @@ impl Device for Oscillator {
                 let mut out = self.phase/PI -1.0;
                 match aa {
                     PolyBlep => {
-                        out -= poly_belp_offset(self.phase/(2.0*PI), 
+                        out -= poly_belp_offset(self.phase/(2.0*PI),
                                                 self.phase_delta/(2.0*PI));
                     },
                     _ => ()
@@ -115,9 +115,9 @@ impl Device for Oscillator {
                 match aa {
                     PolyBlep => {
                         // two discontinuities, at rising and falling edges
-                        out += poly_belp_offset(self.phase/(2.0*PI), 
+                        out += poly_belp_offset(self.phase/(2.0*PI),
                                                 self.phase_delta/(2.0*PI));
-                        out -= poly_belp_offset(fmod(self.phase/(2.0*PI)+0.5, 
+                        out -= poly_belp_offset(fmod(self.phase/(2.0*PI)+0.5,
                                                      1.0),
                                                 self.phase_delta/(2.0*PI));
                     },
@@ -131,9 +131,9 @@ impl Device for Oscillator {
                 match aa {
                     PolyBlep => {
                         // two discontinuities, at rising and falling edges
-                        out += poly_belp_offset(self.phase/(2.0*PI), 
+                        out += poly_belp_offset(self.phase/(2.0*PI),
                                                 self.phase_delta/(2.0*PI));
-                        out -= poly_belp_offset(fmod(self.phase/(2.0*PI)+0.5, 
+                        out -= poly_belp_offset(fmod(self.phase/(2.0*PI)+0.5,
                                                      1.0),
                                                 self.phase_delta/(2.0*PI));
                     },

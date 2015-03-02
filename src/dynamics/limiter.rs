@@ -20,7 +20,7 @@ pub struct Limiter {
     pub outputs: OutputArray<Sample>,
 
     level_detectors: Vec<LevelDetector>,
-    num_channels: usize, 
+    num_channels: usize,
     threshold: f32,
     gain: f32
 }

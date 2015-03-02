@@ -56,8 +56,8 @@ impl LevelDetector {
         let pow = s*s;
         let alpha = if pow > self.last_power {
             self.attack_alpha
-        } else { 
-            self.release_alpha 
+        } else {
+            self.release_alpha
         };
         self.last_power = alpha*self.last_power + (1.0-alpha)*pow;
 

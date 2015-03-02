@@ -11,7 +11,7 @@ fn main() {
     use oxcable::filters::first_order::Filter;
 
     // Initialize objects
-    println!("Initializing signal chain..."); 
+    println!("Initializing signal chain...");
     let mut wav_in = wav::WavReader::new("wav/delta.wav");
 
     let cutoff = 1000.0;

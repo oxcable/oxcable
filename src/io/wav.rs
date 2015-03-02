@@ -37,7 +37,7 @@ impl WavReader {
         WavReader {
             outputs: OutputArray::new(header.num_channels as usize),
             num_channels: header.num_channels as usize,
-            num_samples: (header.data_size / ((header.bit_depth/8) as u32) / 
+            num_samples: (header.data_size / ((header.bit_depth/8) as u32) /
                 (header.num_channels as u32)) as usize,
             samples_read: 0,
             file: file
@@ -100,13 +100,13 @@ impl WavWriter {
     /// This function panics if the file can't be opened or written to
     #[stable]
     pub fn new(filename: &str, num_channels: usize) -> WavWriter {
-        let mut file = File::open_mode(&Path::new(filename), Truncate, 
+        let mut file = File::open_mode(&Path::new(filename), Truncate,
                                       ReadWrite).unwrap();
         let header = WavHeader::new(num_channels as u16, SAMPLE_RATE as u32,
                                     0u32);
         assert!(header.write_to_file(&mut file).is_ok());
-        WavWriter { 
-            inputs: InputArray::new(num_channels), 
+        WavWriter {
+            inputs: InputArray::new(num_channels),
             num_channels: num_channels,
             file: file,
             samples_written: 0
@@ -236,7 +236,7 @@ impl WavHeader {
         if self.wave_lbl != WAVE { return false; }
         if self.fmt_hdr  != FMT_ { return false; }
         if self.data_hdr != DATA { return false; }
-        
+
         // Check sizes are correct
         if self.file_size != self.data_size + 36 { return false; }
         if self.section_size != 16 { return false; }

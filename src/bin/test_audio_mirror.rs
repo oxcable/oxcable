@@ -8,7 +8,7 @@ fn main() {
     use oxcable::types::Device;
     use oxcable::io::audio::{AudioIn, AudioOut};
 
-    println!("Initializing signal chain..."); 
+    println!("Initializing signal chain...");
     assert!(init::initialize().is_ok());
 
     let mut mic = AudioIn::new(1);

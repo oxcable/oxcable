@@ -96,7 +96,7 @@ impl Voice for SubtractiveSynthVoice {
                         midi_note_to_freq(note)));
                 self.adsr.handle_message(AdsrMessage::NoteDown, t);
             },
-            MidiMessage::NoteOff(_, _) => 
+            MidiMessage::NoteOff(_, _) =>
                 self.adsr.handle_message(AdsrMessage::NoteUp, t),
             _ => ()
         }

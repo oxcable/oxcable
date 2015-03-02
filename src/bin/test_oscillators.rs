@@ -11,7 +11,7 @@ fn main() {
     use oxcable::oscillator::Oscillator;
 
     // Initialize objects
-    println!("Initializing signal chain..."); 
+    println!("Initializing signal chain...");
     let freq = 8000.0;
     let mut oscs = Vec::<oscillator::Oscillator>::new();
     let mut wavs = Vec::<WavWriter>::new();

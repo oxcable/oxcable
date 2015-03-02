@@ -25,7 +25,7 @@ impl<T: Clone+Default> OutputArray<T> {
         }
         OutputArray { chs: chs }
     }
-    
+
     /// Returns the number of output channels
     pub fn get_num_channels(&self) -> usize {
         self.chs.len()
@@ -57,7 +57,7 @@ pub struct InputArray<T> {
 
 impl<T: Clone+Default> InputArray<T> {
     /// Creates a new input array that can receive from `num_channels` channels.
-    /// 
+    ///
     /// These channels are initialized as empty, and must be filled to return
     /// input data.
     pub fn new(num_channels: usize) -> InputArray<T> {

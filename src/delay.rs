@@ -40,7 +40,7 @@ impl Delay {
     /// * `wetness`: how much of our input signal to mix into the delayed signal
     ///              in the output
     #[stable]
-    pub fn new(delay: f32, feedback: f32, wetness: f32, 
+    pub fn new(delay: f32, feedback: f32, wetness: f32,
                num_channels: usize) -> Delay {
         // Create the delay buffers, starting with silence
         let delay_samples = (delay * SAMPLE_RATE as f32) as u32;

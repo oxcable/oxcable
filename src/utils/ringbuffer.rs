@@ -25,12 +25,12 @@ pub struct RingBuffer<T: Clone> {
 impl<T: Clone> RingBuffer<T> {
     /// Returns an empty ring buffer that can hold at most `capacity` elements.
     pub fn new(capacity: usize) -> RingBuffer<T> {
-        RingBuffer { 
-            buf: Vec::with_capacity(capacity), 
+        RingBuffer {
+            buf: Vec::with_capacity(capacity),
             capacity: capacity,
-            size: 0, 
-            start_t: 0, 
-            end_t: 0 
+            size: 0,
+            start_t: 0,
+            end_t: 0
         }
     }
 
@@ -117,9 +117,9 @@ mod tests {
 
     #[test]
     fn test_get() {
-        let mut rb: RingBuffer<i32> = RingBuffer { 
-            buf: vec![7,13], 
-            capacity: 2, 
+        let mut rb: RingBuffer<i32> = RingBuffer {
+            buf: vec![7,13],
+            capacity: 2,
             size: 2,
             start_t: 7,
             end_t: 9
@@ -141,9 +141,9 @@ mod tests {
 
     #[test]
     fn test_update() {
-        let mut rb: RingBuffer<i32> = RingBuffer { 
-            buf: vec![7,13], 
-            capacity: 2, 
+        let mut rb: RingBuffer<i32> = RingBuffer {
+            buf: vec![7,13],
+            capacity: 2,
             size: 2,
             start_t: 7,
             end_t: 9
@@ -162,9 +162,9 @@ mod tests {
 
     #[test]
     fn test_add() {
-        let mut rb: RingBuffer<i32> = RingBuffer { 
-            buf: vec![7,13], 
-            capacity: 2, 
+        let mut rb: RingBuffer<i32> = RingBuffer {
+            buf: vec![7,13],
+            capacity: 2,
             size: 2,
             start_t: 7,
             end_t: 9

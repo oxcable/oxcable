@@ -17,7 +17,7 @@ pub struct Adder {
     #[stable]
     pub output: OutputElement<Sample>,
 
-    num_inputs: usize, 
+    num_inputs: usize,
 }
 
 impl Adder {

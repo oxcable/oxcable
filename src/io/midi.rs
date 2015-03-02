@@ -32,7 +32,7 @@ fn midievent_from_portmidi(event: portmidi::MidiEvent) -> MidiEvent {
         }
         0b1110 => {
             let int_value = ((msg.data2 as i16) << 7) | (msg.data1 as i16);
-            let bend = (int_value - 0x2000) as f32 / 
+            let bend = (int_value - 0x2000) as f32 /
                 (0x2000i16) as f32;
             MidiMessage::PitchBend(bend)
         }
@@ -44,7 +44,7 @@ fn midievent_from_portmidi(event: portmidi::MidiEvent) -> MidiEvent {
         0b1011 => MidiMessage::ControlChange(msg.data1 as u8, msg.data2 as u8),
         0b1100 => MidiMessage::ProgramChange(msg.data1 as u8),
         0b1101 => MidiMessage::ChannelPressure(msg.data1 as f32 / 127.0),
-        _ => MidiMessage::Other(msg.status as u8, msg.data1 as u8, 
+        _ => MidiMessage::Other(msg.status as u8, msg.data1 as u8,
                                 msg.data2 as u8)
     };
 
@@ -94,7 +94,7 @@ impl Device for MidiIn {
         let mut events = Vec::new();
         loop {
             match self.pm_stream.read().unwrap() {
-                Some(pm_event) => 
+                Some(pm_event) =>
                     events.push(midievent_from_portmidi(pm_event)),
                 None => break
             }

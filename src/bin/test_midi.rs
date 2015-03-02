@@ -12,7 +12,7 @@ fn main() {
     use oxcable::oscillator;
     use oxcable::oscillator::Oscillator;
 
-    println!("Initializing signal chain..."); 
+    println!("Initializing signal chain...");
     assert!(init::initialize().is_ok());
 
     let mut midi = MidiIn::new();
@@ -31,9 +31,9 @@ fn main() {
                 for event in events.iter() {
                     println!("{:?}", event);
                     match event.payload {
-                        MidiMessage::NoteOn(_,_) => 
+                        MidiMessage::NoteOn(_,_) =>
                             adsr.handle_message(adsr::AdsrMessage::NoteDown, t),
-                        MidiMessage::NoteOff(_,_) => 
+                        MidiMessage::NoteOff(_,_) =>
                             adsr.handle_message(adsr::AdsrMessage::NoteUp, t),
                         _ => ()
                     }

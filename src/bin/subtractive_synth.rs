@@ -10,7 +10,7 @@ fn main() {
     use oxcable::io::audio::AudioOut;
     use oxcable::io::midi::MidiIn;
 
-    println!("Initializing signal chain..."); 
+    println!("Initializing signal chain...");
     assert!(init::initialize().is_ok());
 
     let mut midi = MidiIn::new();

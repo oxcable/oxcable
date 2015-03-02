@@ -17,7 +17,7 @@ pub struct Multiplier {
     #[stable]
     pub output: OutputElement<Sample>,
 
-    num_inputs: usize, 
+    num_inputs: usize,
 }
 
 impl Multiplier {

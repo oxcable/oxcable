@@ -14,7 +14,7 @@ use types::Time;
 /// Container for a single channel of data.
 pub struct Channel<T> {
     next_t: Time,
-    data: T, 
+    data: T,
 }
 
 impl<T: Clone+Default> Channel<T> {

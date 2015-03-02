@@ -37,7 +37,7 @@ pub struct MidiEvent {
 #[derive(Clone, Copy, Debug)]
 pub enum MidiMessage {
     /// NoteOn(note number, velocity)
-    NoteOn(u8, f32),       
+    NoteOn(u8, f32),
     /// NoteOff(note number, velocity)
     NoteOff(u8, f32),
     /// PitchBend(bend)
