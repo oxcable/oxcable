@@ -17,13 +17,6 @@
 //! we would want to give it a public `InputElement<MidiEvent>` to receive
 //! a single set of MIDI events, and a public `OutputArray<Sample>` with two
 //! channels, one for each stereo audio channel.
-//!
-//! Messages
-//! --------
-//!
-//! A device that wishes to receive arbitrary messages from the outside world
-//! can use a `MessageReceiver`, which can then create multiple thread-safe
-//! `MessageSender`s to send messages with.
 
 #![unstable]
 
