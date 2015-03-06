@@ -6,8 +6,6 @@
 #![feature(io)]
 #![feature(test)]
 
-extern crate byteorder;
-
 pub mod adsr;
 pub mod components;
 pub mod delay;

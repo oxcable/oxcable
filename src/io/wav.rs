@@ -4,7 +4,7 @@
 
 extern crate byteorder;
 
-use byteorder::{ReadBytesExt, WriteBytesExt, LittleEndian};
+use self::byteorder::{ReadBytesExt, WriteBytesExt, LittleEndian};
 use std::fs::File;
 use std::io::{self, Seek, SeekFrom};
 

@@ -2,8 +2,6 @@
 
 #![unstable]
 
-extern crate portaudio;
-
 pub mod audio;
 pub mod midi;
 pub mod wav;
