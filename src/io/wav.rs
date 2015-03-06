@@ -2,11 +2,14 @@
 
 #![unstable]
 
-use std::old_io::{IoResult, File, Truncate, ReadWrite, SeekEnd, SeekSet};
+extern crate byteorder;
+
+use byteorder::{ReadBytesExt, WriteBytesExt, LittleEndian};
+use std::fs::File;
+use std::io::{self, Seek, SeekFrom};
 
 use components::{InputArray, OutputArray};
 use types::{SAMPLE_RATE, Device, Time, Sample};
-
 
 /// Reads audio from a wav file.
 ///
@@ -31,7 +34,7 @@ impl WavReader {
     /// file.
     #[stable]
     pub fn new(filename: &str) -> WavReader {
-        let mut file = File::open(&Path::new(filename)).unwrap();
+        let mut file = File::open(filename).unwrap();
         let header = WavHeader::read_from_file(&mut file).unwrap();
         assert!(header.is_valid());
         WavReader {
@@ -58,9 +61,9 @@ impl WavReader {
 
     /// Resets the reader to begin reading from the start of the file.
     #[stable]
-    pub fn restart(&mut self) -> IoResult<()> {
+    pub fn restart(&mut self) -> io::Result<u64> {
         self.samples_read = 0;
-        self.file.seek(44, SeekSet)
+        self.file.seek(SeekFrom::Start(44))
     }
 }
 
@@ -68,7 +71,7 @@ impl Device for WavReader {
     fn tick(&mut self, _t: Time) {
         for i in (0 .. self.num_channels) {
             let s = if self.samples_read < self.num_samples {
-                (self.file.read_le_i16().unwrap() as Sample) / 32768.0
+                (self.file.read_i16::<LittleEndian>().unwrap() as Sample) / 32768.0
             } else {
                 0.0
             };
@@ -100,8 +103,7 @@ impl WavWriter {
     /// This function panics if the file can't be opened or written to
     #[stable]
     pub fn new(filename: &str, num_channels: usize) -> WavWriter {
-        let mut file = File::open_mode(&Path::new(filename), Truncate,
-                                      ReadWrite).unwrap();
+        let mut file = File::create(filename).unwrap();
         let header = WavHeader::new(num_channels as u16, SAMPLE_RATE as u32,
                                     0u32);
         assert!(header.write_to_file(&mut file).is_ok());
@@ -117,11 +119,10 @@ impl WavWriter {
     pub fn update_data_size(&mut self) {
         let data_size = self.samples_written * self.num_channels * 16/8;
         let file_size = 36+data_size;
-        assert!(self.file.seek(4, SeekSet).is_ok());
-        assert!(self.file.write_le_u32(file_size as u32).is_ok());
-        assert!(self.file.seek(40, SeekSet).is_ok());
-        assert!(self.file.write_le_u32(data_size as u32).is_ok());
-        assert!(self.file.seek(0, SeekEnd).is_ok());
+        assert!(self.file.seek(SeekFrom::Start(4)).is_ok());
+        assert!(self.file.write_u32::<LittleEndian>(file_size as u32).is_ok());
+        assert!(self.file.seek(SeekFrom::Start(40)).is_ok());
+        assert!(self.file.write_u32::<LittleEndian>(data_size as u32).is_ok());
     }
 }
 
@@ -131,7 +132,7 @@ impl Device for WavWriter {
             let mut s = self.inputs.get(i, t).unwrap_or(0.0);
             if s > 0.999f32 { s = 0.999f32; }
             if s < -0.999f32 { s = -0.999f32; }
-            assert!(self.file.write_le_i16((s*32768.0) as i16).is_ok());
+            assert!(self.file.write_i16::<LittleEndian>((s*32768.0) as i16).is_ok());
         }
         self.samples_written += 1;
     }
@@ -184,47 +185,34 @@ impl WavHeader {
     }
 
     /// Attempts to read a wav header from the provided file
-    fn read_from_file(f: &mut File) -> IoResult<WavHeader> {
-        let riff_hdr = f.read_le_u32();
-        if  riff_hdr.is_err() { return Err(riff_hdr.unwrap_err()) }
-        let file_size = f.read_le_u32();
-        if  file_size.is_err() { return Err(file_size.unwrap_err()) }
-        let wave_lbl = f.read_le_u32();
-        if  wave_lbl.is_err() { return Err(wave_lbl.unwrap_err()) }
-        let fmt_hdr = f.read_le_u32();
-        if  fmt_hdr.is_err() { return Err(fmt_hdr.unwrap_err()) }
-        let section_size = f.read_le_u32();
-        if  section_size.is_err() { return Err(section_size.unwrap_err()) }
-        let format = f.read_le_u16();
-        if  format.is_err() { return Err(format.unwrap_err()) }
-        let num_channels = f.read_le_u16();
-        if  num_channels.is_err() { return Err(num_channels.unwrap_err()) }
-        let sample_rate = f.read_le_u32();
-        if  sample_rate.is_err() { return Err(sample_rate.unwrap_err()) }
-        let byte_rate = f.read_le_u32();
-        if  byte_rate.is_err() { return Err(byte_rate.unwrap_err()) }
-        let block_align = f.read_le_u16();
-        if  block_align.is_err() { return Err(block_align.unwrap_err()) }
-        let bit_depth = f.read_le_u16();
-        if  bit_depth.is_err() { return Err(bit_depth.unwrap_err()) }
-        let data_hdr = f.read_le_u32();
-        if  data_hdr.is_err() { return Err(data_hdr.unwrap_err()) }
-        let data_size = f.read_le_u32();
-        if  data_size.is_err() { return Err(data_size.unwrap_err()) }
+    fn read_from_file(f: &mut File) -> byteorder::Result<WavHeader> {
+        let riff_hdr = try!(f.read_u32::<LittleEndian>());
+        let file_size = try!(f.read_u32::<LittleEndian>());
+        let wave_lbl = try!(f.read_u32::<LittleEndian>());
+        let fmt_hdr = try!(f.read_u32::<LittleEndian>());
+        let section_size = try!(f.read_u32::<LittleEndian>());
+        let format = try!(f.read_u16::<LittleEndian>());
+        let num_channels = try!(f.read_u16::<LittleEndian>());
+        let sample_rate = try!(f.read_u32::<LittleEndian>());
+        let byte_rate = try!(f.read_u32::<LittleEndian>());
+        let block_align = try!(f.read_u16::<LittleEndian>());
+        let bit_depth = try!(f.read_u16::<LittleEndian>());
+        let data_hdr = try!(f.read_u32::<LittleEndian>());
+        let data_size = try!(f.read_u32::<LittleEndian>());
         Ok(WavHeader {
-            riff_hdr: riff_hdr.unwrap(),
-            file_size: file_size.unwrap(),
-            wave_lbl: wave_lbl.unwrap(),
-            fmt_hdr: fmt_hdr.unwrap(),
-            section_size: section_size.unwrap(),
-            format: format.unwrap(),
-            num_channels: num_channels.unwrap(),
-            sample_rate: sample_rate.unwrap(),
-            byte_rate: byte_rate.unwrap(),
-            block_align: block_align.unwrap(),
-            bit_depth: bit_depth.unwrap(),
-            data_hdr: data_hdr.unwrap(),
-            data_size: data_size.unwrap()
+            riff_hdr: riff_hdr,
+            file_size: file_size,
+            wave_lbl: wave_lbl,
+            fmt_hdr: fmt_hdr,
+            section_size: section_size,
+            format: format,
+            num_channels: num_channels,
+            sample_rate: sample_rate,
+            byte_rate: byte_rate,
+            block_align: block_align,
+            bit_depth: bit_depth,
+            data_hdr: data_hdr,
+            data_size: data_size
         })
     }
 
@@ -257,19 +245,19 @@ impl WavHeader {
     }
 
     /// Attempts to write this wav header to the provided file
-    fn write_to_file(&self, f: &mut File) -> IoResult<()> {
-        f.write_le_u32(self.riff_hdr)
-            .and_then(|()| { f.write_le_u32(self.file_size) })
-            .and_then(|()| { f.write_le_u32(self.wave_lbl) })
-            .and_then(|()| { f.write_le_u32(self.fmt_hdr) })
-            .and_then(|()| { f.write_le_u32(self.section_size) })
-            .and_then(|()| { f.write_le_u16(self.format) })
-            .and_then(|()| { f.write_le_u16(self.num_channels) })
-            .and_then(|()| { f.write_le_u32(self.sample_rate) })
-            .and_then(|()| { f.write_le_u32(self.byte_rate) })
-            .and_then(|()| { f.write_le_u16(self.block_align) })
-            .and_then(|()| { f.write_le_u16(self.bit_depth) })
-            .and_then(|()| { f.write_le_u32(self.data_hdr) })
-            .and_then(|()| { f.write_le_u32(self.data_size) })
+    fn write_to_file(&self, f: &mut File) -> byteorder::Result<()> {
+        f.write_u32::<LittleEndian>(self.riff_hdr)
+            .and_then(|()| { f.write_u32::<LittleEndian>(self.file_size) })
+            .and_then(|()| { f.write_u32::<LittleEndian>(self.wave_lbl) })
+            .and_then(|()| { f.write_u32::<LittleEndian>(self.fmt_hdr) })
+            .and_then(|()| { f.write_u32::<LittleEndian>(self.section_size) })
+            .and_then(|()| { f.write_u16::<LittleEndian>(self.format) })
+            .and_then(|()| { f.write_u16::<LittleEndian>(self.num_channels) })
+            .and_then(|()| { f.write_u32::<LittleEndian>(self.sample_rate) })
+            .and_then(|()| { f.write_u32::<LittleEndian>(self.byte_rate) })
+            .and_then(|()| { f.write_u16::<LittleEndian>(self.block_align) })
+            .and_then(|()| { f.write_u16::<LittleEndian>(self.bit_depth) })
+            .and_then(|()| { f.write_u32::<LittleEndian>(self.data_hdr) })
+            .and_then(|()| { f.write_u32::<LittleEndian>(self.data_size) })
     }
 }

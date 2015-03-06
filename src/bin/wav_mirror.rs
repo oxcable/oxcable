@@ -7,7 +7,7 @@ extern crate portaudio;
 fn main() {
     use oxcable::types::Device;
     use oxcable::io::wav;
-    println!("Mirroring microphone input to speaker...");
+    println!("Mirroring wav/song.wav input to wav/test_wav.wav...");
 
     let mut inwav = wav::WavReader::new("wav/song.wav");
     let mut outwav = wav::WavWriter::new("wav/test_wav.wav", 2);

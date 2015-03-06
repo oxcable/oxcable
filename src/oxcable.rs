@@ -2,9 +2,11 @@
 
 #![feature(collections)]
 #![feature(core)]
-#![feature(old_io)]
-#![feature(old_path)]
+#![feature(fs)]
+#![feature(io)]
 #![feature(test)]
+
+extern crate byteorder;
 
 pub mod adsr;
 pub mod components;

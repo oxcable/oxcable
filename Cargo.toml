@@ -11,6 +11,7 @@ name = "oxcable"
 path = "src/oxcable.rs"
 
 [dependencies]
+byteorder = "*"
 portmidi = "*"
 portaudio = "*"
 rand = "*"
