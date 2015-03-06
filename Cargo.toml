@@ -11,8 +11,6 @@ name = "oxcable"
 path = "src/oxcable.rs"
 
 [dependencies]
-rand = "0.1.2"
-portmidi = "0.0.4"
-
-[dependencies.rust-portaudio]
-git = "https://github.com/mitchmindtree/rust-portaudio.git"
+portmidi = "*"
+portaudio = "*"
+rand = "*"
