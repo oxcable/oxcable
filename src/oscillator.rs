@@ -2,10 +2,11 @@
 
 #![unstable="naming scheme for PI unstable"]
 
+extern crate num;
 extern crate rand;
 
 use std::f32::consts::PI;
-use std::num::Float;
+use self::num::traits::Float;
 
 use components::OutputElement;
 use types::{SAMPLE_RATE, Device, Sample, Time};

@@ -2,7 +2,8 @@
 
 #![stable]
 
-use std::num::Float;
+extern crate num;
+use self::num::traits::Float;
 
 use types::{SAMPLE_RATE, Sample};
 

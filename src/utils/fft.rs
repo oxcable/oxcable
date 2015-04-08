@@ -7,7 +7,6 @@
 #![stable]
 
 use std::f32::consts::PI;
-use std::num::UnsignedInt;
 use std::vec::Vec;
 
 use utils::complex::Complex;

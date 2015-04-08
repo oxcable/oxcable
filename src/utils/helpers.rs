@@ -2,8 +2,8 @@
 
 #![stable]
 
-use std::num::Float;
-
+extern crate num;
+use self::num::traits::Float;
 
 /// Compares floating point numbers for equality.
 ///

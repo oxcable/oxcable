@@ -14,9 +14,12 @@
 #![unstable]
 
 
+extern crate num;
+
 use std::f32::consts::PI;
-use std::num::Float;
 use std::vec::Vec;
+
+use self::num::traits::Float;
 
 use components::{InputArray, OutputArray};
 use types::{SAMPLE_RATE, Device, Sample, Time};

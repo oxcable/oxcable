@@ -1,9 +1,11 @@
 //! Provides a complex number type and corresponding arithmetic.
 
-#![unstable="operator overloads in rust are not yet stable"]
+#![unstable]
+
+extern crate num;
 
 use std::fmt;
-use std::num::Float;
+use self::num::traits::Float;
 use std::ops::{Neg, Add, Sub, Mul};
 
 

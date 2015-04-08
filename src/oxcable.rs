@@ -1,9 +1,6 @@
 #![crate_name = "oxcable"]
 
 #![feature(collections)]
-#![feature(core)]
-#![feature(fs)]
-#![feature(io)]
 #![feature(test)]
 
 pub mod adsr;

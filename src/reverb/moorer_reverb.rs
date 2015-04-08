@@ -5,7 +5,9 @@
 
 #![unstable]
 
-use std::num::Float;
+extern crate num;
+
+use self::num::traits::Float;
 use std::vec::Vec;
 
 use types::{SAMPLE_RATE, Device, Sample, Time};
