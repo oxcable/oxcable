@@ -114,9 +114,11 @@ impl WavWriter {
             samples_written: 0
         }
     }
+}
 
-    /// Updates the wav header to have the correct amount of data written
-    pub fn update_data_size(&mut self) {
+impl Drop for WavWriter {
+    fn drop(&mut self) {
+        // Updates the wav header to have the correct amount of data written
         let data_size = self.samples_written * self.num_channels * 16/8;
         let file_size = 36+data_size;
         assert!(self.file.seek(SeekFrom::Start(4)).is_ok());

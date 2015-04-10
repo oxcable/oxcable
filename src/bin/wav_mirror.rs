@@ -19,5 +19,4 @@ fn main() {
         outwav.tick(t);
         t += 1;
     }
-    outwav.update_data_size()
 }

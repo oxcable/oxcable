@@ -44,9 +44,5 @@ fn main() {
         t += 1;
     }
 
-    // Finish the wav files
-    for i in (0 .. wav_outs.len()) {
-        wav_outs[i].update_data_size();
-    }
     println!("Done");
 }

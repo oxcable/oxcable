@@ -47,10 +47,5 @@ fn main() {
             wavs[i].tick(t);
         }
     }
-
-    // Finish the wav files
-    for i in (0 .. wavs.len()) {
-        wavs[i].update_data_size();
-    }
     println!("Done");
 }
