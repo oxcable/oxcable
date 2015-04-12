@@ -6,12 +6,13 @@ extern crate oxcable;
 #[cfg(not(test))]
 fn main() {
     use oxcable::init;
-    use oxcable::types::Device;
+    use oxcable::oscillator;
+    use oxcable::components::DeviceManager;
     use oxcable::delay::Delay;
     use oxcable::io::audio::{AudioIn, AudioOut};
     use oxcable::mixers::Gain;
-    use oxcable::oscillator;
     use oxcable::oscillator::Oscillator;
+    use oxcable::types::Device;
 
     println!("Setting up signal chain...");
     assert!(init::initialize().is_ok());
@@ -28,14 +29,15 @@ fn main() {
     spk.inputs.set_channel(0, del.outputs.get_channel(0));
     spk.inputs.set_channel(1, gain.outputs.get_channel(0));
 
+    let mut manager = DeviceManager::new();
+    manager.add_device(&mut mic);
+    manager.add_device(&mut del);
+    manager.add_device(&mut osc);
+    manager.add_device(&mut gain);
+    manager.add_device(&mut spk);
+
     println!("Playing...");
-    let mut t = 0;
     loop {
-        mic.tick(t);
-        del.tick(t);
-        osc.tick(t);
-        gain.tick(t);
-        spk.tick(t);
-        t += 1;
+        manager.tick();
     }
 }

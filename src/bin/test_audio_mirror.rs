@@ -5,6 +5,7 @@ extern crate oxcable;
 #[cfg(not(test))]
 fn main() {
     use oxcable::init;
+    use oxcable::components::DeviceManager;
     use oxcable::types::Device;
     use oxcable::io::audio::{AudioIn, AudioOut};
 
@@ -15,15 +16,12 @@ fn main() {
     let mut spk = AudioOut::new(1);
     spk.inputs.set_channel(0, mic.outputs.get_channel(0));
 
-    println!("Mirroring microphone input to speaker...");
-    let mut t = 0;
-    loop {
-        mic.tick(t);
-        spk.tick(t);
-        t += 1;
-    }
+    let mut manager = DeviceManager::new();
+    manager.add_device(&mut mic);
+    manager.add_device(&mut spk);
 
-    // mic.stop();
-    // spk.stop();
-    // assert!(init::terminate().is_ok());
+    println!("Mirroring microphone input to speaker...");
+    loop {
+        manager.tick();
+    }
 }

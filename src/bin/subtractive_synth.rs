@@ -4,9 +4,9 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use oxcable::instruments::subtractive_synth::SubtractiveSynth;
     use oxcable::init;
-    use oxcable::types::Device;
+    use oxcable::components::DeviceManager;
+    use oxcable::instruments::subtractive_synth::SubtractiveSynth;
     use oxcable::io::audio::AudioOut;
     use oxcable::io::midi::MidiIn;
 
@@ -20,13 +20,14 @@ fn main() {
     synth.input.set_channel(midi.output.get_channel());
     spk.inputs.set_channel(0, synth.output.outputs.get_channel(0));
 
+    let mut manager = DeviceManager::new();
+    manager.add_device(&mut midi);
+    manager.add_device(&mut synth);
+    manager.add_device(&mut spk);
+
     println!("Playing...");
-    let mut t = 0;
     loop {
-        midi.tick(t);
-        synth.tick(t);
-        spk.tick(t);
-        t += 1;
+        manager.tick();
     }
 
     // midi.stop();
