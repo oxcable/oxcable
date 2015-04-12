@@ -24,10 +24,11 @@ def load_audio_data(waveform):
 
 def plot_spectra(title, names, xs):
     fs = range
-    for (name,x) in zip(names, xs):
+    colors = ['blue', 'red', 'green']
+    for (name,x, color) in zip(names, xs, colors):
         Xmag = np.absolute(np.fft.fft(x, 5000))
         X = 20*np.log10(Xmag/max(Xmag)) # convert to decibels
-        plot.plot(X[:len(X)/2], label=name)
+        plot.plot(X[:len(X)/2], label=name, color=color)
     plot.legend()
     plot.title(title)
     plot.show()
