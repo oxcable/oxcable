@@ -1,4 +1,4 @@
-//! Time synchronized input and output components for processing devices.
+//! Time synchronized components for building and processing devices.
 //!
 //! These components are meant to provide standard building blocks and interface
 //! elements to create `Device`s.
