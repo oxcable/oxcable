@@ -12,7 +12,6 @@ fn main() {
     use oxcable::io::audio::{AudioEngine, AudioIn, AudioOut};
     use oxcable::mixers::Gain;
     use oxcable::oscillator::Oscillator;
-    use oxcable::types::Device;
 
     println!("Setting up signal chain...");
     let engine = Rc::new(AudioEngine::open().unwrap());
@@ -36,8 +35,7 @@ fn main() {
     manager.add_device(&mut gain);
     manager.add_device(&mut spk);
 
-    println!("Playing...");
-    loop {
-        manager.tick();
-    }
+    println!("Playing. Press Enter to quit...");
+    manager.loop_until_enter();
+    println!("Done!");
 }

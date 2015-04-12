@@ -25,8 +25,7 @@ fn main() {
     manager.add_device(&mut synth);
     manager.add_device(&mut spk);
 
-    println!("Playing...");
-    loop {
-        manager.tick();
-    }
+    println!("Playing. Press Enter to quit...");
+    manager.loop_until_enter();
+    println!("Done!");
 }

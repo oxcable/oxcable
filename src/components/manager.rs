@@ -2,9 +2,11 @@
 
 #![unstable]
 
+use std::sync::mpsc::channel;
+use std::thread;
 use std::vec::Vec;
 
-use types::{Device, Time};
+use types::{Device, Time, SAMPLE_RATE};
 
 pub struct DeviceManager<'a> {
     t: Time,
@@ -30,5 +32,26 @@ impl<'a> DeviceManager<'a> {
             device.tick(self.t);
         }
         self.t += 1;
+    }
+
+    pub fn loop_until_enter(&mut self) {
+        let (tx, rx) = channel();
+        let _ = thread::spawn(move || {
+            use std::io::{Read, stdin};
+            let mut buf = [0];
+            let _ = stdin().read(&mut buf);
+            assert!(tx.send(()).is_ok());
+        });
+
+        let ticks = SAMPLE_RATE / 10;
+        loop {
+            // Tick for 100ms, then check for exit command
+            for _ in 0..ticks {
+                self.tick();
+            }
+            if rx.try_recv().is_ok() {
+                break;
+            }
+        }
     }
 }
