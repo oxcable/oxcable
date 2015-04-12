@@ -4,18 +4,18 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use oxcable::init;
+    use std::rc::Rc;
     use oxcable::components::DeviceManager;
     use oxcable::instruments::subtractive_synth::SubtractiveSynth;
-    use oxcable::io::audio::AudioOut;
-    use oxcable::io::midi::MidiIn;
+    use oxcable::io::audio::{AudioEngine, AudioOut};
+    use oxcable::io::midi::{MidiEngine, MidiIn};
 
     println!("Initializing signal chain...");
-    assert!(init::initialize().is_ok());
-
-    let mut midi = MidiIn::new();
+    let audio_engine = Rc::new(AudioEngine::open().unwrap());
+    let midi_engine = Rc::new(MidiEngine::open().unwrap());
+    let mut midi = MidiIn::new(midi_engine);
     let mut synth = SubtractiveSynth::new(2);
-    let mut spk = AudioOut::new(1);
+    let mut spk = AudioOut::new(audio_engine, 1);
 
     synth.input.set_channel(midi.output.get_channel());
     spk.inputs.set_channel(0, synth.output.outputs.get_channel(0));
@@ -29,7 +29,4 @@ fn main() {
     loop {
         manager.tick();
     }
-
-    // midi.stop();
-    // assert!(init::terminate().is_ok());
 }

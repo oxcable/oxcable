@@ -4,21 +4,22 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
+    use std::rc::Rc;
     use oxcable::adsr;
-    use oxcable::init;
     use oxcable::types::{Device, MidiMessage};
-    use oxcable::io::audio::AudioOut;
-    use oxcable::io::midi::MidiIn;
+    use oxcable::io::audio::{AudioEngine, AudioOut};
+    use oxcable::io::midi::{MidiEngine, MidiIn};
     use oxcable::oscillator;
     use oxcable::oscillator::Oscillator;
 
     println!("Initializing signal chain...");
-    assert!(init::initialize().is_ok());
+    let audio_engine = Rc::new(AudioEngine::open().unwrap());
+    let midi_engine = Rc::new(MidiEngine::open().unwrap());
 
-    let mut midi = MidiIn::new();
+    let mut midi = MidiIn::new(midi_engine);
     let mut osc = Oscillator::new(oscillator::Sine, 440.0);
     let mut adsr = adsr::Adsr::default(1);
-    let mut spk = AudioOut::new(1);
+    let mut spk = AudioOut::new(audio_engine, 1);
     adsr.inputs.set_channel(0, osc.output.get_channel());
     spk.inputs.set_channel(0, adsr.outputs.get_channel(0));
 
@@ -46,7 +47,4 @@ fn main() {
         spk.tick(t);
         t += 1;
     }
-
-    // midi.stop();
-    // assert!(init::terminate().is_ok());
 }

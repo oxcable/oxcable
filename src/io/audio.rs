@@ -4,9 +4,10 @@
 
 extern crate portaudio;
 
+use std::rc::Rc;
+
 use types::{SAMPLE_RATE, Device, Sample, Time};
 use components::{InputArray, OutputArray};
-use init;
 
 
 /// Defines the audio format for Portaudio.
@@ -17,6 +18,26 @@ static PORTAUDIO_T: portaudio::pa::SampleFormat =
 static BUFFER_SIZE: usize = 256;
 
 
+/// Used to handle portaudio resources.
+pub struct AudioEngine;
+
+impl AudioEngine {
+    pub fn open() -> Result<AudioEngine, &'static str> {
+        if portaudio::pa::initialize().is_err() {
+            return Result::Err("failed to initialize portaudio");
+        }
+        Result::Ok(AudioEngine)
+    }
+}
+
+impl Drop for AudioEngine {
+    fn drop(&mut self)
+    {
+        assert!(portaudio::pa::terminate().is_ok());
+    }
+}
+
+
 /// Reads audio from the OS's default input device.
 #[stable]
 pub struct AudioIn {
@@ -24,6 +45,8 @@ pub struct AudioIn {
     #[stable]
     pub outputs: OutputArray<Sample>,
 
+    #[allow(dead_code)] // the engine is used as an RAII marker
+    engine: Rc<AudioEngine>,
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
     num_channels: usize,
     buffer: Vec<Sample>,
@@ -34,12 +57,7 @@ pub struct AudioIn {
 impl AudioIn {
     /// Opens an audio input stream reading `num_channels` inputs.
     #[stable]
-    pub fn new(num_channels: usize) -> AudioIn {
-        // Check for initialization
-        if !init::is_initialized() {
-            panic!("Must initialize oxcable first");
-        }
-
+    pub fn new(engine: Rc<AudioEngine>, num_channels: usize) -> AudioIn {
         // Open a stream
         let mut pa_stream = portaudio::pa::Stream::new();
         assert!(pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,
@@ -49,16 +67,17 @@ impl AudioIn {
 
         AudioIn {
             outputs: OutputArray::new(num_channels),
+            engine: engine,
             pa_stream: pa_stream,
             num_channels: num_channels,
             buffer: Vec::with_capacity(num_channels*BUFFER_SIZE),
             samples_read: BUFFER_SIZE,
         }
     }
+}
 
-    /// Closes the portaudio stream
-    #[stable]
-    pub fn stop(&mut self) {
+impl Drop for AudioIn {
+    fn drop(&mut self) {
         assert!(self.pa_stream.stop().is_ok());
         assert!(self.pa_stream.close().is_ok());
     }
@@ -91,6 +110,8 @@ pub struct AudioOut {
     #[stable]
     pub inputs: InputArray<Sample>,
 
+    #[allow(dead_code)] // the engine is used as an RAII marker
+    engine: Rc<AudioEngine>,
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
     num_channels: usize,
     buffer: Vec<Sample>,
@@ -101,12 +122,7 @@ pub struct AudioOut {
 impl AudioOut {
     /// Opens an output stream writing `num_channels` outputs.
     #[stable]
-    pub fn new(num_channels: usize) -> AudioOut {
-        // Check for initialization
-        if !init::is_initialized() {
-            panic!("Must initialize oxcable first");
-        }
-
+    pub fn new(engine: Rc<AudioEngine>, num_channels: usize) -> AudioOut {
         // Open a stream
         let mut pa_stream = portaudio::pa::Stream::new();
         assert!(pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,
@@ -116,16 +132,17 @@ impl AudioOut {
 
         AudioOut {
             inputs: InputArray::new(num_channels),
+            engine: engine,
             pa_stream: pa_stream,
             num_channels: num_channels,
             buffer: Vec::with_capacity(num_channels*BUFFER_SIZE),
             samples_written: 0,
         }
     }
+}
 
-    /// Closes the portaudio stream
-    #[stable]
-    pub fn stop(&mut self) {
+impl Drop for AudioOut {
+    fn drop(&mut self) {
         assert!(self.pa_stream.stop().is_ok());
         assert!(self.pa_stream.close().is_ok());
     }

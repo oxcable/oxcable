@@ -5,19 +5,19 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use oxcable::init;
+    use std::rc::Rc;
     use oxcable::oscillator;
     use oxcable::components::DeviceManager;
     use oxcable::delay::Delay;
-    use oxcable::io::audio::{AudioIn, AudioOut};
+    use oxcable::io::audio::{AudioEngine, AudioIn, AudioOut};
     use oxcable::mixers::Gain;
     use oxcable::oscillator::Oscillator;
     use oxcable::types::Device;
 
     println!("Setting up signal chain...");
-    assert!(init::initialize().is_ok());
+    let engine = Rc::new(AudioEngine::open().unwrap());
 
-    let mut mic = AudioIn::new(1);
+    let mut mic = AudioIn::new(engine.clone(), 1);
     let mut del = Delay::new(0.5, 0.5, 0.5, 1);
     del.inputs.set_channel(0, mic.outputs.get_channel(0));
 
@@ -25,7 +25,7 @@ fn main() {
     let mut gain = Gain::new(-12.0, 1);
     gain.inputs.set_channel(0, osc.output.get_channel());
 
-    let mut spk = AudioOut::new(2);
+    let mut spk = AudioOut::new(engine.clone(), 2);
     spk.inputs.set_channel(0, del.outputs.get_channel(0));
     spk.inputs.set_channel(1, gain.outputs.get_channel(0));
 

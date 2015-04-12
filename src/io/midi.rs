@@ -4,11 +4,11 @@
 
 extern crate portmidi;
 
+use std::rc::Rc;
 use std::vec::Vec;
 
 use types::{Device, MidiEvent, MidiMessage, Time};
 use components::OutputElement;
-use init;
 
 
 /// Defines the maximum event buffer size for portmidi
@@ -52,6 +52,26 @@ fn midievent_from_portmidi(event: portmidi::MidiEvent) -> MidiEvent {
 }
 
 
+/// Used to handle portaudio resources.
+pub struct MidiEngine;
+
+impl MidiEngine {
+    pub fn open() -> Result<MidiEngine, &'static str> {
+        if portmidi::initialize().is_err() {
+            return Result::Err("failed to initialize portmidi");
+        }
+        Result::Ok(MidiEngine)
+    }
+}
+
+impl Drop for MidiEngine {
+    fn drop(&mut self)
+    {
+        assert!(portmidi::terminate().is_ok());
+    }
+}
+
+
 /// Reads audio from the OS's default midi device.
 #[stable]
 pub struct MidiIn {
@@ -59,6 +79,8 @@ pub struct MidiIn {
     #[stable]
     pub output: OutputElement<Vec<MidiEvent>>,
 
+    #[allow(dead_code)] // the engine is used as an RAII marker
+    engine: Rc<MidiEngine>,
     pm_stream: portmidi::InputPort,
 }
 
@@ -66,18 +88,14 @@ pub struct MidiIn {
 impl MidiIn {
     /// Opens a midi input stream.
     #[stable]
-    pub fn new() -> MidiIn {
-        // Check for initialization
-        if !init::is_initialized() {
-            panic!("Must initialize oxcable first");
-        }
-
+    pub fn new(engine: Rc<MidiEngine>) -> MidiIn {
         // Open a stream. For now, use firs device
         let mut pm_stream = portmidi::InputPort::new(0, BUFFER_SIZE);
         assert!(pm_stream.open().is_ok());
 
         MidiIn {
             output: OutputElement::new(),
+            engine: engine,
             pm_stream: pm_stream,
         }
     }
