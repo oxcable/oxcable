@@ -68,19 +68,19 @@ impl<T: Clone+Default> ChannelRef<T> {
 #[cfg(test)]
 mod tests {
     use super::test::Bencher;
-    use core::types::Sample;
-    use super::ChannelRef;
+    use super::{Channel};
 
     #[bench]
     fn bench_ref_get(b: &mut Bencher) {
-        let ch: ChannelRef<Sample> = ChannelRef::new();
-        ch.push(0.0);
-        b.iter(|| ch.get(0));
+        let mut writer = Channel::new();
+        let reader = writer.get_reader();
+        writer.push(0.0);
+        b.iter(|| reader.get(0));
     }
 
     #[bench]
     fn bench_ref_push(b: &mut Bencher) {
-        let ch: ChannelRef<Sample> = ChannelRef::new();
-        b.iter(|| ch.push(0.0));
+        let mut writer = Channel::new();
+        b.iter(|| writer.push(0.0));
     }
 }

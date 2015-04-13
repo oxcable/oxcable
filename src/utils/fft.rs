@@ -178,7 +178,7 @@ fn int_log(n: u32) -> u32 {
 mod test {
     use std::vec::Vec;
 
-    use core::complex::Complex;
+    use utils::complex::Complex;
     use super::{Transformer, int_log, bit_reverse};
 
     /// Tests int_log with many values

@@ -195,7 +195,7 @@ fn poly_belp_offset(t: f32, dt: f32) -> f32 {
 // A couple of basic unit tests...
 #[cfg(test)]
 mod test {
-    use core::util::flt_eq;
+    use utils::helpers::flt_eq;
     static EPSILON: f32 = 1e-6;
 
     /// Tests fmod with many values
@@ -231,7 +231,7 @@ mod test {
     #[test]
     fn test_naive_square() {
         use super::{AntialiasType, Waveform, Oscillator};
-        use core::types::Device;
+        use types::Device;
         let mut osc = Oscillator::new(Waveform::Square(AntialiasType::Aliased),
                                       4410.0);
 
@@ -250,7 +250,7 @@ mod test {
     #[test]
     fn test_naive_saw() {
         use super::{AntialiasType, Waveform, Oscillator};
-        use core::types::Device;
+        use types::Device;
         let mut osc = Oscillator::new(Waveform::Saw(AntialiasType::Aliased),
                                       4410.0);
 
