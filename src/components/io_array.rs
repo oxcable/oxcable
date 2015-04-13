@@ -5,13 +5,13 @@
 use std::default::Default;
 use std::vec::Vec;
 
-use components::channel::ChannelRef;
+use components::channel::{Channel, ChannelRef};
 use types::Time;
 
 
 /// Stores generated frame data and manages access to that data.
 pub struct OutputArray<T> {
-    chs: Vec<ChannelRef<T>>
+    chs: Vec<Channel<T>>
 }
 
 impl<T: Clone+Default> OutputArray<T> {
@@ -21,7 +21,7 @@ impl<T: Clone+Default> OutputArray<T> {
     pub fn new(num_channels: usize) -> OutputArray<T> {
         let mut chs = Vec::with_capacity(num_channels);
         for _ in (0 .. num_channels) {
-            chs.push(ChannelRef::new());
+            chs.push(Channel::new());
         }
         OutputArray { chs: chs }
     }
@@ -33,7 +33,7 @@ impl<T: Clone+Default> OutputArray<T> {
 
     /// Returns a reference to channel `i`.
     pub fn get_channel(&self, i: usize) -> ChannelRef<T> {
-        self.chs[i].clone()
+        self.chs[i].get_reader()
     }
 
     /// Attempts to get the data frame for time `t` in channel `i`.
@@ -44,7 +44,7 @@ impl<T: Clone+Default> OutputArray<T> {
 
     /// Pushes the next data frame to channel `i`.
     #[inline]
-    pub fn push(&self, i: usize, f: T) {
+    pub fn push(&mut self, i: usize, f: T) {
         self.chs[i].push(f);
     }
 }

@@ -1,12 +1,13 @@
 //! Provides a time synchronous container for data.
+//!
+//! A Channel provides single-writer, multiple-reader, thread-local storage of
+//! time-marked data.
 
 #![unstable]
 
 extern crate test;
 
-use std::cell::RefCell;
 use std::default::Default;
-use std::rc::Rc;
 
 use types::Time;
 
@@ -41,30 +42,25 @@ impl<T: Clone+Default> Channel<T> {
         self.data = f.clone();
         self.next_t += 1;
     }
+
+    /// Returns a read only reference to this channel
+    pub fn get_reader(&self) -> ChannelRef<T> {
+        ChannelRef { ch: self }
+    }
 }
 
 
-/// A reference to a channel, used to link outputs to inputs.
-#[derive(Clone)]
+/// A read-only reference to a channel
 pub struct ChannelRef<T>  {
-    ch: Rc<RefCell<Channel<T>>>
+    ch: *const Channel<T>
 }
 
 impl<T: Clone+Default> ChannelRef<T> {
-    pub fn new() -> ChannelRef<T> {
-        ChannelRef {
-            ch: Rc::new(RefCell::new(Channel::new()))
-        }
-    }
-
     #[inline]
     pub fn get(&self, t: Time) -> Option<T> {
-        self.ch.borrow().get(t)
-    }
-
-    #[inline]
-    pub fn push(&self, f: T) {
-        self.ch.borrow_mut().push(f);
+        unsafe {
+            (*self.ch).get(t)
+        }
     }
 }
 

@@ -4,24 +4,24 @@
 
 use std::default::Default;
 
-use components::channel::ChannelRef;
+use components::channel::{Channel, ChannelRef};
 use types::Time;
 
 
 /// Stores generated frame data and manages access to that data.
 pub struct OutputElement<T> {
-    ch: ChannelRef<T>
+    ch: Channel<T>
 }
 
 impl<T: Clone+Default> OutputElement<T> {
     /// Creates a new output element, initialized to time `t=0`.
     pub fn new() -> OutputElement<T> {
-        OutputElement { ch: ChannelRef::new() }
+        OutputElement { ch: Channel::new() }
     }
 
     /// Returns a reference to the channel.
     pub fn get_channel(&self) -> ChannelRef<T> {
-        self.ch.clone()
+        self.ch.get_reader()
     }
 
     /// Attempts to get the data frame for time `t`.
@@ -32,7 +32,7 @@ impl<T: Clone+Default> OutputElement<T> {
 
     /// Pushes the next data frame.
     #[inline]
-    pub fn push(&self, f: T) {
+    pub fn push(&mut self, f: T) {
         self.ch.push(f);
     }
 }
