@@ -1,7 +1,5 @@
 //! A collection of small utility functions.
 
-#![stable]
-
 extern crate num;
 use self::num::traits::Float;
 
@@ -9,25 +7,21 @@ use self::num::traits::Float;
 ///
 /// The maximum difference is specified by `epsilon`; that is, `f1` and `f2` are
 /// equal if they differ by at most epsilon.
-#[stable]
 pub fn flt_eq(f1: f32, f2: f32, epsilon: f32) -> bool {
     (f1 - f2).abs() < epsilon
 }
 
 /// Converts a decibel multiplier to a power ratio.
-#[stable]
 pub fn decibel_to_ratio(db: f32) -> f32 {
     10.0.powf(db/10.0)
 }
 
 /// Converts a power ratio to decibels.
-#[stable]
 pub fn ratio_to_decibel(ratio: f32) -> f32 {
     10.0*ratio.log10()
 }
 
 /// Converts a MIDI note number to frequency in Hz
-#[stable]
 pub fn midi_note_to_freq(note: u8) -> f32 {
     440.0*2.0.powf((note as f32 - 69.0) / 12.0)
 }

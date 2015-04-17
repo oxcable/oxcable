@@ -1,7 +1,5 @@
 //! Provides single channel time synchronized input and output.
 
-#![unstable]
-
 use std::default::Default;
 
 use components::channel::{Channel, ChannelRef};

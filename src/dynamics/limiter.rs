@@ -1,7 +1,5 @@
 //! Provides a limiter filter.
 
-#![unstable]
-
 use std::vec::Vec;
 
 use components::{InputArray, OutputArray};
@@ -13,10 +11,8 @@ use dynamics::level_detector::LevelDetector;
 /// A limiter.
 pub struct Limiter {
     /// Input audio channels
-    #[stable]
     pub inputs: InputArray<Sample>,
     /// Output audio channels
-    #[stable]
     pub outputs: OutputArray<Sample>,
 
     level_detectors: Vec<LevelDetector>,
@@ -31,7 +27,6 @@ impl Limiter {
     /// * `threshold` specifies the decibel level to limit the signal to.
     /// * The specified `gain` (in decibels) will be applied to the
     ///   signal after compression.
-    #[stable]
     pub fn new(threshold: f32, gain: f32, num_channels: usize) -> Limiter {
         // Create our level detectors
         let mut levels = Vec::with_capacity(num_channels);

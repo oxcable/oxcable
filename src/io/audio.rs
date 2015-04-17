@@ -1,7 +1,5 @@
 //! Provides audio IO from OS sound devices.
 
-#![stable]
-
 extern crate portaudio;
 
 use std::rc::Rc;
@@ -39,10 +37,8 @@ impl Drop for AudioEngine {
 
 
 /// Reads audio from the OS's default input device.
-#[stable]
 pub struct AudioIn {
     /// Output audio channels
-    #[stable]
     pub outputs: OutputArray<Sample>,
 
     #[allow(dead_code)] // the engine is used as an RAII marker
@@ -53,10 +49,8 @@ pub struct AudioIn {
     samples_read: usize,
 }
 
-#[stable]
 impl AudioIn {
     /// Opens an audio input stream reading `num_channels` inputs.
-    #[stable]
     pub fn new(engine: Rc<AudioEngine>, num_channels: usize) -> AudioIn {
         // Open a stream
         let mut pa_stream = portaudio::pa::Stream::new();
@@ -104,10 +98,8 @@ impl Device for AudioIn {
 
 
 /// Writes audio to the OS's default output device.
-#[stable]
 pub struct AudioOut {
     /// Input audio channels
-    #[stable]
     pub inputs: InputArray<Sample>,
 
     #[allow(dead_code)] // the engine is used as an RAII marker
@@ -118,10 +110,8 @@ pub struct AudioOut {
     samples_written: usize,
 }
 
-#[stable]
 impl AudioOut {
     /// Opens an output stream writing `num_channels` outputs.
-    #[stable]
     pub fn new(engine: Rc<AudioEngine>, num_channels: usize) -> AudioOut {
         // Open a stream
         let mut pa_stream = portaudio::pa::Stream::new();

@@ -1,7 +1,5 @@
 //! Provides time synchronized input and output arrays.
 
-#![unstable]
-
 use std::default::Default;
 use std::vec::Vec;
 

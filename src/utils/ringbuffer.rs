@@ -1,7 +1,5 @@
 //! Provides a generic ring buffer
 
-#![stable]
-
 use std::clone::Clone;
 use std::ops::Add;
 use std::vec::Vec;

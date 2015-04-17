@@ -1,7 +1,5 @@
 //! Provides a compression filter.
 
-#![unstable]
-
 use std::vec::Vec;
 
 use components::{InputArray, OutputArray};
@@ -13,10 +11,8 @@ use dynamics::level_detector::LevelDetector;
 /// A compression filter.
 pub struct Compressor {
     /// Input audio channels
-    #[stable]
     pub inputs: InputArray<Sample>,
     /// Output audio channels
-    #[stable]
     pub outputs: OutputArray<Sample>,
 
     level_detectors: Vec<LevelDetector>,
@@ -35,7 +31,6 @@ impl Compressor {
     ///   a compression ratio of 1 forces the output down to the threshold.
     /// * The specified `gain` (in decibels) will be applied to the
     ///   signal after compression.
-    #[stable]
     pub fn new(threshold: f32, compression_ratio: f32, gain: f32,
                num_channels: usize) -> Compressor {
         // Create our level detectors

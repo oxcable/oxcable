@@ -1,14 +1,11 @@
 //! Provides an ADSR filter
 
-#![unstable]
-
 use components::{InputArray, OutputArray};
 use types::{SAMPLE_RATE,Device, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 
 
 /// Defines the messages that the ADSR supports
-#[unstable]
 #[derive(Clone, Copy)]
 pub enum AdsrMessage {
     /// Triggers an attack
@@ -36,13 +33,10 @@ impl AdsrState {
 
 
 /// A multichannel ADSR filter
-#[stable]
 pub struct Adsr {
     /// Input audio channels
-    #[stable]
     pub inputs: InputArray<Sample>,
     /// Output audio channels
-    #[stable]
     pub outputs: OutputArray<Sample>,
 
     // Remember parameter values
@@ -70,7 +64,6 @@ impl Adsr {
     /// * The specified `gain` (in decibels) will be applied to the
     ///   signal after filtering.
     /// * `num_channels` defines how many channels of audio to filter.
-    #[stable]
     pub fn new(attack_time: f32, decay_time: f32, sustain_level: f32,
                release_time: f32, gain: f32, num_channels: usize) -> Adsr {
         // Convert times to samples
@@ -95,13 +88,11 @@ impl Adsr {
     }
 
     /// Returns an ADSR with reasonable default values for the envelope.
-    #[stable]
     pub fn default(num_channels: usize) ->Adsr {
         Adsr::new(0.05, 0.1, 0.5, 0.1, 0.0, num_channels)
     }
 
     /// Applies the message to our Adsr
-    #[unstable]
     pub fn handle_message(&mut self, msg: AdsrMessage, t: Time) {
         match msg {
             AdsrMessage::NoteDown =>
@@ -149,7 +140,6 @@ impl Adsr {
 }
 
 impl Device for Adsr {
-    #[stable]
     fn tick(&mut self, t: Time) {
         // Handle any state changes
         if self.next_state_change == t {

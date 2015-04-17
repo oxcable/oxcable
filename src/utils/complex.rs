@@ -1,7 +1,5 @@
 //! Provides a complex number type and corresponding arithmetic.
 
-#![unstable]
-
 extern crate num;
 
 use std::fmt;

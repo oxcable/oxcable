@@ -1,7 +1,5 @@
 //! Provides MIDI input from OS MIDI devices.
 
-#![unstable]
-
 extern crate portmidi;
 
 use std::rc::Rc;
@@ -73,10 +71,8 @@ impl Drop for MidiEngine {
 
 
 /// Reads audio from the OS's default midi device.
-#[stable]
 pub struct MidiIn {
     /// Output midi channel
-    #[stable]
     pub output: OutputElement<Vec<MidiEvent>>,
 
     #[allow(dead_code)] // the engine is used as an RAII marker
@@ -84,10 +80,8 @@ pub struct MidiIn {
     pm_stream: portmidi::InputPort,
 }
 
-#[stable]
 impl MidiIn {
     /// Opens a midi input stream.
-    #[stable]
     pub fn new(engine: Rc<MidiEngine>) -> MidiIn {
         // Open a stream. For now, use firs device
         let mut pm_stream = portmidi::InputPort::new(0, BUFFER_SIZE);
@@ -101,7 +95,6 @@ impl MidiIn {
     }
 
     /// Closes the portmidi stream
-    #[stable]
     pub fn stop(&mut self) {
         assert!(self.pm_stream.close().is_ok());
     }

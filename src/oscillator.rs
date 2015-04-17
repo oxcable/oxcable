@@ -1,7 +1,5 @@
 //! Provides an oscillator that generates periodic waveforms.
 
-#![unstable="naming scheme for PI unstable"]
-
 extern crate num;
 extern crate rand;
 
@@ -15,7 +13,6 @@ pub use self::AntialiasType::{Aliased, PolyBlep};
 pub use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
 
 /// Defines the messages that the Oscillator supports
-#[unstable="needs more modes"]
 #[derive(Clone, Copy, Debug)]
 pub enum OscillatorMessage {
     /// Sets the frequency in Hz
@@ -27,7 +24,6 @@ pub enum OscillatorMessage {
 /// Aliased waveforms will use naive methods that produce aliasing.
 /// PolyBLEP (Polynomial Bandlimited Step) uses offsets to round off sharp edges
 /// and reduce aliasing.
-#[stable]
 #[derive(Clone, Copy, Debug)]
 pub enum AntialiasType {
     /// Naive, aliasing waveforms.
@@ -42,7 +38,6 @@ pub enum AntialiasType {
 /// waveforms using PolyBLEP. Aliased waveformsare useful for control signals,
 /// but not for raw audio signals. For audible signals, instead used the
 /// corresponding `PolyBlep` waveforms.
-#[stable]
 #[derive(Clone, Copy, Debug)]
 pub enum Waveform {
     Sine,
@@ -56,7 +51,6 @@ pub enum Waveform {
 /// An oscillator that generates a periodic waveform.
 pub struct Oscillator {
     /// A single output audio channel
-    #[stable]
     pub output: OutputElement<Sample>,
 
     waveform: Waveform,
@@ -68,7 +62,6 @@ pub struct Oscillator {
 impl Oscillator {
     /// Returns an oscillator with the specified waveform at the specified
     /// frequency, in Hz.
-    #[stable]
     pub fn new(waveform: Waveform, freq: f32) -> Oscillator {
         Oscillator {
             output: OutputElement::new(),

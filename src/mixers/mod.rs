@@ -1,7 +1,5 @@
 //! Defines `Device`s for mixing signals
 
-#![unstable]
-
 pub use self::adder::Adder;
 pub use self::gain::Gain;
 pub use self::multiplier::Multiplier;

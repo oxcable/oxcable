@@ -3,8 +3,6 @@
 //! This algorithmic reverb filter follows the basic design specified by James
 //! Moorer in his seminal paper, "About This Reverberation Business".
 
-#![unstable]
-
 extern crate num;
 
 use self::num::traits::Float;
@@ -16,13 +14,12 @@ use utils::ringbuffer::RingBuffer;
 use utils::helpers::decibel_to_ratio;
 use reverb::rooms::Room;
 
+
 /// A multichannel reverb filter, that operates on each channel indepedently.
 pub struct MoorerReverb {
     /// Input audio channels
-    #[stable]
     pub inputs: InputArray<Sample>,
     /// Output audio channels
-    #[stable]
     pub outputs: OutputArray<Sample>,
 
     num_channels: usize,
@@ -49,7 +46,6 @@ impl MoorerReverb {
     /// * `gain`: the output gain, in decibels
     /// * `wetness`: how much of the input signal to mix into the output
     /// * `num_channels`: number of channels to process
-    #[stable]
     pub fn new(room: Room, rev_time: f32, gain: f32, wetness:f32,
            num_channels: usize) -> MoorerReverb {
         assert!(room.tapped_delays.len() == room.tapped_gains.len());

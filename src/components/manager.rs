@@ -1,7 +1,5 @@
 //! Provides a manager class for device processing.
 
-#![unstable]
-
 use std::sync::mpsc::channel;
 use std::thread;
 use std::vec::Vec;

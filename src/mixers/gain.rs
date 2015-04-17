@@ -1,7 +1,5 @@
 //! `Device` for changing channel levels.
 
-#![unstable]
-
 use components::{InputArray, OutputArray};
 use types::{Device, Sample, Time};
 use utils::helpers::decibel_to_ratio;
@@ -15,10 +13,8 @@ use utils::helpers::decibel_to_ratio;
 /// scaled by 2 then placed in channel 1 of the outputs.
 pub struct Gain {
     /// Input audio channels.
-    #[stable]
     pub inputs: InputArray<Sample>,
     /// Output audio channels.
-    #[stable]
     pub outputs: OutputArray<Sample>,
 
     num_channels: usize,
@@ -29,7 +25,6 @@ impl Gain {
     /// Returns a new gain filter.
     ///
     /// `gain` should be in decibels.
-    #[stable]
     pub fn new(gain: f32, num_channels: usize) -> Gain {
         Gain {
             inputs: InputArray::new(num_channels),

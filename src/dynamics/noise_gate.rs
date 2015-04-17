@@ -1,7 +1,5 @@
 //! Provides a noise gate filter.
 
-#![unstable]
-
 use std::vec::Vec;
 
 use components::{InputArray, OutputArray};
@@ -13,10 +11,8 @@ use dynamics::level_detector::LevelDetector;
 /// A noise gate
 pub struct NoiseGate {
     /// Input audio channels
-    #[stable]
     pub inputs: InputArray<Sample>,
     /// Output audio channels
-    #[stable]
     pub outputs: OutputArray<Sample>,
 
     level_detectors: Vec<LevelDetector>,
@@ -36,7 +32,6 @@ impl NoiseGate {
     ///
     /// The specified `gain` (in decibels) will be applied to the signal after
     /// compression.
-    #[stable]
     pub fn new(on_threshold: f32, off_threshold: f32, gain: f32,
                num_channels: usize) -> NoiseGate {
         // Create our level detectors

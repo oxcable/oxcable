@@ -11,8 +11,6 @@
 //! with the width of the peak determined by the Q (higher Q means a narrower
 //! peak).
 
-#![unstable]
-
 
 extern crate num;
 
@@ -37,18 +35,12 @@ pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf, Peak};
 ///
 /// `Peak` filters specify the center frequency in Hz, the gain for the peak in
 /// decibels, and the filter Q.
-#[stable]
 #[derive(Clone, Copy, Debug)]
 pub enum FilterMode {
-    #[stable]
     LowPass(f32),        // cutoff
-    #[stable]
     HighPass(f32),
-    #[stable]
     LowShelf(f32, f32),  // cutoff, gain
-    #[stable]
     HighShelf(f32, f32),
-    #[stable]
     Peak(f32, f32, f32), // center frequency, gain, Q
 }
 
@@ -56,10 +48,8 @@ pub enum FilterMode {
 /// mode. Each of the channels will be filtered independently.
 pub struct Filter {
     /// Input audio channels
-    #[stable]
     pub inputs: InputArray<Sample>,
     /// Output audio channels
-    #[stable]
     pub outputs: OutputArray<Sample>,
 
     num_channels: usize,
@@ -71,7 +61,6 @@ pub struct Filter {
 
 impl Filter {
     /// Creates a new second order filter with the provided mode.
-    #[stable]
     pub fn new(mode: FilterMode, num_channels: usize) -> Filter {
         // Populate the delay elements
         let mut x_last1 = Vec::<f32>::with_capacity(num_channels);

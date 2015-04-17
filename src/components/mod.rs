@@ -18,8 +18,6 @@
 //! a single set of MIDI events, and a public `OutputArray<Sample>` with two
 //! channels, one for each stereo audio channel.
 
-#![unstable]
-
 pub use self::io_array::{InputArray, OutputArray};
 pub use self::io_elements::{InputElement, OutputElement};
 pub use self::manager::DeviceManager;

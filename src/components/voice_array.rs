@@ -1,7 +1,5 @@
 //! Provides polyphonic voice arrays.
 
-#![unstable]
-
 use std::collections::{VecDeque, VecMap};
 use std::vec::Vec;
 

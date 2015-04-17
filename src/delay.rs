@@ -1,7 +1,5 @@
 //! Provides a simple delay module.
 
-#![unstable]
-
 
 use std::vec::Vec;
 
@@ -16,13 +14,10 @@ use utils::ringbuffer::RingBuffer;
 /// played at full amplitude, and is then decayed linearly by the feedback
 /// multiplier. The output is mixed with the raw input using the wetness
 /// percentage.
-#[unstable]
 pub struct Delay {
     /// Input audio channels
-    #[stable]
     pub inputs: InputArray<Sample>,
     /// Output audio channels
-    #[stable]
     pub outputs: OutputArray<Sample>,
 
     num_channels: usize,
@@ -39,7 +34,6 @@ impl Delay {
     ///               delay
     /// * `wetness`: how much of our input signal to mix into the delayed signal
     ///              in the output
-    #[stable]
     pub fn new(delay: f32, feedback: f32, wetness: f32,
                num_channels: usize) -> Delay {
         // Create the delay buffers, starting with silence

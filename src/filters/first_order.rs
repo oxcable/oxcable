@@ -7,7 +7,6 @@
 //! A `LowShelf` or `HighShelf` filter will provide a shelf starting at the
 //! cutoff frequency, and will provide the specified gain in the shelf region.
 
-#![unstable]
 #![allow(non_snake_case)]
 
 extern crate num;
@@ -30,28 +29,20 @@ pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf};
 ///
 /// `LowShelf` and `HighShelf` filters specify the cutoff frequency in Hz, and
 /// the gain for the shelf region in decibels.
-#[stable]
 #[derive(Clone, Copy, Debug)]
 pub enum FilterMode {
-    #[stable]
     LowPass(f32),       // cutoff
-    #[stable]
     HighPass(f32),
-    #[stable]
     LowShelf(f32, f32), // cutoff, gain
-    #[stable]
     HighShelf(f32, f32)
 }
 
 /// A filter that uses a first order all pass filter to perform the specified
 /// mode. Each of the channels will be filtered independently.
-#[unstable]
 pub struct Filter {
     /// Input audio channels
-    #[stable]
     pub inputs: InputArray<Sample>,
     /// Output audio channels
-    #[stable]
     pub outputs: OutputArray<Sample>,
 
     num_channels: usize,
@@ -64,7 +55,6 @@ pub struct Filter {
 
 impl Filter {
     /// Creates a new first order filter with the provided mode.
-    #[stable]
     pub fn new(mode: FilterMode, num_channels: usize) -> Filter {
         // Populate the last vectors
         let mut x_last = Vec::<f32>::with_capacity(num_channels);

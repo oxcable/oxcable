@@ -1,7 +1,5 @@
 //! `Device` for adding multiple channels into one.
 
-#![unstable]
-
 use components::{InputArray, OutputElement};
 use types::{Device, Sample, Time};
 
@@ -11,10 +9,8 @@ use types::{Device, Sample, Time};
 /// The adder sums all its inputs into a single output.
 pub struct Adder {
     /// Input audio channels
-    #[stable]
     pub inputs: InputArray<Sample>,
     /// A single output audio channel
-    #[stable]
     pub output: OutputElement<Sample>,
 
     num_inputs: usize,
@@ -22,7 +18,6 @@ pub struct Adder {
 
 impl Adder {
     /// Returns a new adder with `num_inputs` input channels.
-    #[stable]
     pub fn new(num_inputs: usize) -> Adder {
         Adder {
             inputs: InputArray::new(num_inputs),
