@@ -20,11 +20,11 @@ static BUFFER_SIZE: usize = 256;
 pub struct AudioEngine;
 
 impl AudioEngine {
-    pub fn open() -> Result<AudioEngine, &'static str> {
-        if portaudio::pa::initialize().is_err() {
-            return Result::Err("failed to initialize portaudio");
+    pub fn open() -> Result<AudioEngine, String> {
+        match portaudio::pa::initialize() {
+            Ok(()) => Ok(AudioEngine),
+            Err(e) => Err(portaudio::pa::get_error_text(e))
         }
-        Result::Ok(AudioEngine)
     }
 }
 

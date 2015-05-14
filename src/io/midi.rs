@@ -54,11 +54,9 @@ fn midievent_from_portmidi(event: portmidi::MidiEvent) -> MidiEvent {
 pub struct MidiEngine;
 
 impl MidiEngine {
-    pub fn open() -> Result<MidiEngine, &'static str> {
-        if portmidi::initialize().is_err() {
-            return Result::Err("failed to initialize portmidi");
-        }
-        Result::Ok(MidiEngine)
+    pub fn open() -> Result<MidiEngine, portmidi::PortMidiError> {
+        try!(portmidi::initialize());
+        Ok(MidiEngine)
     }
 }
 
