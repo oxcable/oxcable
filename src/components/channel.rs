@@ -3,8 +3,6 @@
 //! A Channel provides single-writer, multiple-reader, thread-local storage of
 //! time-marked data.
 
-extern crate test;
-
 use std::default::Default;
 
 use types::Time;

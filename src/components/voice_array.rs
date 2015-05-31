@@ -1,6 +1,6 @@
 //! Provides polyphonic voice arrays.
 
-use std::collections::{VecDeque, VecMap};
+use std::collections::{VecDeque, HashMap};
 use std::vec::Vec;
 
 use components::channel::ChannelRef;
@@ -31,9 +31,9 @@ pub struct VoiceArray<T> {
     /// All the voices are contained in the voices vector
     voices: Vec<T>,
     /// Maps MIDI note numbers to currently triggered voice indices
-    note_to_voice: VecMap<usize>,
+    note_to_voice: HashMap<u8, usize>,
     /// Maps voice indices to MIDI note numbers
-    voice_to_note: VecMap<u8>,
+    voice_to_note: HashMap<usize, u8>,
     /// Places the most recently mapped voices at the end
     voice_queue: VecDeque<usize>
 }
@@ -54,8 +54,8 @@ impl<T: Device+Voice> VoiceArray<T> {
         VoiceArray {
             output: adder,
             voices: voices,
-            note_to_voice: VecMap::new(),
-            voice_to_note: VecMap::new(),
+            note_to_voice: HashMap::new(),
+            voice_to_note: HashMap::new(),
             voice_queue: voice_queue
         }
     }
@@ -77,7 +77,7 @@ impl<T: Device+Voice> VoiceArray<T> {
 
     /// Selects a voice to handle this event, and triggers the note
     fn handle_note_on(&mut self, note: u8, event: &MidiEvent, t: Time) {
-        let i = match self.note_to_voice.remove(&(note as usize)) {
+        let i = match self.note_to_voice.remove(&note) {
             Some(i) => {
                 // This note is already being played, so retrigger it and move
                 // it to the back of the queue
@@ -90,12 +90,12 @@ impl<T: Device+Voice> VoiceArray<T> {
 
                 // Remove the mapping between the voice and its old note
                 match self.voice_to_note.remove(&i) {
-                    Some(n) => { self.note_to_voice.remove(&(n as usize)); },
+                    Some(n) => { self.note_to_voice.remove(&n); },
                     None => ()
                 }
 
                 // Map this voice to its new note
-                self.note_to_voice.insert(note as usize, i);
+                self.note_to_voice.insert(note, i);
                 self.voice_to_note.insert(i, note);
                 i
             }
@@ -107,7 +107,7 @@ impl<T: Device+Voice> VoiceArray<T> {
 
     // Find the voice playing this note and stop it
     fn handle_note_off(&mut self, note: u8, event: &MidiEvent, t: Time) {
-        match self.note_to_voice.remove(&(note as usize)) {
+        match self.note_to_voice.remove(&note) {
             Some(i) => {
                 self.remove_from_queue(i);
                 self.voice_to_note.remove(&i);

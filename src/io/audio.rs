@@ -52,11 +52,11 @@ pub struct AudioIn {
 impl AudioIn {
     /// Opens an audio input stream reading `num_channels` inputs.
     pub fn new(engine: Rc<AudioEngine>, num_channels: usize) -> AudioIn {
-        // Open a stream
+        // Open a stream in blocking mode
         let mut pa_stream = portaudio::pa::Stream::new();
         assert!(pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,
                                        num_channels as i32, 0i32,
-                                       PORTAUDIO_T).is_ok());
+                                       PORTAUDIO_T, None).is_ok());
         assert!(pa_stream.start().is_ok());
 
         AudioIn {
@@ -113,11 +113,11 @@ pub struct AudioOut {
 impl AudioOut {
     /// Opens an output stream writing `num_channels` outputs.
     pub fn new(engine: Rc<AudioEngine>, num_channels: usize) -> AudioOut {
-        // Open a stream
+        // Open a stream in blocking mode
         let mut pa_stream = portaudio::pa::Stream::new();
         assert!(pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,
                                        0i32, num_channels as i32,
-                                       PORTAUDIO_T).is_ok());
+                                       PORTAUDIO_T, None).is_ok());
         assert!(pa_stream.start().is_ok());
 
         AudioOut {
