@@ -4,8 +4,7 @@ extern crate portaudio;
 
 use std::rc::Rc;
 
-use types::{SAMPLE_RATE, Device, Sample, Time};
-use components::{InputArray, OutputArray};
+use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Sample, Time};
 
 
 /// Defines the audio format for Portaudio.
@@ -38,9 +37,6 @@ impl Drop for AudioEngine {
 
 /// Reads audio from the OS's default input device.
 pub struct AudioIn {
-    /// Output audio channels
-    pub outputs: OutputArray<Sample>,
-
     #[allow(dead_code)] // the engine is used as an RAII marker
     engine: Rc<AudioEngine>,
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
@@ -60,7 +56,6 @@ impl AudioIn {
         assert!(pa_stream.start().is_ok());
 
         AudioIn {
-            outputs: OutputArray::new(num_channels),
             engine: engine,
             pa_stream: pa_stream,
             num_channels: num_channels,
@@ -77,8 +72,16 @@ impl Drop for AudioIn {
     }
 }
 
-impl Device for AudioIn {
-    fn tick(&mut self, _t: Time) {
+impl AudioDevice for AudioIn {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(0)
+    }
+
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
+
+    fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {
         if self.samples_read == BUFFER_SIZE {
             let result = self.pa_stream.read(BUFFER_SIZE as u32);
             match result {
@@ -89,8 +92,7 @@ impl Device for AudioIn {
         }
 
         for i in (0 .. self.num_channels) {
-            let s = self.buffer[self.samples_read*self.num_channels + i];
-            self.outputs.push(i, s);
+            outputs[i] = self.buffer[self.samples_read*self.num_channels + i];
         }
         self.samples_read += 1;
     }
@@ -99,9 +101,6 @@ impl Device for AudioIn {
 
 /// Writes audio to the OS's default output device.
 pub struct AudioOut {
-    /// Input audio channels
-    pub inputs: InputArray<Sample>,
-
     #[allow(dead_code)] // the engine is used as an RAII marker
     engine: Rc<AudioEngine>,
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
@@ -121,7 +120,6 @@ impl AudioOut {
         assert!(pa_stream.start().is_ok());
 
         AudioOut {
-            inputs: InputArray::new(num_channels),
             engine: engine,
             pa_stream: pa_stream,
             num_channels: num_channels,
@@ -138,13 +136,21 @@ impl Drop for AudioOut {
     }
 }
 
-impl Device for AudioOut {
-    fn tick(&mut self, t: Time) {
-        for i in (0 .. self.num_channels) {
-            let mut s = self.inputs.get(i, t).unwrap_or(0.0);
-            if s > 1.0 { s = 1.0; }
-            if s < -1.0 { s = -1.0; }
-            self.buffer.push(s)
+impl AudioDevice for AudioOut {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
+
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(0)
+    }
+
+    fn tick(&mut self, _: Time, inputs: &[Sample], _: &mut[Sample]) {
+        for s in inputs.iter() {
+            let mut clipped = *s;
+            if clipped > 1.0 { clipped = 1.0; }
+            if clipped < -1.0 { clipped = -1.0; }
+            self.buffer.push(clipped)
         }
         self.samples_written += 1;
 

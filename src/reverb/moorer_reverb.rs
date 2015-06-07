@@ -3,13 +3,9 @@
 //! This algorithmic reverb filter follows the basic design specified by James
 //! Moorer in his seminal paper, "About This Reverberation Business".
 
-extern crate num;
+use num::traits::Float;
 
-use self::num::traits::Float;
-use std::vec::Vec;
-
-use types::{SAMPLE_RATE, Device, Sample, Time};
-use components::{InputArray, OutputArray};
+use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Sample, Time};
 use utils::ringbuffer::RingBuffer;
 use utils::helpers::decibel_to_ratio;
 use reverb::rooms::Room;
@@ -17,11 +13,6 @@ use reverb::rooms::Room;
 
 /// A multichannel reverb filter, that operates on each channel indepedently.
 pub struct MoorerReverb {
-    /// Input audio channels
-    pub inputs: InputArray<Sample>,
-    /// Output audio channels
-    pub outputs: OutputArray<Sample>,
-
     num_channels: usize,
     gain: f32,
     wetness: f32,
@@ -92,8 +83,6 @@ impl MoorerReverb {
 
         // Return struct
         MoorerReverb {
-            inputs: InputArray::new(num_channels),
-            outputs: OutputArray::new(num_channels),
             num_channels: num_channels,
             gain: decibel_to_ratio(gain),
             wetness: wetness,
@@ -109,11 +98,17 @@ impl MoorerReverb {
     }
 }
 
-impl Device for MoorerReverb {
-    fn tick(&mut self, t: Time) {
-        for i in (0 .. self.num_channels) {
-            let x = self.inputs.get(i, t).unwrap_or(0.0);
+impl AudioDevice for MoorerReverb {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
 
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
+
+    fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]) {
+        for (i,x) in inputs.iter().enumerate() {
             // Advance tapped delay line
             self.tapped_delay_lines[i].push(0.0);
             for (delay, gain) in self.tapped_delays.iter()
@@ -139,7 +134,7 @@ impl Device for MoorerReverb {
             // Finally store result
             let wet_out = tapped_out + self.comb_out_buffer[i].get(t).unwrap();
             let y = self.gain * (self.wetness*wet_out + (1.0-self.wetness)*x);
-            self.outputs.push(i, y);
+            outputs[i] = y;
         }
     }
 }

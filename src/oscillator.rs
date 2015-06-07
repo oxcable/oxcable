@@ -1,13 +1,10 @@
 //! Provides an oscillator that generates periodic waveforms.
 
-extern crate num;
-extern crate rand;
-
 use std::f32::consts::PI;
-use self::num::traits::Float;
+use num::traits::Float;
+use rand::random;
 
-use components::OutputElement;
-use types::{SAMPLE_RATE, Device, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Sample, Time};
 
 pub use self::AntialiasType::{Aliased, PolyBlep};
 pub use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
@@ -50,9 +47,6 @@ pub enum Waveform {
 
 /// An oscillator that generates a periodic waveform.
 pub struct Oscillator {
-    /// A single output audio channel
-    pub output: OutputElement<Sample>,
-
     waveform: Waveform,
     phase: f32,
     phase_delta: f32,
@@ -64,7 +58,6 @@ impl Oscillator {
     /// frequency, in Hz.
     pub fn new(waveform: Waveform, freq: f32) -> Oscillator {
         Oscillator {
-            output: OutputElement::new(),
             waveform: waveform,
             phase: 0.0,
             phase_delta: freq*2.0*PI/(SAMPLE_RATE as f32),
@@ -82,8 +75,16 @@ impl Oscillator {
     }
 }
 
-impl Device for Oscillator {
-    fn tick(&mut self, _t: Time) {
+impl AudioDevice for Oscillator {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(0)
+    }
+
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(1)
+    }
+
+    fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {
         // Tick the phase
         self.phase += self.phase_delta;
         if self.phase >= 2.0*PI {
@@ -137,7 +138,7 @@ impl Device for Oscillator {
                 // Perform leaky integration
                 self.phase_delta*out + (1.0-self.phase_delta)*self.last_sample
             },
-            WhiteNoise => 2.0*rand::random::<f32>() - 1.0,
+            WhiteNoise => 2.0*random::<f32>() - 1.0,
             PulseTrain => {
                 // If we wrapped around...
                 if self.phase < self.phase_delta {
@@ -149,7 +150,7 @@ impl Device for Oscillator {
         };
 
         // Push the sample out
-        self.output.push(s);
+        outputs[0] = s;
     }
 }
 

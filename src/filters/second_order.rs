@@ -12,15 +12,10 @@
 //! peak).
 
 
-extern crate num;
-
 use std::f32::consts::PI;
-use std::vec::Vec;
+use num::traits::Float;
 
-use self::num::traits::Float;
-
-use components::{InputArray, OutputArray};
-use types::{SAMPLE_RATE, Device, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 
 pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf, Peak};
@@ -47,13 +42,7 @@ pub enum FilterMode {
 /// A filter that uses a second order all pass filter to perform the specified
 /// mode. Each of the channels will be filtered independently.
 pub struct Filter {
-    /// Input audio channels
-    pub inputs: InputArray<Sample>,
-    /// Output audio channels
-    pub outputs: OutputArray<Sample>,
-
     num_channels: usize,
-
     x_last1: Vec<Sample>, x_last2: Vec<Sample>, // two time step delay elements
     y_last1: Vec<Sample>, y_last2: Vec<Sample>,
     b0: f32, b1: f32, b2: f32, a1: f32, a2: f32
@@ -78,8 +67,6 @@ impl Filter {
         let (b0, b1, b2, a1, a2) = compute_parameters(mode);
 
         Filter {
-            inputs: InputArray::new(num_channels),
-            outputs: OutputArray::new(num_channels),
             num_channels: num_channels,
             x_last1: x_last1, x_last2: x_last2,
             y_last1: y_last1, y_last2: y_last2,
@@ -189,11 +176,17 @@ fn compute_parameters(mode: FilterMode) -> (f32, f32, f32, f32, f32) {
     }
 }
 
-impl Device for Filter {
-    fn tick(&mut self, t: Time) {
-        for i in (0 .. self.num_channels) {
-            let x = self.inputs.get(i, t).unwrap_or(0.0);
+impl AudioDevice for Filter {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
 
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
+
+    fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {
+        for (i,x) in inputs.iter().enumerate() {
             // Run the all pass filter, and feedback the result
             let y = self.b0*x + self.b1*self.x_last1[i]
                 + self.b2*self.x_last2[i] - self.a1*self.y_last1[i]
@@ -202,9 +195,9 @@ impl Device for Filter {
             // Store our results
             self.x_last2[i] = self.x_last1[i];
             self.y_last2[i] = self.y_last1[i];
-            self.x_last1[i] = x;
+            self.x_last1[i] = *x;
             self.y_last1[i] = y;
-            self.outputs.push(i, y);
+            outputs[i] = y;
         }
     }
 }

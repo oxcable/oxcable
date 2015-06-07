@@ -1,38 +1,34 @@
 //! `Device` for multiplying multiple channels into one.
 
-use components::{InputArray, OutputElement};
-use types::{Device, Sample, Time};
+use types::{AudioDevice, DeviceIOType, Sample, Time};
 
 
 /// A multiplier.
 ///
 /// Multiplies all its inputs into a single output.
-pub struct Multiplier {
-    /// Input audio channels
-    pub inputs: InputArray<Sample>,
-    /// A single audio output channel.
-    pub output: OutputElement<Sample>,
-
-    num_inputs: usize,
-}
+pub struct Multiplier;
 
 impl Multiplier {
     /// Returns a new multiplier with `num_inputs` input channels
-    pub fn new(num_inputs: usize) -> Multiplier {
-        Multiplier {
-            inputs: InputArray::new(num_inputs),
-            output: OutputElement::new(),
-            num_inputs: num_inputs
-        }
+    pub fn new() -> Multiplier {
+        Multiplier
     }
 }
 
-impl Device for Multiplier {
-    fn tick(&mut self, t: Time) {
-        let mut s = 1.0;
-        for i in (0 .. self.num_inputs) {
-            s *= self.inputs.get(i, t).unwrap_or(0.0);
+impl AudioDevice for Multiplier {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Any
+    }
+
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(1)
+    }
+
+    fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {
+        let mut prod = 1.0;
+        for s in inputs.iter() {
+            prod *= *s;
         }
-        self.output.push(s);
+        outputs[0] = prod;
     }
 }

@@ -1,18 +1,12 @@
 //! `Device` for selecting one of several channels.
 
-use components::{InputArray, OutputElement};
-use types::{Device, Sample, Time};
+use types::{AudioDevice, DeviceIOType, Sample, Time};
 
 
 /// A multiplexer.
 ///
 /// Mirrors one of its inputs into a single output while ignoring the rest.
 pub struct Multiplexer {
-    /// Input audio channels
-    pub inputs: InputArray<Sample>,
-    /// A single output audio channel
-    pub output: OutputElement<Sample>,
-
     num_inputs: usize,
     selected: usize,
 }
@@ -21,8 +15,6 @@ impl Multiplexer {
     /// Returns a new multiplexer with `num_inputs` input channels.
     pub fn new(num_inputs: usize) -> Multiplexer {
         Multiplexer {
-            inputs: InputArray::new(num_inputs),
-            output: OutputElement::new(),
             num_inputs: num_inputs,
             selected: 0
         }
@@ -41,9 +33,16 @@ impl Multiplexer {
     }
 }
 
-impl Device for Multiplexer {
-    fn tick(&mut self, t: Time) {
-        let s = self.inputs.get(self.selected, t).unwrap_or(0.0);
-        self.output.push(s);
+impl AudioDevice for Multiplexer {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_inputs)
+    }
+
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(1)
+    }
+
+    fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {
+        outputs[0] = inputs[self.selected];
     }
 }

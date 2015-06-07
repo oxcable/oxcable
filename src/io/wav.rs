@@ -1,22 +1,16 @@
 //! Provides audio IO from wav files.
 
-extern crate byteorder;
-
-use self::byteorder::{ReadBytesExt, WriteBytesExt, LittleEndian};
+use byteorder::{self, ReadBytesExt, WriteBytesExt, LittleEndian};
 use std::fs::File;
 use std::io::{self, Seek, SeekFrom};
 
-use components::{InputArray, OutputArray};
-use types::{SAMPLE_RATE, Device, Time, Sample};
+use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Time, Sample};
 
 /// Reads audio from a wav file.
 ///
 /// The reader will continue until it runs out of samples. When it does, the
 /// reader will return silence until it is reset to the beginning of the file.
 pub struct WavReader {
-    /// Output audio channels
-    pub outputs: OutputArray<Sample>,
-
     num_channels: usize,
     num_samples: usize,
     samples_read: usize,
@@ -33,7 +27,6 @@ impl WavReader {
         let header = WavHeader::read_from_file(&mut file).unwrap();
         assert!(header.is_valid());
         WavReader {
-            outputs: OutputArray::new(header.num_channels as usize),
             num_channels: header.num_channels as usize,
             num_samples: (header.data_size / ((header.bit_depth/8) as u32) /
                 (header.num_channels as u32)) as usize,
@@ -59,15 +52,23 @@ impl WavReader {
     }
 }
 
-impl Device for WavReader {
-    fn tick(&mut self, _t: Time) {
+impl AudioDevice for WavReader {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(0)
+    }
+
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
+
+    fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {
         for i in (0 .. self.num_channels) {
             let s = if self.samples_read < self.num_samples {
                 (self.file.read_i16::<LittleEndian>().unwrap() as Sample) / 32768.0
             } else {
                 0.0
             };
-            self.outputs.push(i, s);
+            outputs[i] = s;
         }
         self.samples_read += 1;
     }
@@ -79,9 +80,6 @@ impl Device for WavReader {
 /// The writer initializes the data_size to be 0. This will not be overwritten
 /// with the proper size until `update_data_size` is called.
 pub struct WavWriter {
-    /// Input audio channels
-    pub inputs: InputArray<Sample>,
-
     num_channels: usize,
     file: File,
     samples_written: usize,
@@ -97,7 +95,6 @@ impl WavWriter {
                                     0u32);
         assert!(header.write_to_file(&mut file).is_ok());
         WavWriter {
-            inputs: InputArray::new(num_channels),
             num_channels: num_channels,
             file: file,
             samples_written: 0
@@ -117,13 +114,22 @@ impl Drop for WavWriter {
     }
 }
 
-impl Device for WavWriter {
-    fn tick(&mut self, t: Time) {
-        for i in (0 .. self.num_channels) {
-            let mut s = self.inputs.get(i, t).unwrap_or(0.0);
-            if s > 0.999f32 { s = 0.999f32; }
-            if s < -0.999f32 { s = -0.999f32; }
-            assert!(self.file.write_i16::<LittleEndian>((s*32768.0) as i16).is_ok());
+impl AudioDevice for WavWriter {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
+
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(0)
+    }
+
+    fn tick(&mut self, _: Time, inputs: &[Sample], _: &mut[Sample]) {
+        for s in inputs.iter() {
+            let mut clipped = *s;
+            if clipped > 0.999f32 { clipped = 0.999f32; }
+            if clipped < -0.999f32 { clipped = -0.999f32; }
+            assert!(self.file.write_i16::<LittleEndian>(
+                    (clipped*32768.0) as i16).is_ok());
         }
         self.samples_written += 1;
     }

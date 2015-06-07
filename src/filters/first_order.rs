@@ -9,15 +9,10 @@
 
 #![allow(non_snake_case)]
 
-extern crate num;
-
 use std::f32::consts::PI;
-use std::vec::Vec;
+use num::traits::Float;
 
-use self::num::traits::Float;
-
-use components::{InputArray, OutputArray};
-use types::{SAMPLE_RATE, Device, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 
 pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf};
@@ -40,11 +35,6 @@ pub enum FilterMode {
 /// A filter that uses a first order all pass filter to perform the specified
 /// mode. Each of the channels will be filtered independently.
 pub struct Filter {
-    /// Input audio channels
-    pub inputs: InputArray<Sample>,
-    /// Output audio channels
-    pub outputs: OutputArray<Sample>,
-
     num_channels: usize,
     x_last: Vec<Sample>,
     y1_last: Vec<Sample>,
@@ -68,8 +58,6 @@ impl Filter {
         let (alpha, H0) = compute_parameters(mode.clone());
 
         Filter {
-            inputs: InputArray::new(num_channels),
-            outputs: OutputArray::new(num_channels),
             num_channels: num_channels,
             x_last: x_last,
             y1_last: y1_last,
@@ -117,11 +105,17 @@ fn compute_parameters(mode: FilterMode) -> (f32, f32) {
     }
 }
 
-impl Device for Filter {
-    fn tick(&mut self, t: Time) {
-        for i in (0 .. self.num_channels) {
-            let x = self.inputs.get(i, t).unwrap_or(0.0);
+impl AudioDevice for Filter {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
 
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
+
+    fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {
+        for (i,x) in inputs.iter().enumerate() {
             // Run the all pass filter, and feedback the result
             let y1 = self.alpha*x + self.x_last[i] - self.alpha*self.y1_last[i];
             let y = match self.mode {
@@ -132,9 +126,9 @@ impl Device for Filter {
             };
 
             // Store our results
-            self.x_last[i] = x;
+            self.x_last[i] = *x;
             self.y1_last[i] = y1;
-            self.outputs.push(i, y);
+            outputs[i] = y;
         }
     }
 }

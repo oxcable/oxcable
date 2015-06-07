@@ -49,9 +49,18 @@ pub enum MidiMessage {
 
 
 
+#[derive(Clone, Copy, Debug)]
+pub enum DeviceIOType {
+    Any,
+    Exactly(usize)
+}
+
 /// An interface for a synchronous processing device.
-pub trait Device {
+pub trait AudioDevice {
+    fn num_inputs(&self) -> DeviceIOType;
+    fn num_outputs(&self) -> DeviceIOType;
+
     /// Process a single frame worth of data. This function should be called
     /// once per time step, starting at `t=0`.
-    fn tick(&mut self, t: Time);
+    fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]);
 }

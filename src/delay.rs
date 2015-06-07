@@ -3,8 +3,7 @@
 
 use std::vec::Vec;
 
-use components::{InputArray, OutputArray};
-use types::{SAMPLE_RATE, Device, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Sample, Time};
 use utils::ringbuffer::RingBuffer;
 
 
@@ -15,11 +14,6 @@ use utils::ringbuffer::RingBuffer;
 /// multiplier. The output is mixed with the raw input using the wetness
 /// percentage.
 pub struct Delay {
-    /// Input audio channels
-    pub inputs: InputArray<Sample>,
-    /// Output audio channels
-    pub outputs: OutputArray<Sample>,
-
     num_channels: usize,
     delay_buffers: Vec<RingBuffer<Sample>>,
     feedback: f32,
@@ -47,8 +41,6 @@ impl Delay {
         }
 
         Delay {
-            inputs: InputArray::new(num_channels),
-            outputs: OutputArray::new(num_channels),
             num_channels: num_channels,
             delay_buffers: bufs,
             feedback: feedback,
@@ -57,18 +49,23 @@ impl Delay {
     }
 }
 
-impl Device for Delay {
-    fn tick(&mut self, t: Time) {
-        for i in (0 .. self.num_channels) {
-            let s = self.inputs.get(i, t).unwrap_or(0.0);
+impl AudioDevice for Delay {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
 
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
+
+    fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]) {
+        for (i,s) in inputs.iter().enumerate() {
             // Get our delayed signal and feed it back with our input
             let delayed = self.delay_buffers[i].get(t).unwrap();
             self.delay_buffers[i].push(s + self.feedback*delayed);
 
             // Mix our wet signal with the input
-            let out = self.wetness*delayed + (1.0-self.wetness)*s;
-            self.outputs.push(i, out);
+            outputs[i] = self.wetness*delayed + (1.0-self.wetness)*s;
         }
     }
 }

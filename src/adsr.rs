@@ -1,7 +1,6 @@
 //! Provides an ADSR filter
 
-use components::{InputArray, OutputArray};
-use types::{SAMPLE_RATE,Device, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 
 
@@ -34,11 +33,6 @@ impl AdsrState {
 
 /// A multichannel ADSR filter
 pub struct Adsr {
-    /// Input audio channels
-    pub inputs: InputArray<Sample>,
-    /// Output audio channels
-    pub outputs: OutputArray<Sample>,
-
     // Remember parameter values
     num_channels: usize,
     attack_time: Time,
@@ -72,8 +66,6 @@ impl Adsr {
         let release_samples = (release_time*SAMPLE_RATE as f32) as Time;
 
         Adsr {
-            inputs: InputArray::new(num_channels),
-            outputs: OutputArray::new(num_channels),
             num_channels: num_channels,
             attack_time: attack_samples,
             decay_time: decay_samples,
@@ -88,7 +80,7 @@ impl Adsr {
     }
 
     /// Returns an ADSR with reasonable default values for the envelope.
-    pub fn default(num_channels: usize) ->Adsr {
+    pub fn default(num_channels: usize) -> Adsr {
         Adsr::new(0.05, 0.1, 0.5, 0.1, 0.0, num_channels)
     }
 
@@ -139,8 +131,16 @@ impl Adsr {
     }
 }
 
-impl Device for Adsr {
-    fn tick(&mut self, t: Time) {
+impl AudioDevice for Adsr {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
+
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(self.num_channels)
+    }
+
+    fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]) {
         // Handle any state changes
         if self.next_state_change == t {
             let next_state = self.current_state.next();
@@ -151,9 +151,8 @@ impl Device for Adsr {
         self.multiplier += self.multiplier_delta;
 
         // Apply the envelope
-        for i in (0 .. self.num_channels) {
-            let s = self.inputs.get(i, t).unwrap_or(0.0);
-            self.outputs.push(i, s*self.gain*self.multiplier);
+        for (i,s) in inputs.iter().enumerate() {
+            outputs[i] = s*self.gain*self.multiplier;
         }
     }
 }
