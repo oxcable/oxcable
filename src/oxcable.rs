@@ -5,6 +5,7 @@ extern crate num;
 extern crate rand;
 
 pub mod adsr;
+pub mod chain;
 pub mod delay;
 pub mod dynamics;
 pub mod filters;
