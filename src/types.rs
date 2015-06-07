@@ -16,6 +16,8 @@ pub type Time   = u64;
 pub struct MidiEvent {
     /// The MIDI channel this event was sent to
     pub channel: u8,
+    /// The timestamp of this event
+    pub time: Time,
     /// The message contents
     pub payload: MidiMessage
 }
@@ -55,7 +57,6 @@ pub enum DeviceIOType {
     Exactly(usize)
 }
 
-/// An interface for a synchronous processing device.
 pub trait AudioDevice {
     fn num_inputs(&self) -> DeviceIOType;
     fn num_outputs(&self) -> DeviceIOType;

@@ -3,10 +3,8 @@
 extern crate portmidi;
 
 use std::rc::Rc;
-use std::vec::Vec;
 
-use types::{Device, MidiEvent, MidiMessage, Time};
-use components::OutputElement;
+use types::{MidiEvent, MidiMessage, Time};
 
 
 /// Defines the maximum event buffer size for portmidi
@@ -14,7 +12,7 @@ static BUFFER_SIZE: i32 = 256;
 
 
 /// Converts a raw portmidi message to an oxcable MIDI event
-fn midievent_from_portmidi(event: portmidi::MidiEvent) -> MidiEvent {
+fn midievent_from_portmidi(event: portmidi::MidiEvent, t: Time) -> MidiEvent {
     let msg = event.message;
     let channel = (msg.status & 0x0F) as u8;
     let payload = match (msg.status as u8) >> 4 {
@@ -46,7 +44,7 @@ fn midievent_from_portmidi(event: portmidi::MidiEvent) -> MidiEvent {
                                 msg.data2 as u8)
     };
 
-    MidiEvent { channel: channel, payload: payload }
+    MidiEvent { channel: channel, time: t, payload: payload }
 }
 
 
@@ -70,9 +68,6 @@ impl Drop for MidiEngine {
 
 /// Reads audio from the OS's default midi device.
 pub struct MidiIn {
-    /// Output midi channel
-    pub output: OutputElement<Vec<MidiEvent>>,
-
     #[allow(dead_code)] // the engine is used as an RAII marker
     engine: Rc<MidiEngine>,
     pm_stream: portmidi::InputPort,
@@ -86,7 +81,6 @@ impl MidiIn {
         assert!(pm_stream.open().is_ok());
 
         MidiIn {
-            output: OutputElement::new(),
             engine: engine,
             pm_stream: pm_stream,
         }
@@ -96,18 +90,15 @@ impl MidiIn {
     pub fn stop(&mut self) {
         assert!(self.pm_stream.close().is_ok());
     }
-}
 
-impl Device for MidiIn {
-    fn tick(&mut self, _t: Time) {
+    pub fn get_events(&mut self, t: Time) -> Vec<MidiEvent> {
         let mut events = Vec::new();
         loop {
             match self.pm_stream.read().unwrap() {
-                Some(pm_event) =>
-                    events.push(midievent_from_portmidi(pm_event)),
+                Some(pm_event) => events.push(midievent_from_portmidi(pm_event, t)),
                 None => break
             }
         }
-        self.output.push(events);
+        events
     }
 }

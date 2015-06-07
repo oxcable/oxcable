@@ -1,55 +1,72 @@
 //! A basic subtractive synthesizer
 
 use adsr::{Adsr, AdsrMessage};
-use components::{InputElement, Voice, VoiceArray};
-use components::channel::ChannelRef;
-use types::{Device, MidiEvent, MidiMessage, Time, Sample};
-use utils::helpers::midi_note_to_freq;
-use mixers::Gain;
+use io::midi::MidiIn;
 use oscillator::{AntialiasType, Oscillator, OscillatorMessage, Waveform};
+use types::{AudioDevice, DeviceIOType, MidiEvent, MidiMessage, Time, Sample};
+use utils::helpers::midi_note_to_freq;
+use instruments::voice_array::VoiceArray;
 
 
 /// A polyphonic subtractive synthesizer
 pub struct SubtractiveSynth {
-    /// Input MIDI channel
-    pub input: InputElement<Vec<MidiEvent>>,
-    /// Output audio channel
-    pub output: Gain,
-
-    /// Our voice manager
-    voices: VoiceArray<SubtractiveSynthVoice>
+    voices: VoiceArray<SubtractiveSynthVoice>,
+    midi: MidiIn,
+    gain: f32,
 }
 
 impl SubtractiveSynth {
     /// Returns a new subtractive synth that can play `num_voices` notes at one
     /// time.
-    pub fn new(num_voices: usize) -> SubtractiveSynth {
+    pub fn new(midi: MidiIn, num_voices: usize) -> SubtractiveSynth {
         let mut voices = Vec::with_capacity(num_voices);
         for _i in (0 .. num_voices) {
             voices.push(SubtractiveSynthVoice::new());
         }
         let voice_array = VoiceArray::new(voices);
 
-        let mut output = Gain::new(-6.0, 1);
-        output.inputs.set_channel(0, voice_array.output.output.get_channel());
-
         SubtractiveSynth {
-            input: InputElement::new(),
-            output: output,
-            voices: voice_array
+            voices: voice_array,
+            midi: midi,
+            gain: -6.0,
+        }
+    }
+
+    fn handle_event(&mut self, event: MidiEvent) {
+        match event.payload {
+            MidiMessage::NoteOn(note, _) =>
+                self.voices.note_on(note).handle_event(event),
+                MidiMessage::NoteOff(note, _) =>
+                    self.voices.note_off(note).map_or((),
+                        |d| d.handle_event(event)),
+                _ => {
+                    for voice in self.voices.iter_mut() {
+                        voice.handle_event(event);
+                    }
+                }
         }
     }
 }
 
-impl Device for SubtractiveSynth {
-    fn tick(&mut self, t: Time) {
-        let events = self.input.get(t).unwrap();
-        for event in events.iter() {
-            self.voices.handle_event(event, t);
+impl AudioDevice for SubtractiveSynth {
+    fn num_inputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(0)
+    }
+
+    fn num_outputs(&self) -> DeviceIOType {
+        DeviceIOType::Exactly(1)
+    }
+
+    fn tick(&mut self, t: Time, _: &[Sample], outputs: &mut[Sample]) {
+        for event in self.midi.get_events(t) {
+            self.handle_event(event);
         }
 
-        self.voices.tick(t);
-        self.output.tick(t);
+        let mut s = 0.0;
+        for voice in self.voices.iter_mut() {
+            s += voice.tick(t);
+        }
+        outputs[0] = self.gain * s;
     }
 }
 
@@ -57,43 +74,39 @@ impl Device for SubtractiveSynth {
 /// The container for a single voice
 struct SubtractiveSynthVoice {
     osc: Oscillator,
-    adsr: Adsr
+    adsr: Adsr,
+    osc_buf: Vec<Sample>,
+    adsr_buf: Vec<Sample>,
 }
 
 impl SubtractiveSynthVoice {
     fn new() -> SubtractiveSynthVoice {
         let osc = Oscillator::new(Waveform::Saw(AntialiasType::PolyBlep), 440.0);
-        let mut adsr = Adsr::default(1);
-        adsr.inputs.set_channel(0, osc.output.get_channel());
+        let adsr = Adsr::default(1);
         SubtractiveSynthVoice {
             osc: osc,
-            adsr: adsr
+            adsr: adsr,
+            osc_buf: vec![0.0],
+            adsr_buf: vec![0.0],
         }
     }
-}
 
-impl Device for SubtractiveSynthVoice {
-    fn tick(&mut self, t: Time) {
-        self.osc.tick(t);
-        self.adsr.tick(t);
-    }
-}
-
-impl Voice for SubtractiveSynthVoice {
-    fn get_channel(&self) -> ChannelRef<Sample> {
-        self.adsr.outputs.get_channel(0)
-    }
-
-    fn handle_event(&mut self, event: &MidiEvent, t: Time) {
+    fn handle_event(&mut self, event: MidiEvent) {
         match event.payload {
             MidiMessage::NoteOn(note, _) => {
                 self.osc.handle_message(OscillatorMessage::SetFreq(
                         midi_note_to_freq(note)));
-                self.adsr.handle_message(AdsrMessage::NoteDown, t);
+                self.adsr.handle_message(AdsrMessage::NoteDown, event.time);
             },
             MidiMessage::NoteOff(_, _) =>
-                self.adsr.handle_message(AdsrMessage::NoteUp, t),
+                self.adsr.handle_message(AdsrMessage::NoteUp, event.time),
             _ => ()
         }
+    }
+
+    fn tick(&mut self, t: Time) -> Sample {
+        self.osc.tick(t, &[0.0;0], &mut self.osc_buf);
+        self.adsr.tick(t, &self.osc_buf, &mut self.adsr_buf);
+        self.adsr_buf[0]
     }
 }
