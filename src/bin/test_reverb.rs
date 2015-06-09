@@ -14,7 +14,7 @@ fn main() {
     let engine = Rc::new(AudioEngine::open().unwrap());
 
     let mut mic = AudioIn::new(engine.clone(), 1);
-    let mut rev = MoorerReverb::new(rooms::hall(), 1.0, -3.0, 0.5, 1);
+    let mut rev = MoorerReverb::new(rooms::HALL, 1.0, -3.0, 0.5, 1);
     let mut spk = AudioOut::new(engine.clone(), 1);
     rev.inputs.set_channel(0, mic.outputs.get_channel(0));
     spk.inputs.set_channel(0, rev.outputs.get_channel(0));
