@@ -15,22 +15,37 @@ static PORTAUDIO_T: portaudio::pa::SampleFormat =
 static BUFFER_SIZE: usize = 256;
 
 
-/// Used to handle portaudio resources.
-pub struct AudioEngine;
+/// This empty struct is used as a RAII marker for an initialized portaudio
+/// connection. It is held in a Rc, and copies are passed to all streams opened
+/// with it.
+struct AudioEngineMarker;
+impl Drop for AudioEngineMarker {
+    fn drop(&mut self)
+    {
+        assert!(portaudio::pa::terminate().is_ok());
+    }
+}
+
+/// The AudioEnginer opens and manages the resources associated with portaudio.
+/// It is used open new input/output streams and safely free them.
+pub struct AudioEngine {
+    marker: Rc<AudioEngineMarker>
+}
 
 impl AudioEngine {
     pub fn open() -> Result<AudioEngine, String> {
         match portaudio::pa::initialize() {
-            Ok(()) => Ok(AudioEngine),
+            Ok(()) => Ok(AudioEngine { marker: Rc::new(AudioEngineMarker) }),
             Err(e) => Err(portaudio::pa::get_error_text(e))
         }
     }
-}
 
-impl Drop for AudioEngine {
-    fn drop(&mut self)
-    {
-        assert!(portaudio::pa::terminate().is_ok());
+    pub fn new_input(&self, num_channels: usize) -> AudioIn {
+        AudioIn::new(self.marker.clone(), num_channels)
+    }
+
+    pub fn new_output(&self, num_channels: usize) -> AudioOut {
+        AudioOut::new(self.marker.clone(), num_channels)
     }
 }
 
@@ -38,7 +53,7 @@ impl Drop for AudioEngine {
 /// Reads audio from the OS's default input device.
 pub struct AudioIn {
     #[allow(dead_code)] // the engine is used as an RAII marker
-    engine: Rc<AudioEngine>,
+    engine: Rc<AudioEngineMarker>,
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
     num_channels: usize,
     buffer: Vec<Sample>,
@@ -47,7 +62,7 @@ pub struct AudioIn {
 
 impl AudioIn {
     /// Opens an audio input stream reading `num_channels` inputs.
-    pub fn new(engine: Rc<AudioEngine>, num_channels: usize) -> AudioIn {
+    fn new(engine: Rc<AudioEngineMarker>, num_channels: usize) -> AudioIn {
         // Open a stream in blocking mode
         let mut pa_stream = portaudio::pa::Stream::new();
         assert!(pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,
@@ -102,7 +117,7 @@ impl AudioDevice for AudioIn {
 /// Writes audio to the OS's default output device.
 pub struct AudioOut {
     #[allow(dead_code)] // the engine is used as an RAII marker
-    engine: Rc<AudioEngine>,
+    engine: Rc<AudioEngineMarker>,
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
     num_channels: usize,
     buffer: Vec<Sample>,
@@ -111,7 +126,7 @@ pub struct AudioOut {
 
 impl AudioOut {
     /// Opens an output stream writing `num_channels` outputs.
-    pub fn new(engine: Rc<AudioEngine>, num_channels: usize) -> AudioOut {
+    fn new(engine: Rc<AudioEngineMarker>, num_channels: usize) -> AudioOut {
         // Open a stream in blocking mode
         let mut pa_stream = portaudio::pa::Stream::new();
         assert!(pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,

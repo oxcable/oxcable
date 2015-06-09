@@ -4,17 +4,16 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use std::rc::Rc;
     use oxcable::chain::DeviceChain;
-    use oxcable::io::audio::{AudioEngine, AudioIn, AudioOut};
+    use oxcable::io::audio::AudioEngine;
 
     println!("Initializing signal chain...");
-    let engine = Rc::new(AudioEngine::open().unwrap());
-    let mut chain = DeviceChain::from(AudioIn::new(engine.clone(), 1))
-        .into(AudioOut::new(engine.clone(), 1));
+    let engine = AudioEngine::open().unwrap();
+    let mut chain = DeviceChain::from(engine.new_input(1))
+        .into(engine.new_output(1));
 
     println!("Mirroring microphone input to speaker...");
-    loop {
+    for _ in 0..44100 {
         chain.tick();
     }
 }
