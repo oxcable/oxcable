@@ -12,8 +12,7 @@ fn main() {
     let mut chain = DeviceChain::from(engine.new_input(1))
         .into(engine.new_output(1));
 
-    println!("Mirroring microphone input to speaker...");
-    for _ in 0..44100 {
-        chain.tick();
-    }
+    println!("Mirroring microphone input to speaker.");
+    println!("Press enter to quit.");
+    chain.tick_until_enter();
 }
