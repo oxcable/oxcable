@@ -4,19 +4,17 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use oxcable::types::Device;
+    use oxcable::chain::DeviceChain;
     use oxcable::io::wav;
+
+    println!("Initializing signal chain...");
+    let inwav = wav::WavReader::new("wav/song.wav");
+    let samples = inwav.get_num_samples();
+    let outwav = wav::WavWriter::new("wav/test_wav.wav", 2);
+    let mut chain = DeviceChain::from(inwav).into(outwav);
+
     println!("Mirroring wav/song.wav input to wav/test_wav.wav...");
-
-    let mut inwav = wav::WavReader::new("wav/song.wav");
-    let mut outwav = wav::WavWriter::new("wav/test_wav.wav", 2);
-    outwav.inputs.set_channel(0, inwav.outputs.get_channel(0));
-    outwav.inputs.set_channel(1, inwav.outputs.get_channel(1));
-
-    let mut t = 0;
-    while !inwav.is_done() {
-        inwav.tick(t);
-        outwav.tick(t);
-        t += 1;
+    for _ in 0..samples {
+        chain.tick();
     }
 }
