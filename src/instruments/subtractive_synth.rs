@@ -28,7 +28,7 @@ impl SubtractiveSynth {
         SubtractiveSynth {
             voices: voice_array,
             midi: midi,
-            gain: -6.0,
+            gain: -12.0,
         }
     }
 

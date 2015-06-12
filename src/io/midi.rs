@@ -76,7 +76,7 @@ pub struct MidiIn {
 impl MidiIn {
     /// Opens a midi input stream.
     pub fn new(engine: Rc<MidiEngine>) -> MidiIn {
-        // Open a stream. For now, use firs device
+        // Open a stream. For now, use first device
         let mut pm_stream = portmidi::InputPort::new(0, BUFFER_SIZE);
         assert!(pm_stream.open().is_ok());
 
