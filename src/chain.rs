@@ -1,3 +1,5 @@
+//! Provides a linear chain to cascade `AudioDevice`s together.
+
 use types::{AudioDevice, DeviceIOType, Sample, Time};
 use utils::tick::Tick;
 

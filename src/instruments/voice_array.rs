@@ -74,7 +74,7 @@ impl<T> VoiceArray<T> {
         &mut self.voices[i]
     }
 
-    // Find the voice playing this note and mark it as done
+    /// Find the voice playing this note and mark it as done
     pub fn note_off(&mut self, note: u8) -> Option<&mut T> {
         match self.note_to_voice.remove(&note) {
             Some(i) => {

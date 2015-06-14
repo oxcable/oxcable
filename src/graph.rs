@@ -1,3 +1,5 @@
+//! Provides a way to link `AudioDevice`s into an acyclic graph.
+
 use types::{AudioDevice, DeviceIOType, Sample, Time};
 use utils::tick::Tick;
 
