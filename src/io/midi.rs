@@ -55,7 +55,7 @@ struct MidiEngineMarker;
 impl Drop for MidiEngineMarker {
     fn drop(&mut self)
     {
-        assert!(portmidi::terminate().is_ok());
+        portmidi::terminate().unwrap();
     }
 }
 
@@ -88,7 +88,7 @@ impl MidiIn {
     fn new(engine: Rc<MidiEngineMarker>) -> MidiIn {
         // Open a stream. For now, use first device
         let mut pm_stream = portmidi::InputPort::new(0, BUFFER_SIZE);
-        assert!(pm_stream.open().is_ok());
+        pm_stream.open().unwrap();
 
         MidiIn {
             engine: engine,
@@ -98,7 +98,7 @@ impl MidiIn {
 
     /// Closes the portmidi stream
     pub fn stop(&mut self) {
-        assert!(self.pm_stream.close().is_ok());
+        self.pm_stream.close().unwrap();
     }
 
     pub fn get_events(&mut self, t: Time) -> Vec<MidiEvent> {

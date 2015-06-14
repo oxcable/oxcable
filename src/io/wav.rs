@@ -93,7 +93,7 @@ impl WavWriter {
         let mut file = File::create(filename).unwrap();
         let header = WavHeader::new(num_channels as u16, SAMPLE_RATE as u32,
                                     0u32);
-        assert!(header.write_to_file(&mut file).is_ok());
+        header.write_to_file(&mut file).unwrap();
         WavWriter {
             num_channels: num_channels,
             file: file,
@@ -107,10 +107,10 @@ impl Drop for WavWriter {
         // Updates the wav header to have the correct amount of data written
         let data_size = self.samples_written * self.num_channels * 16/8;
         let file_size = 36+data_size;
-        assert!(self.file.seek(SeekFrom::Start(4)).is_ok());
-        assert!(self.file.write_u32::<LittleEndian>(file_size as u32).is_ok());
-        assert!(self.file.seek(SeekFrom::Start(40)).is_ok());
-        assert!(self.file.write_u32::<LittleEndian>(data_size as u32).is_ok());
+        self.file.seek(SeekFrom::Start(4)).unwrap();
+        self.file.write_u32::<LittleEndian>(file_size as u32).unwrap();
+        self.file.seek(SeekFrom::Start(40)).unwrap();
+        self.file.write_u32::<LittleEndian>(data_size as u32).unwrap();
     }
 }
 
@@ -128,8 +128,7 @@ impl AudioDevice for WavWriter {
             let mut clipped = *s;
             if clipped > 0.999f32 { clipped = 0.999f32; }
             if clipped < -0.999f32 { clipped = -0.999f32; }
-            assert!(self.file.write_i16::<LittleEndian>(
-                    (clipped*32768.0) as i16).is_ok());
+            self.file.write_i16::<LittleEndian>((clipped*32768.0) as i16).unwrap();
         }
         self.samples_written += 1;
     }

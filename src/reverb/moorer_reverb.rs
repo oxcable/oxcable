@@ -113,8 +113,7 @@ impl AudioDevice for MoorerReverb {
             self.tapped_delay_lines[i].push(0.0);
             for (delay, gain) in self.tapped_delays.iter()
                 .zip(self.tapped_gains.iter()) {
-                assert!(self.tapped_delay_lines[i].add(t + *delay, *gain * x)
-                        .is_ok());;
+                self.tapped_delay_lines[i].add(t + *delay, *gain * x).unwrap();
             }
             let tapped_out = (x + self.tapped_delay_lines[i].get(t).unwrap()) /
                 (self.tapped_delays.len() as f32);

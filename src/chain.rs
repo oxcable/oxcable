@@ -45,7 +45,7 @@ impl DeviceChain {
             use std::io::{Read, stdin};
             let mut buf = [0];
             let _ = stdin().read(&mut buf);
-            assert!(tx.send(()).is_ok());
+            tx.send(()).unwrap();
         });
 
         let ticks = SAMPLE_RATE / 10;
