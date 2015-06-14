@@ -4,17 +4,16 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use std::rc::Rc;
     use oxcable::chain::DeviceChain;
     use oxcable::instruments::subtractive_synth::SubtractiveSynth;
     use oxcable::io::audio::AudioEngine;
-    use oxcable::io::midi::{MidiEngine, MidiIn};
+    use oxcable::io::midi::MidiEngine;
 
     println!("Initializing signal chain...");
     let audio_engine = AudioEngine::open().unwrap();
-    let midi_engine = Rc::new(MidiEngine::open().unwrap());
+    let midi_engine = MidiEngine::open().unwrap();
     let mut chain = DeviceChain::from(SubtractiveSynth::new(
-            MidiIn::new(midi_engine.clone()), 2))
+            midi_engine.new_input(), 2))
         .into(audio_engine.new_output(1));
 
     println!("Playing. Press Enter to quit...");

@@ -48,20 +48,30 @@ fn midievent_from_portmidi(event: portmidi::MidiEvent, t: Time) -> MidiEvent {
 }
 
 
-/// Used to handle portaudio resources.
-pub struct MidiEngine;
+/// This empty struct is used as a RAII marker for an initialized portmidi
+/// connection. It is held in a Rc, and copies are passed to all streams opened
+/// with it.
+struct MidiEngineMarker;
+impl Drop for MidiEngineMarker {
+    fn drop(&mut self)
+    {
+        assert!(portmidi::terminate().is_ok());
+    }
+}
+
+/// Used to handle portmidi resources.
+pub struct MidiEngine {
+    marker: Rc<MidiEngineMarker>
+}
 
 impl MidiEngine {
     pub fn open() -> Result<MidiEngine, portmidi::PortMidiError> {
         try!(portmidi::initialize());
-        Ok(MidiEngine)
+        Ok(MidiEngine { marker: Rc::new(MidiEngineMarker) })
     }
-}
 
-impl Drop for MidiEngine {
-    fn drop(&mut self)
-    {
-        assert!(portmidi::terminate().is_ok());
+    pub fn new_input(&self) -> MidiIn {
+        MidiIn::new(self.marker.clone())
     }
 }
 
@@ -69,13 +79,13 @@ impl Drop for MidiEngine {
 /// Reads audio from the OS's default midi device.
 pub struct MidiIn {
     #[allow(dead_code)] // the engine is used as an RAII marker
-    engine: Rc<MidiEngine>,
+    engine: Rc<MidiEngineMarker>,
     pm_stream: portmidi::InputPort,
 }
 
 impl MidiIn {
     /// Opens a midi input stream.
-    pub fn new(engine: Rc<MidiEngine>) -> MidiIn {
+    fn new(engine: Rc<MidiEngineMarker>) -> MidiIn {
         // Open a stream. For now, use first device
         let mut pm_stream = portmidi::InputPort::new(0, BUFFER_SIZE);
         assert!(pm_stream.open().is_ok());
