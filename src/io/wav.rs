@@ -40,6 +40,11 @@ impl WavReader {
         self.num_samples
     }
 
+    /// Returns the number of channels in the wav file.
+    pub fn get_num_channels(&self) -> usize {
+        self.num_channels
+    }
+
     /// Returns true if we have read the entire wav file.
     pub fn is_done(&self) -> bool {
         self.samples_read >= self.num_samples

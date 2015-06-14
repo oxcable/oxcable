@@ -11,7 +11,7 @@ fn main() {
     println!("Initializing signal chain...");
     let inwav = wav::WavReader::new("wav/song.wav");
     let samples = inwav.get_num_samples();
-    let outwav = wav::WavWriter::new("wav/test_wav.wav", 2);
+    let outwav = wav::WavWriter::new("wav/test_wav.wav", inwav.get_num_channels());
     let mut chain = DeviceChain::from(inwav).into(outwav);
 
     println!("Mirroring wav/song.wav input to wav/test_wav.wav...");
