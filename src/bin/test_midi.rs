@@ -46,11 +46,16 @@ fn main() {
     let midi_engine = MidiEngine::open().unwrap();
 
 
-    let mut chain = DeviceChain::from(Oscillator::new(oscillator::Sine, 440.0))
-        .into(WrappedAdsr {
+    let mut chain = DeviceChain::from(
+        Oscillator::new(oscillator::Sine, 440.0)
+    ).into(
+        WrappedAdsr {
             midi: midi_engine.new_input(),
             adsr: Adsr::default(1)
-        }).into(audio_engine.new_output(1));
+        }
+    ).into(
+        audio_engine.new_output(1)
+    );
 
     println!("Playing. Press Enter to quit...");
     tick_until_enter(&mut chain);

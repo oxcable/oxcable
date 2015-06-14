@@ -13,7 +13,8 @@ fn main() {
     println!("Initializing signal chain...");
     let freq = 8000.0;
     let mut chains: Vec<DeviceChain> = Vec::new();
-    chains.push(DeviceChain::from(Oscillator::new(oscillator::Sine, freq))
+    chains.push(DeviceChain::from(
+            Oscillator::new(oscillator::Sine, freq))
         .into(WavWriter::new("wav/test_sine.wav", 1)));
     chains.push(DeviceChain::from(
             Oscillator::new(oscillator::Saw(oscillator::Aliased), freq))

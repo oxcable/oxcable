@@ -13,9 +13,11 @@ fn main() {
     println!("Initializing signal chain...");
     let audio_engine = AudioEngine::open().unwrap();
     let midi_engine = MidiEngine::open().unwrap();
-    let mut chain = DeviceChain::from(SubtractiveSynth::new(
-            midi_engine.new_input(), 2))
-        .into(audio_engine.new_output(1));
+    let mut chain = DeviceChain::from(
+        SubtractiveSynth::new(midi_engine.new_input(), 2)
+    ).into(
+        audio_engine.new_output(1)
+    );
 
     println!("Playing. Press Enter to quit...");
     tick_until_enter(&mut chain);

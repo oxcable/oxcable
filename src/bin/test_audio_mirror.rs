@@ -10,11 +10,13 @@ fn main() {
 
     println!("Initializing signal chain...");
     let engine = AudioEngine::open().unwrap();
-    let mut chain = DeviceChain::from(engine.new_input(1))
-        .into(engine.new_output(1));
+    let mut chain = DeviceChain::from(
+        engine.new_input(1)
+    ).into(
+        engine.new_output(1)
+    );
 
-    println!("Mirroring microphone input to speaker.");
-    println!("Press enter to quit.");
+    println!("Mirroring microphone input to speaker. Press Enter to quit.");
     tick_until_enter(&mut chain);
     println!("Done!");
 }
