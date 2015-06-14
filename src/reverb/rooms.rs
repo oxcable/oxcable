@@ -15,6 +15,7 @@ use types::Time;
 ///
 /// The comb delays are used to fill out the reverberations and create a steady
 /// decay; they sculpt the character of the room.
+#[derive(Copy, Clone, Debug)]
 pub struct Room<'a> {
     pub tapped_delays: &'a[Time],
     pub tapped_gains: &'a[f32],

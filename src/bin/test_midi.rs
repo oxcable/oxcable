@@ -2,49 +2,57 @@
 
 extern crate oxcable;
 
+use oxcable::adsr::{Adsr, AdsrMessage};
+use oxcable::chain::DeviceChain;
+use oxcable::types::{AudioDevice, DeviceIOType, MidiMessage, Time, Sample};
+use oxcable::io::audio::AudioEngine;
+use oxcable::io::midi::{MidiEngine, MidiIn};
+use oxcable::oscillator::{self, Oscillator};
+use oxcable::utils::tick::tick_until_enter;
+
+struct WrappedAdsr {
+    midi: MidiIn,
+    adsr: Adsr
+}
+impl AudioDevice for WrappedAdsr {
+    fn num_inputs(&self) -> DeviceIOType {
+        self.adsr.num_inputs()
+    }
+
+    fn num_outputs(&self) -> DeviceIOType {
+        self.adsr.num_outputs()
+    }
+
+    fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]) {
+        for event in self.midi.get_events(t) {
+            println!("{:?}", event);
+            match event.payload {
+                MidiMessage::NoteOn(_,_) =>
+                    self.adsr.handle_message(AdsrMessage::NoteDown, t),
+                MidiMessage::NoteOff(_,_) =>
+                    self.adsr.handle_message(AdsrMessage::NoteUp, t),
+                _ => ()
+            }
+        }
+        self.adsr.tick(t, inputs, outputs);
+    }
+}
+
 #[cfg(not(test))]
 fn main() {
-    use std::rc::Rc;
-    use oxcable::adsr;
-    use oxcable::types::{Device, MidiMessage};
-    use oxcable::io::audio::{AudioEngine, AudioOut};
-    use oxcable::io::midi::{MidiEngine, MidiIn};
-    use oxcable::oscillator;
-    use oxcable::oscillator::Oscillator;
 
     println!("Initializing signal chain...");
-    let audio_engine = Rc::new(AudioEngine::open().unwrap());
-    let midi_engine = Rc::new(MidiEngine::open().unwrap());
+    let audio_engine = AudioEngine::open().unwrap();
+    let midi_engine = MidiEngine::open().unwrap();
 
-    let mut midi = MidiIn::new(midi_engine);
-    let mut osc = Oscillator::new(oscillator::Sine, 440.0);
-    let mut adsr = adsr::Adsr::default(1);
-    let mut spk = AudioOut::new(audio_engine, 1);
-    adsr.inputs.set_channel(0, osc.output.get_channel());
-    spk.inputs.set_channel(0, adsr.outputs.get_channel(0));
 
-    println!("Playing...");
-    let mut t = 0;
-    loop {
-        midi.tick(t);
-        match midi.output.get(t) {
-            Some(ref events) if events.len() > 0 => {
-                for event in events.iter() {
-                    println!("{:?}", event);
-                    match event.payload {
-                        MidiMessage::NoteOn(_,_) =>
-                            adsr.handle_message(adsr::AdsrMessage::NoteDown, t),
-                        MidiMessage::NoteOff(_,_) =>
-                            adsr.handle_message(adsr::AdsrMessage::NoteUp, t),
-                        _ => ()
-                    }
-                }
-            }
-            _ => ()
-        }
-        osc.tick(t);
-        adsr.tick(t);
-        spk.tick(t);
-        t += 1;
-    }
+    let mut chain = DeviceChain::from(Oscillator::new(oscillator::Sine, 440.0))
+        .into(WrappedAdsr {
+            midi: midi_engine.new_input(),
+            adsr: Adsr::default(1)
+        }).into(audio_engine.new_output(1));
+
+    println!("Playing. Press Enter to quit...");
+    tick_until_enter(&mut chain);
+    println!("Done!");
 }

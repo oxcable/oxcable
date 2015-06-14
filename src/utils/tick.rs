@@ -1,10 +1,16 @@
 use std::sync::mpsc::channel;
 use std::thread;
 
-use types::SAMPLE_RATE;
+use types::{SAMPLE_RATE, Time};
 
 pub trait Tick {
     fn tick(&mut self);
+}
+
+pub fn tick_n_times<T>(ticker: &mut T, times: Time) where T: Tick {
+    for _ in 0..times {
+        ticker.tick();
+    }
 }
 
 pub fn tick_forever<T>(ticker: &mut T) where T: Tick {

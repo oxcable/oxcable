@@ -12,8 +12,8 @@ use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Time, Sample};
 /// reader will return silence until it is reset to the beginning of the file.
 pub struct WavReader {
     num_channels: usize,
-    num_samples: usize,
-    samples_read: usize,
+    num_samples: Time,
+    samples_read: Time,
     file: File
 }
 
@@ -29,14 +29,14 @@ impl WavReader {
         WavReader {
             num_channels: header.num_channels as usize,
             num_samples: (header.data_size / ((header.bit_depth/8) as u32) /
-                (header.num_channels as u32)) as usize,
+                (header.num_channels as u32)) as Time,
             samples_read: 0,
             file: file
         }
     }
 
     /// Returns the number of audio samples in the wav file.
-    pub fn get_num_samples(&self) -> usize {
+    pub fn get_num_samples(&self) -> Time {
         self.num_samples
     }
 

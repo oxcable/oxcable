@@ -5,37 +5,31 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use std::rc::Rc;
     use oxcable::oscillator;
-    use oxcable::components::DeviceManager;
     use oxcable::delay::Delay;
-    use oxcable::io::audio::{AudioEngine, AudioIn, AudioOut};
+    use oxcable::graph::DeviceGraph;
+    use oxcable::io::audio::AudioEngine;
     use oxcable::mixers::Gain;
     use oxcable::oscillator::Oscillator;
+    use oxcable::utils::tick::tick_until_enter;
 
     println!("Setting up signal chain...");
-    let engine = Rc::new(AudioEngine::open().unwrap());
+    let engine = AudioEngine::open().unwrap();
+    let mut graph = DeviceGraph::new();
 
-    let mut mic = AudioIn::new(engine.clone(), 1);
-    let mut del = Delay::new(0.5, 0.5, 0.5, 1);
-    del.inputs.set_channel(0, mic.outputs.get_channel(0));
+    let mic = graph.add_node(engine.new_input(1));
+    let del = graph.add_node(Delay::new(0.5, 0.5, 0.5, 1));
+    graph.add_edge(mic, 0, del, 0).unwrap();
 
-    let mut osc = Oscillator::new(oscillator::Sine, 440.0);
-    let mut gain = Gain::new(-12.0, 1);
-    gain.inputs.set_channel(0, osc.output.get_channel());
+    let osc = graph.add_node(Oscillator::new(oscillator::Sine, 440.0));
+    let gain = graph.add_node(Gain::new(-12.0, 1));
+    graph.add_edge(osc, 0, gain, 0).unwrap();
 
-    let mut spk = AudioOut::new(engine.clone(), 2);
-    spk.inputs.set_channel(0, del.outputs.get_channel(0));
-    spk.inputs.set_channel(1, gain.outputs.get_channel(0));
-
-    let mut manager = DeviceManager::new();
-    manager.add_device(&mut mic);
-    manager.add_device(&mut del);
-    manager.add_device(&mut osc);
-    manager.add_device(&mut gain);
-    manager.add_device(&mut spk);
+    let spk = graph.add_node(engine.new_output(2));
+    graph.add_edge(del, 0, spk, 0).unwrap();
+    graph.add_edge(gain, 0, spk, 1).unwrap();
 
     println!("Playing. Press Enter to quit...");
-    manager.loop_until_enter();
+    tick_until_enter(&mut graph);
     println!("Done!");
 }

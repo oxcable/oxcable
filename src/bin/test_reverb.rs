@@ -5,26 +5,19 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use std::rc::Rc;
-    use oxcable::types::Device;
-    use oxcable::io::audio::{AudioEngine, AudioIn, AudioOut};
+    use oxcable::chain::DeviceChain;
+    use oxcable::io::audio::AudioEngine;
     use oxcable::reverb::{MoorerReverb, rooms};
+    use oxcable::utils::tick::tick_until_enter;
 
     println!("Initializing signal chain...");
-    let engine = Rc::new(AudioEngine::open().unwrap());
-
-    let mut mic = AudioIn::new(engine.clone(), 1);
-    let mut rev = MoorerReverb::new(rooms::HALL, 1.0, -3.0, 0.5, 1);
-    let mut spk = AudioOut::new(engine.clone(), 1);
-    rev.inputs.set_channel(0, mic.outputs.get_channel(0));
-    spk.inputs.set_channel(0, rev.outputs.get_channel(0));
+    let engine = AudioEngine::open().unwrap();
+    let mut chain = DeviceChain::from(engine.new_input(1))
+        .into(MoorerReverb::new(rooms::HALL, 1.0, -3.0, 0.5, 1))
+        .into(engine.new_output(1));
 
     println!("Playing...");
-    let mut t = 0;
-    loop {
-        mic.tick(t);
-        rev.tick(t);
-        spk.tick(t);
-        t += 1;
-    }
+    println!("Press enter to quit.");
+    tick_until_enter(&mut chain);
+    println!("Done!");
 }

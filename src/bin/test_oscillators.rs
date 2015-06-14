@@ -7,6 +7,7 @@ fn main() {
     use oxcable::chain::DeviceChain;
     use oxcable::io::wav::WavWriter;
     use oxcable::oscillator::{self, Oscillator};
+    use oxcable::utils::tick::tick_n_times;
 
     // Initialize objects
     println!("Initializing signal chain...");
@@ -41,10 +42,8 @@ fn main() {
 
     // Write files
     println!("Writing oscillators to wav files...");
-    for _ in (0u64 .. 44100) {
-        for chain in chains.iter_mut() {
-            chain.tick();
-        }
+    for chain in chains.iter_mut() {
+        tick_n_times(chain, 44100);
     }
     println!("Done");
 }
