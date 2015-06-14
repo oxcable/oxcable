@@ -214,7 +214,7 @@ mod test {
         }
 
         let t = Transformer::new(8);
-        assert!(t.fft(&impulse, &mut out).is_ok());
+        t.fft(&impulse, &mut out).unwrap();
 
         for c in out.iter() {
             assert!(c.eq(one))
@@ -238,7 +238,7 @@ mod test {
         }
 
         let t = Transformer::new(8);
-        assert!(t.ifft(&impulse, &mut out).is_ok());
+        t.ifft(&impulse, &mut out).unwrap();
 
         assert!(out[0].eq(one));
         for c in out[1 .. 8].iter() {
@@ -262,8 +262,8 @@ mod test {
         }
 
         let t = Transformer::new(8);
-        assert!(t.fft(&input, &mut fft).is_ok());
-        assert!(t.ifft(&fft, &mut out).is_ok());
+        t.fft(&input, &mut fft).unwrap();
+        t.ifft(&fft, &mut out).unwrap();
 
         for i in (0 .. 7) {
             println!("{}",out[i].real() - ((i+1) as f32));
@@ -291,8 +291,8 @@ mod test {
         }
 
         let t = Transformer::new(8);
-        assert!(t.fft(&input, &mut fft).is_ok());
-        assert!(t.ifft(&fft, &mut out).is_ok());
+        t.fft(&input, &mut fft).unwrap();
+        t.ifft(&fft, &mut out).unwrap();
 
         for i in (0 .. 7) {
             println!("{}",out[i].real() - ((i+1) as f32));

@@ -225,37 +225,41 @@ mod test {
     #[test]
     fn test_naive_square() {
         use super::{AntialiasType, Waveform, Oscillator};
-        use types::Device;
+        use types::AudioDevice;
         let mut osc = Oscillator::new(Waveform::Square(AntialiasType::Aliased),
                                       4410.0);
+        let input = vec![];
+        let mut output = vec![0.0];
 
-        osc.tick(0); assert!(osc.output.get(0).unwrap() == 1.0);
-        osc.tick(1); assert!(osc.output.get(1).unwrap() == 1.0);
-        osc.tick(2); assert!(osc.output.get(2).unwrap() == 1.0);
-        osc.tick(3); assert!(osc.output.get(3).unwrap() == 1.0);
-        osc.tick(4); assert!(osc.output.get(4).unwrap() == -1.0);
-        osc.tick(5); assert!(osc.output.get(5).unwrap() == -1.0);
-        osc.tick(6); assert!(osc.output.get(6).unwrap() == -1.0);
-        osc.tick(7); assert!(osc.output.get(7).unwrap() == -1.0);
-        osc.tick(8); assert!(osc.output.get(8).unwrap() == -1.0);
+        osc.tick(0, &input, &mut output); assert!(output[0] == 1.0);
+        osc.tick(1, &input, &mut output); assert!(output[0] == 1.0);
+        osc.tick(2, &input, &mut output); assert!(output[0] == 1.0);
+        osc.tick(3, &input, &mut output); assert!(output[0] == 1.0);
+        osc.tick(4, &input, &mut output); assert!(output[0] == -1.0);
+        osc.tick(5, &input, &mut output); assert!(output[0] == -1.0);
+        osc.tick(6, &input, &mut output); assert!(output[0] == -1.0);
+        osc.tick(7, &input, &mut output); assert!(output[0] == -1.0);
+        osc.tick(8, &input, &mut output); assert!(output[0] == -1.0);
     }
 
     /// Tests saw wave
     #[test]
     fn test_naive_saw() {
         use super::{AntialiasType, Waveform, Oscillator};
-        use types::Device;
+        use types::AudioDevice;
         let mut osc = Oscillator::new(Waveform::Saw(AntialiasType::Aliased),
                                       4410.0);
+        let input = vec![];
+        let mut output = vec![0.0];
 
-        osc.tick(0); assert!(flt_eq(osc.output.get(0).unwrap(), -0.8, EPSILON));
-        osc.tick(1); assert!(flt_eq(osc.output.get(1).unwrap(), -0.6, EPSILON));
-        osc.tick(2); assert!(flt_eq(osc.output.get(2).unwrap(), -0.4, EPSILON));
-        osc.tick(3); assert!(flt_eq(osc.output.get(3).unwrap(), -0.2, EPSILON));
-        osc.tick(4); assert!(flt_eq(osc.output.get(4).unwrap(), 0.0, EPSILON));
-        osc.tick(5); assert!(flt_eq(osc.output.get(5).unwrap(), 0.2, EPSILON));
-        osc.tick(6); assert!(flt_eq(osc.output.get(6).unwrap(), 0.4, EPSILON));
-        osc.tick(7); assert!(flt_eq(osc.output.get(7).unwrap(), 0.6, EPSILON));
-        osc.tick(8); assert!(flt_eq(osc.output.get(8).unwrap(), 0.8, EPSILON));
+        osc.tick(0, &input, &mut output); assert!(flt_eq(output[0], -0.8, EPSILON));
+        osc.tick(1, &input, &mut output); assert!(flt_eq(output[0], -0.6, EPSILON));
+        osc.tick(2, &input, &mut output); assert!(flt_eq(output[0], -0.4, EPSILON));
+        osc.tick(3, &input, &mut output); assert!(flt_eq(output[0], -0.2, EPSILON));
+        osc.tick(4, &input, &mut output); assert!(flt_eq(output[0], 0.0, EPSILON));
+        osc.tick(5, &input, &mut output); assert!(flt_eq(output[0], 0.2, EPSILON));
+        osc.tick(6, &input, &mut output); assert!(flt_eq(output[0], 0.4, EPSILON));
+        osc.tick(7, &input, &mut output); assert!(flt_eq(output[0], 0.6, EPSILON));
+        osc.tick(8, &input, &mut output); assert!(flt_eq(output[0], 0.8, EPSILON));
     }
 }
