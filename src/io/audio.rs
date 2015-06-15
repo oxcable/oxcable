@@ -40,11 +40,11 @@ impl AudioEngine {
         }
     }
 
-    pub fn new_input(&self, num_channels: usize) -> AudioIn {
+    pub fn default_input(&self, num_channels: usize) -> AudioIn {
         AudioIn::new(self.marker.clone(), num_channels)
     }
 
-    pub fn new_output(&self, num_channels: usize) -> AudioOut {
+    pub fn default_output(&self, num_channels: usize) -> AudioOut {
         AudioOut::new(self.marker.clone(), num_channels)
     }
 }

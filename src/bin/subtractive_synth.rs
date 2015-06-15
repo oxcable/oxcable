@@ -16,7 +16,7 @@ fn main() {
     let mut chain = DeviceChain::from(
         SubtractiveSynth::new(midi_engine.choose_input(), 2)
     ).into(
-        audio_engine.new_output(1)
+        audio_engine.default_output(1)
     );
 
     println!("Playing. Press Enter to quit...");

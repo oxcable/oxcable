@@ -16,9 +16,9 @@ fn main() {
     println!("Setting up signal chain...");
     let engine = AudioEngine::open().unwrap();
     let mut graph = DeviceGraph::new();
-    let spk = graph.add_node(engine.new_output(2));
+    let spk = graph.add_node(engine.default_output(2));
 
-    let mic = graph.add_node(engine.new_input(1));
+    let mic = graph.add_node(engine.default_input(1));
     let del = graph.add_node(Delay::new(0.5, 0.5, 0.5, 1));
     graph.add_edge(mic, 0, del, 0).unwrap();
     graph.add_edge(del, 0, spk, 0).unwrap();

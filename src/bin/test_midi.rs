@@ -55,7 +55,7 @@ fn main() {
             adsr: Adsr::default(1)
         }
     ).into(
-        audio_engine.new_output(1)
+        audio_engine.default_output(1)
     );
 
     println!("Playing. Press Enter to quit...");
