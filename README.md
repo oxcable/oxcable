@@ -11,6 +11,14 @@ This is a personal project of mine, with two goals:
 
 I am still fleshing out the core libraries, so interfaces are very unstable.
 
+Examples
+--------
+
+For many simple examples, the `src/bin` directory contains many sample test
+scripts. For an example of a project leveraging the tools this framework
+contains, see my [sample subtractive
+synthesizer](https://github.com/thenyeguy/oxcable-subtractive-synth).
+
 Installing
 ----------
 
