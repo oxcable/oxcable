@@ -51,7 +51,7 @@ fn main() {
         Oscillator::new(oscillator::Sine, 440.0)
     ).into(
         WrappedAdsr {
-            midi: midi_engine.new_input(),
+            midi: midi_engine.choose_input(),
             adsr: Adsr::default(1)
         }
     ).into(

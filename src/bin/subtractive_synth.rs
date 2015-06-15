@@ -14,7 +14,7 @@ fn main() {
     let audio_engine = AudioEngine::open().unwrap();
     let midi_engine = MidiEngine::open().unwrap();
     let mut chain = DeviceChain::from(
-        SubtractiveSynth::new(midi_engine.new_input(), 2)
+        SubtractiveSynth::new(midi_engine.choose_input(), 2)
     ).into(
         audio_engine.new_output(1)
     );

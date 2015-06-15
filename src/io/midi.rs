@@ -2,6 +2,7 @@
 
 extern crate portmidi;
 
+use std::io::{self, Read, Write};
 use std::rc::Rc;
 
 use types::{MidiDevice, MidiEvent, MidiMessage, Time};
@@ -70,8 +71,51 @@ impl MidiEngine {
         Ok(MidiEngine { marker: Rc::new(MidiEngineMarker) })
     }
 
-    pub fn new_input(&self) -> MidiIn {
-        MidiIn::new(self.marker.clone())
+    pub fn default_input(&self) -> MidiIn {
+        MidiIn::new(self.marker.clone(),
+            portmidi::get_default_input_device_id().unwrap())
+    }
+
+    pub fn choose_input(&self) -> MidiIn {
+        println!("Select a MIDI input:");
+        let default_in = portmidi::get_default_input_device_id();
+        let mut valids = Vec::new();
+        for i in 0..portmidi::count_devices() {
+            match portmidi::get_device_info(i) {
+                Some(device) => {
+                    if device.input {
+                        print!("   {}) {}", valids.len(), device.name);
+                        if Some(device.device_id) == default_in {
+                            print!(" (default)");
+                        }
+                        println!("");
+                        valids.push(device);
+                    }
+                },
+                _ => ()
+            }
+        }
+        assert!(valids.len() > 0);
+
+        let mut port = None;
+        let mut s = String::new();
+        while port.is_none() {
+            print!(" > ");
+            io::stdout().flush().unwrap();
+            if io::stdin().read_line(&mut s).is_ok() {
+                port = s.trim().parse::<usize>().ok().map_or(None, |i|
+                    if i < valids.len() {
+                        Some(i)
+                    } else {
+                        None
+                    }
+                );
+            }
+            s.clear();
+        }
+
+        MidiIn::new(self.marker.clone(),
+                    port.unwrap() as portmidi::PortMidiDeviceId)
     }
 }
 
@@ -85,9 +129,10 @@ pub struct MidiIn {
 
 impl MidiIn {
     /// Opens a midi input stream.
-    fn new(engine: Rc<MidiEngineMarker>) -> MidiIn {
+    fn new(engine: Rc<MidiEngineMarker>, port: portmidi::PortMidiDeviceId)
+            -> MidiIn {
         // Open a stream. For now, use first device
-        let mut pm_stream = portmidi::InputPort::new(1, BUFFER_SIZE);
+        let mut pm_stream = portmidi::InputPort::new(port, BUFFER_SIZE);
         pm_stream.open().unwrap();
 
         MidiIn {
