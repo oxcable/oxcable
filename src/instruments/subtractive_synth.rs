@@ -1,24 +1,24 @@
 //! A basic subtractive synthesizer
 
 use adsr::{Adsr, AdsrMessage};
-use io::midi::MidiIn;
 use oscillator::{AntialiasType, Oscillator, OscillatorMessage, Waveform};
-use types::{AudioDevice, DeviceIOType, MidiEvent, MidiMessage, Time, Sample};
+use types::{AudioDevice, DeviceIOType, MidiDevice, MidiEvent, MidiMessage, Time,
+            Sample};
 use utils::helpers::midi_note_to_freq;
 use instruments::voice_array::VoiceArray;
 
 
 /// A polyphonic subtractive synthesizer
-pub struct SubtractiveSynth {
+pub struct SubtractiveSynth<M: MidiDevice> {
     voices: VoiceArray<SubtractiveSynthVoice>,
-    midi: MidiIn,
+    midi: M,
     gain: f32,
 }
 
-impl SubtractiveSynth {
+impl<M> SubtractiveSynth<M> where M: MidiDevice {
     /// Returns a new subtractive synth that can play `num_voices` notes at one
     /// time.
-    pub fn new(midi: MidiIn, num_voices: usize) -> SubtractiveSynth {
+    pub fn new(midi: M, num_voices: usize) -> SubtractiveSynth<M> {
         let mut voices = Vec::with_capacity(num_voices);
         for _i in (0 .. num_voices) {
             voices.push(SubtractiveSynthVoice::new());
@@ -48,7 +48,7 @@ impl SubtractiveSynth {
     }
 }
 
-impl AudioDevice for SubtractiveSynth {
+impl<M> AudioDevice for SubtractiveSynth<M> where M: MidiDevice {
     fn num_inputs(&self) -> DeviceIOType {
         DeviceIOType::Exactly(0)
     }

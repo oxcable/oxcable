@@ -65,3 +65,7 @@ pub trait AudioDevice {
     /// once per time step, starting at `t=0`.
     fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]);
 }
+
+pub trait MidiDevice {
+    fn get_events(&mut self, t: Time) -> Vec<MidiEvent>;
+}

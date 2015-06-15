@@ -4,7 +4,8 @@ extern crate oxcable;
 
 use oxcable::adsr::{Adsr, AdsrMessage};
 use oxcable::chain::DeviceChain;
-use oxcable::types::{AudioDevice, DeviceIOType, MidiMessage, Time, Sample};
+use oxcable::types::{AudioDevice, DeviceIOType, MidiDevice, MidiMessage, Time,
+                     Sample};
 use oxcable::io::audio::AudioEngine;
 use oxcable::io::midi::{MidiEngine, MidiIn};
 use oxcable::oscillator::{self, Oscillator};

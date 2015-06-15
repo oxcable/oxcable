@@ -4,7 +4,7 @@ extern crate portmidi;
 
 use std::rc::Rc;
 
-use types::{MidiEvent, MidiMessage, Time};
+use types::{MidiDevice, MidiEvent, MidiMessage, Time};
 
 
 /// Defines the maximum event buffer size for portmidi
@@ -87,7 +87,7 @@ impl MidiIn {
     /// Opens a midi input stream.
     fn new(engine: Rc<MidiEngineMarker>) -> MidiIn {
         // Open a stream. For now, use first device
-        let mut pm_stream = portmidi::InputPort::new(0, BUFFER_SIZE);
+        let mut pm_stream = portmidi::InputPort::new(1, BUFFER_SIZE);
         pm_stream.open().unwrap();
 
         MidiIn {
@@ -100,8 +100,10 @@ impl MidiIn {
     pub fn stop(&mut self) {
         self.pm_stream.close().unwrap();
     }
+}
 
-    pub fn get_events(&mut self, t: Time) -> Vec<MidiEvent> {
+impl MidiDevice for MidiIn {
+    fn get_events(&mut self, t: Time) -> Vec<MidiEvent> {
         let mut events = Vec::new();
         loop {
             match self.pm_stream.read().unwrap() {
