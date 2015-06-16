@@ -175,7 +175,7 @@ fn fmod(n: f32, base: f32) -> f32 {
 /// `dt` should be the change in phase for one sample time, normalized
 fn poly_belp_offset(t: f32, dt: f32) -> f32 {
     if t < dt { // t ~= 0
-        let t = dt;
+        let t = t / dt;
         -t*t + 2.0*t - 1.0
     } else if t > 1.0-dt { // t ~= 1
         let t = (t-1.0) / dt;
