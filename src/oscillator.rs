@@ -4,7 +4,7 @@ use std::f32::consts::PI;
 use num::traits::Float;
 use rand::random;
 
-use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 
 pub use self::AntialiasType::{Aliased, PolyBlep};
 pub use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
@@ -76,12 +76,12 @@ impl Oscillator {
 }
 
 impl AudioDevice for Oscillator {
-    fn num_inputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(0)
+    fn num_inputs(&self) -> usize {
+        0
     }
 
-    fn num_outputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(1)
+    fn num_outputs(&self) -> usize {
+        1
     }
 
     fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {

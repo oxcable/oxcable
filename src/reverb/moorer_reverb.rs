@@ -5,7 +5,7 @@
 
 use num::traits::Float;
 
-use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use utils::ringbuffer::RingBuffer;
 use utils::helpers::decibel_to_ratio;
 use reverb::rooms::Room;
@@ -99,12 +99,12 @@ impl MoorerReverb {
 }
 
 impl AudioDevice for MoorerReverb {
-    fn num_inputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_channels)
+    fn num_inputs(&self) -> usize {
+        self.num_channels
     }
 
-    fn num_outputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_channels)
+    fn num_outputs(&self) -> usize {
+        self.num_channels
     }
 
     fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]) {

@@ -1,6 +1,6 @@
 //! Provides a linear chain to cascade `AudioDevice`s together.
 
-use types::{AudioDevice, DeviceIOType, Sample, Time};
+use types::{AudioDevice, Sample, Time};
 use utils::tick::Tick;
 
 pub struct DeviceChain {
@@ -10,21 +10,12 @@ pub struct DeviceChain {
 
 impl DeviceChain {
     pub fn from<D>(device: D) -> DeviceChain where D: 'static+AudioDevice {
-        match device.num_inputs() {
-            DeviceIOType::Exactly(0) => (),
-            _ => panic!("DeviceChain: first device can't take any inputs")
-        }
         DeviceChain { devices: vec![AudioNode::new(device)], time: 0 }
     }
 
     pub fn into<D>(mut self, device: D) -> DeviceChain where D: 'static+AudioDevice {
-        match device.num_inputs() {
-            DeviceIOType::Exactly(ins) => {
-                if self.devices[self.devices.len()-1].outputs.len() != ins {
-                    panic!("DeviceChain: number of outputs must match number of inputs");
-                }
-            },
-            _ => ()
+        if self.devices[self.devices.len()-1].outputs.len() != device.num_inputs() {
+            panic!("DeviceChain: number of outputs must match number of inputs");
         }
         self.devices.push(AudioNode::new(device));
         self
@@ -49,10 +40,7 @@ struct AudioNode {
 
 impl AudioNode {
     fn new<D>(device: D) -> AudioNode where D: 'static+AudioDevice {
-        let n = match device.num_outputs() {
-            DeviceIOType::Any => panic!("DeviceChain does not support Any outputs"),
-            DeviceIOType::Exactly(i) => i
-        };
+        let n = device.num_outputs();
         let mut outputs = Vec::with_capacity(n);
         for _ in 0..n {
             outputs.push(0.0);

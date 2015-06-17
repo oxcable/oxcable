@@ -49,17 +49,9 @@ pub enum MidiMessage {
     Other(u8, u8, u8)
 }
 
-
-
-#[derive(Clone, Copy, Debug)]
-pub enum DeviceIOType {
-    Any,
-    Exactly(usize)
-}
-
 pub trait AudioDevice {
-    fn num_inputs(&self) -> DeviceIOType;
-    fn num_outputs(&self) -> DeviceIOType;
+    fn num_inputs(&self) -> usize;
+    fn num_outputs(&self) -> usize;
 
     /// Process a single frame worth of data. This function should be called
     /// once per time step, starting at `t=0`.

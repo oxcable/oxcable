@@ -4,8 +4,7 @@ extern crate oxcable;
 
 use oxcable::adsr::{Adsr, AdsrMessage};
 use oxcable::chain::DeviceChain;
-use oxcable::types::{AudioDevice, DeviceIOType, MidiDevice, MidiMessage, Time,
-                     Sample};
+use oxcable::types::{AudioDevice, MidiDevice, MidiMessage, Time, Sample};
 use oxcable::io::audio::AudioEngine;
 use oxcable::io::midi::{MidiEngine, MidiIn};
 use oxcable::oscillator::{self, Oscillator};
@@ -16,11 +15,11 @@ struct WrappedAdsr {
     adsr: Adsr
 }
 impl AudioDevice for WrappedAdsr {
-    fn num_inputs(&self) -> DeviceIOType {
+    fn num_inputs(&self) -> usize {
         self.adsr.num_inputs()
     }
 
-    fn num_outputs(&self) -> DeviceIOType {
+    fn num_outputs(&self) -> usize {
         self.adsr.num_outputs()
     }
 

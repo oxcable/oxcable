@@ -12,7 +12,7 @@
 use std::f32::consts::PI;
 use num::traits::Float;
 
-use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 
 pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf};
@@ -106,12 +106,12 @@ fn compute_parameters(mode: FilterMode) -> (f32, f32) {
 }
 
 impl AudioDevice for Filter {
-    fn num_inputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_channels)
+    fn num_inputs(&self) -> usize {
+        self.num_channels
     }
 
-    fn num_outputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_channels)
+    fn num_outputs(&self) -> usize {
+        self.num_channels
     }
 
     fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {

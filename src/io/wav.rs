@@ -4,7 +4,7 @@ use byteorder::{self, ReadBytesExt, WriteBytesExt, LittleEndian};
 use std::fs::File;
 use std::io::{self, Seek, SeekFrom};
 
-use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Time, Sample};
+use types::{SAMPLE_RATE, AudioDevice, Time, Sample};
 
 /// Reads audio from a wav file.
 ///
@@ -58,12 +58,12 @@ impl WavReader {
 }
 
 impl AudioDevice for WavReader {
-    fn num_inputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(0)
+    fn num_inputs(&self) -> usize {
+        0
     }
 
-    fn num_outputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_channels)
+    fn num_outputs(&self) -> usize {
+        self.num_channels
     }
 
     fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {
@@ -120,12 +120,12 @@ impl Drop for WavWriter {
 }
 
 impl AudioDevice for WavWriter {
-    fn num_inputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_channels)
+    fn num_inputs(&self) -> usize {
+        self.num_channels
     }
 
-    fn num_outputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(0)
+    fn num_outputs(&self) -> usize {
+        0
     }
 
     fn tick(&mut self, _: Time, inputs: &[Sample], _: &mut[Sample]) {

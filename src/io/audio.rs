@@ -4,7 +4,7 @@ extern crate portaudio;
 
 use std::rc::Rc;
 
-use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 
 
 /// Defines the audio format for Portaudio.
@@ -88,12 +88,12 @@ impl Drop for AudioIn {
 }
 
 impl AudioDevice for AudioIn {
-    fn num_inputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(0)
+    fn num_inputs(&self) -> usize {
+        0
     }
 
-    fn num_outputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_channels)
+    fn num_outputs(&self) -> usize {
+        self.num_channels
     }
 
     fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {
@@ -152,12 +152,12 @@ impl Drop for AudioOut {
 }
 
 impl AudioDevice for AudioOut {
-    fn num_inputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_channels)
+    fn num_inputs(&self) -> usize {
+        self.num_channels
     }
 
-    fn num_outputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(0)
+    fn num_outputs(&self) -> usize {
+        0
     }
 
     fn tick(&mut self, _: Time, inputs: &[Sample], _: &mut[Sample]) {

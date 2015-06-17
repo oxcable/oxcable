@@ -1,6 +1,6 @@
 //! `Device` for selecting one of several channels.
 
-use types::{AudioDevice, DeviceIOType, Sample, Time};
+use types::{AudioDevice, Sample, Time};
 
 
 /// A multiplexer.
@@ -34,12 +34,12 @@ impl Multiplexer {
 }
 
 impl AudioDevice for Multiplexer {
-    fn num_inputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_inputs)
+    fn num_inputs(&self) -> usize {
+        self.num_inputs
     }
 
-    fn num_outputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(1)
+    fn num_outputs(&self) -> usize {
+        1
     }
 
     fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {

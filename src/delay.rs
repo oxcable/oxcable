@@ -3,7 +3,7 @@
 
 use std::vec::Vec;
 
-use types::{SAMPLE_RATE, AudioDevice, DeviceIOType, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use utils::ringbuffer::RingBuffer;
 
 
@@ -50,12 +50,12 @@ impl Delay {
 }
 
 impl AudioDevice for Delay {
-    fn num_inputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_channels)
+    fn num_inputs(&self) -> usize {
+        self.num_channels
     }
 
-    fn num_outputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_channels)
+    fn num_outputs(&self) -> usize {
+        self.num_channels
     }
 
     fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]) {

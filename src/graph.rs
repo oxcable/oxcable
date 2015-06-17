@@ -2,7 +2,7 @@
 
 use std::collections::VecDeque;
 
-use types::{AudioDevice, DeviceIOType, Sample, Time};
+use types::{AudioDevice, Sample, Time};
 use utils::tick::Tick;
 
 pub struct DeviceGraph {
@@ -43,15 +43,11 @@ impl DeviceGraph {
         }
 
         // Check channels
-        match self.nodes[from_i].device.num_outputs() {
-            DeviceIOType::Exactly(i) if from_ch >= i =>
-                return Err(GraphError::FromChOutOfRange),
-            _ => ()
+        if self.nodes[from_i].device.num_outputs() <= from_ch {
+            return Err(GraphError::FromChOutOfRange);
         }
-        match self.nodes[to_i].device.num_inputs() {
-            DeviceIOType::Exactly(i) if to_ch >= i =>
-                return Err(GraphError::ToChOutOfRange),
-            _ => ()
+        if self.nodes[to_i].device.num_inputs() <= to_ch {
+            return Err(GraphError::ToChOutOfRange);
         }
         while self.nodes[to_i].inputs.len() < to_ch {
             self.nodes[to_i].inputs.push(None);
@@ -146,19 +142,13 @@ struct AudioNode {
 impl AudioNode {
     fn new<D>(device: D, bus: &mut Vec<Sample>) -> AudioNode
             where D: 'static+AudioDevice {
-        let num_in = match device.num_inputs() {
-            DeviceIOType::Any => 0,
-            DeviceIOType::Exactly(i) => i
-        };
+        let num_in = device.num_inputs();
         let mut inputs = Vec::with_capacity(num_in);
         for _ in 0..num_in {
             inputs.push(None)
         }
 
-        let num_out = match device.num_outputs() {
-            DeviceIOType::Any => panic!("DeviceGraph does not support Any outputs"),
-            DeviceIOType::Exactly(i) => i
-        };
+        let num_out = device.num_outputs();
         let start = bus.len();
         for _ in 0..num_out {
             bus.push(0.0);

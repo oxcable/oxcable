@@ -1,27 +1,29 @@
 //! `Device` for adding multiple channels into one.
 
-use types::{AudioDevice, DeviceIOType, Sample, Time};
+use types::{AudioDevice, Sample, Time};
 
 
 /// An adder.
 ///
 /// The adder sums all its inputs into a single output.
-pub struct Adder;
+pub struct Adder {
+    num_channels: usize
+}
 
 impl Adder {
     /// Returns a new adder with `num_inputs` input channels.
-    pub fn new() -> Adder {
-        Adder
+    pub fn new(num_channels: usize) -> Adder {
+        Adder { num_channels: num_channels }
     }
 }
 
 impl AudioDevice for Adder {
-    fn num_inputs(&self) -> DeviceIOType {
-        DeviceIOType::Any
+    fn num_inputs(&self) -> usize {
+        self.num_channels
     }
 
-    fn num_outputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(1)
+    fn num_outputs(&self) -> usize {
+        1
     }
 
     fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {

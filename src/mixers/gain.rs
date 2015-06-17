@@ -1,6 +1,6 @@
 //! `Device` for changing channel levels.
 
-use types::{AudioDevice, DeviceIOType, Sample, Time};
+use types::{AudioDevice, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 
 
@@ -28,12 +28,12 @@ impl Gain {
 }
 
 impl AudioDevice for Gain {
-    fn num_inputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_channels)
+    fn num_inputs(&self) -> usize {
+        self.num_channels
     }
 
-    fn num_outputs(&self) -> DeviceIOType {
-        DeviceIOType::Exactly(self.num_channels)
+    fn num_outputs(&self) -> usize {
+        self.num_channels
     }
 
     fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {
