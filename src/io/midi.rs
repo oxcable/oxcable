@@ -15,34 +15,36 @@ static BUFFER_SIZE: i32 = 256;
 /// Converts a raw portmidi message to an oxcable MIDI event
 fn midievent_from_portmidi(event: portmidi::MidiEvent, t: Time) -> MidiEvent {
     let msg = event.message;
-    let channel = (msg.status & 0x0F) as u8;
-    let payload = match (msg.status as u8) >> 4 {
+    let channel = msg.status & 0x0F;
+    let payload = match msg.status >> 4 {
         0b1000 => {
-            let note = msg.data1 as u8;
+            let note = msg.data1;
             let velocity = (msg.data2 as f32) / 127.0;
             MidiMessage::NoteOff(note, velocity)
         },
         0b1001 => {
-            let note = msg.data1 as u8;
+            let note = msg.data1;
             let velocity = (msg.data2 as f32) / 127.0;
             MidiMessage::NoteOn(note, velocity)
-        }
+        },
         0b1110 => {
             let int_value = ((msg.data2 as i16) << 7) | (msg.data1 as i16);
             let bend = (int_value - 0x2000) as f32 /
                 (0x2000i16) as f32;
             MidiMessage::PitchBend(bend)
-        }
+        },
         0b1010 => {
-            let note = msg.data1 as u8;
+            let note = msg.data1;
             let pressure = (msg.data2 as f32) / 127.0;
             MidiMessage::KeyPressure(note, pressure)
-        }
-        0b1011 => MidiMessage::ControlChange(msg.data1 as u8, msg.data2 as u8),
-        0b1100 => MidiMessage::ProgramChange(msg.data1 as u8),
+        },
+        0b1011 => match msg.data1 {
+            0x40 => MidiMessage::SustainPedal(msg.data2 >= 64),
+            _ => MidiMessage::ControlChange(msg.data1, msg.data2)
+        },
+        0b1100 => MidiMessage::ProgramChange(msg.data1),
         0b1101 => MidiMessage::ChannelPressure(msg.data1 as f32 / 127.0),
-        _ => MidiMessage::Other(msg.status as u8, msg.data1 as u8,
-                                msg.data2 as u8)
+        _ => MidiMessage::Other(msg.status, msg.data1, msg.data2)
     };
 
     MidiEvent { channel: channel, time: t, payload: payload }

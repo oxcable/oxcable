@@ -39,6 +39,8 @@ pub enum MidiMessage {
     PitchBend(f32),
     /// KeyPressure(note number, pressure)
     KeyPressure(u8, f32),
+    /// SustainPedal(on/off)
+    SustainPedal(bool),
     /// ControlChange(controller, value)
     ControlChange(u8, u8),
     /// ProgramChange(num)
