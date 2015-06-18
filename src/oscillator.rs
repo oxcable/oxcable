@@ -13,7 +13,9 @@ pub use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
 #[derive(Clone, Copy, Debug)]
 pub enum OscillatorMessage {
     /// Sets the frequency in Hz
-    SetFreq(f32)
+    SetFreq(f32),
+    /// Sets the waveform type
+    SetWaveform(Waveform),
 }
 
 /// Antialiasing method for certain waveforms.
@@ -70,6 +72,9 @@ impl Oscillator {
         match msg {
             OscillatorMessage::SetFreq(freq) => {
                 self.phase_delta = freq*2.0*PI/(SAMPLE_RATE as f32);
+            },
+            OscillatorMessage::SetWaveform(waveform) => {
+                self.waveform = waveform;
             }
         }
     }
