@@ -1,16 +1,17 @@
 //! Provides an ADSR filter
 
 use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
-use utils::helpers::decibel_to_ratio;
 
 
 /// Defines the messages that the ADSR supports
 #[derive(Clone, Copy)]
 pub enum AdsrMessage {
-    /// Triggers an attack
     NoteDown,
-    /// Triggers a release
-    NoteUp
+    NoteUp,
+    SetAttack(f32),
+    SetDecay(f32),
+    SetSustain(f32),
+    SetRelease(f32),
 }
 
 
@@ -39,13 +40,13 @@ pub struct Adsr {
     decay_time: Time,
     release_time: Time,
     sustain_level: f32,
-    gain: f32,
 
     // Track state
     current_state: AdsrState,
     next_state_change: Time,
     multiplier: f32,
-    multiplier_delta: f32
+    multiplier_delta: f32,
+    last_time: Time
 }
 
 impl Adsr {
@@ -55,11 +56,9 @@ impl Adsr {
     /// * `decay_time` specifies the length of the decay in seconds.
     /// * `sustain_level` specifies the amplitude of the sustain from 0 to 1.
     /// * `release_time` specifies the length of the release in seconds.
-    /// * The specified `gain` (in decibels) will be applied to the
-    ///   signal after filtering.
     /// * `num_channels` defines how many channels of audio to filter.
     pub fn new(attack_time: f32, decay_time: f32, sustain_level: f32,
-               release_time: f32, gain: f32, num_channels: usize) -> Adsr {
+               release_time: f32, num_channels: usize) -> Adsr {
         // Convert times to samples
         let attack_samples = (attack_time*SAMPLE_RATE as f32) as Time;
         let decay_samples = (decay_time*SAMPLE_RATE as f32) as Time;
@@ -71,26 +70,41 @@ impl Adsr {
             decay_time: decay_samples,
             release_time: release_samples,
             sustain_level: sustain_level,
-            gain: decibel_to_ratio(gain),
             current_state: AdsrState::Silent,
             next_state_change: 0,
             multiplier: 0.0,
-            multiplier_delta: 0.0
+            multiplier_delta: 0.0,
+            last_time: 0,
         }
     }
 
     /// Returns an ADSR with reasonable default values for the envelope.
     pub fn default(num_channels: usize) -> Adsr {
-        Adsr::new(0.05, 0.1, 0.5, 0.1, 0.0, num_channels)
+        Adsr::new(0.05, 0.1, 0.5, 0.1, num_channels)
     }
 
     /// Applies the message to our Adsr
-    pub fn handle_message(&mut self, msg: AdsrMessage, t: Time) {
+    pub fn handle_message(&mut self, msg: AdsrMessage) {
+        let t = self.last_time;
         match msg {
-            AdsrMessage::NoteDown =>
-                self.handle_state_change(AdsrState::Attack, t),
-            AdsrMessage::NoteUp =>
-                self.handle_state_change(AdsrState::Release, t)
+            AdsrMessage::NoteDown => {
+                self.handle_state_change(AdsrState::Attack, t);
+            },
+            AdsrMessage::NoteUp => {
+                self.handle_state_change(AdsrState::Release, t);
+            },
+            AdsrMessage::SetAttack(attack) => {
+                self.attack_time = (attack*SAMPLE_RATE as f32) as Time;
+            },
+            AdsrMessage::SetDecay(decay) => {
+                self.decay_time = (decay*SAMPLE_RATE as f32) as Time;
+            },
+            AdsrMessage::SetSustain(sustain) => {
+                self.sustain_level = sustain;
+            },
+            AdsrMessage::SetRelease(release) => {
+                self.release_time = (release*SAMPLE_RATE as f32) as Time;
+            },
         }
     }
 
@@ -146,13 +160,14 @@ impl AudioDevice for Adsr {
             let next_state = self.current_state.next();
             self.handle_state_change(next_state, t);
         }
+        self.last_time = t;
 
         // Update the multiplier
         self.multiplier += self.multiplier_delta;
 
         // Apply the envelope
         for (i,s) in inputs.iter().enumerate() {
-            outputs[i] = s*self.gain*self.multiplier;
+            outputs[i] = s*self.multiplier;
         }
     }
 }

@@ -28,9 +28,9 @@ impl AudioDevice for WrappedAdsr {
             println!("{:?}", event);
             match event.payload {
                 MidiMessage::NoteOn(_,_) =>
-                    self.adsr.handle_message(AdsrMessage::NoteDown, t),
+                    self.adsr.handle_message(AdsrMessage::NoteDown),
                 MidiMessage::NoteOff(_,_) =>
-                    self.adsr.handle_message(AdsrMessage::NoteUp, t),
+                    self.adsr.handle_message(AdsrMessage::NoteUp),
                 _ => ()
             }
         }
