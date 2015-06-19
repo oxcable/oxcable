@@ -47,7 +47,7 @@ fn main() {
 
 
     let mut chain = DeviceChain::from(
-        Oscillator::new(oscillator::Sine, 440.0)
+        Oscillator::new(oscillator::Saw(oscillator::PolyBlep), 220.0)
     ).into(
         WrappedAdsr {
             midi: midi_engine.choose_input(),

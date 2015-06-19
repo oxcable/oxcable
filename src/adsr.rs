@@ -1,5 +1,7 @@
 //! Provides an ADSR filter
 
+use num::traits::Float;
+
 use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 
 
@@ -44,9 +46,10 @@ pub struct Adsr {
     // Track state
     current_state: AdsrState,
     next_state_change: Time,
+    state_time: Time,
+    level: f32,
+    delta: f32,
     multiplier: f32,
-    multiplier_delta: f32,
-    last_time: Time
 }
 
 impl Adsr {
@@ -72,26 +75,26 @@ impl Adsr {
             sustain_level: sustain_level,
             current_state: AdsrState::Silent,
             next_state_change: 0,
+            state_time: 0,
+            level: 0.0,
+            delta: 0.0,
             multiplier: 0.0,
-            multiplier_delta: 0.0,
-            last_time: 0,
         }
     }
 
     /// Returns an ADSR with reasonable default values for the envelope.
     pub fn default(num_channels: usize) -> Adsr {
-        Adsr::new(0.05, 0.1, 0.5, 0.1, num_channels)
+        Adsr::new(0.05, 0.5, 0.5, 0.5, num_channels)
     }
 
     /// Applies the message to our Adsr
     pub fn handle_message(&mut self, msg: AdsrMessage) {
-        let t = self.last_time;
         match msg {
             AdsrMessage::NoteDown => {
-                self.handle_state_change(AdsrState::Attack, t);
+                self.handle_state_change(AdsrState::Attack);
             },
             AdsrMessage::NoteUp => {
-                self.handle_state_change(AdsrState::Release, t);
+                self.handle_state_change(AdsrState::Release);
             },
             AdsrMessage::SetAttack(attack) => {
                 self.attack_time = (attack*SAMPLE_RATE as f32) as Time;
@@ -109,39 +112,48 @@ impl Adsr {
     }
 
     /// Triggers a state change and updates the corresponding state
-    fn handle_state_change(&mut self, to: AdsrState, t: Time) {
+    fn handle_state_change(&mut self, to: AdsrState) {
         match to {
             AdsrState::Attack => {
                 self.current_state = AdsrState::Attack;
-                self.next_state_change = t + self.attack_time;
-                self.multiplier_delta = (1.0 - self.multiplier) /
-                    self.attack_time as f32;
+                self.next_state_change = self.attack_time;
+                self.compute_deltas(1.0);
             },
             AdsrState::Decay => {
                 self.current_state = AdsrState::Decay;
-                self.next_state_change = t + self.decay_time;
-                self.multiplier_delta = (self.sustain_level - self.multiplier) /
-                    self.decay_time as f32;
+                self.next_state_change = self.decay_time;
+                let goal = self.sustain_level;
+                self.compute_deltas(goal);
             },
             AdsrState::Sustain => {
                 self.current_state = AdsrState::Sustain;
                 self.next_state_change = 0;
-                self.multiplier = self.sustain_level;
-                self.multiplier_delta = 0.0;
+                self.level = self.sustain_level;
+                self.delta = 0.0;
+                self.multiplier = 0.0;
             },
             AdsrState::Release => {
                 self.current_state = AdsrState::Release;
-                self.next_state_change = t + self.release_time;
-                self.multiplier_delta = (0.0 - self.multiplier) /
-                    self.release_time as f32;
+                self.next_state_change = self.release_time;
+                self.compute_deltas(0.0);
             },
             AdsrState::Silent => {
                 self.current_state = AdsrState::Silent;
                 self.next_state_change = 0;
+                self.level = 0.0;
+                self.delta = 0.0;
                 self.multiplier = 0.0;
-                self.multiplier_delta = 0.0;
             }
         }
+        self.state_time = 0;
+    }
+
+    /// Compute the update parameters. Model the exponential envelope as
+    /// an RC circuit
+    fn compute_deltas(&mut self, dest: f32) {
+        let tau = self.next_state_change as f32/4.0;
+        self.multiplier = (-1.0/tau).exp();
+        self.delta = (dest-self.level)*((1.0/tau).exp() - 1.0);
     }
 }
 
@@ -154,20 +166,21 @@ impl AudioDevice for Adsr {
         self.num_channels
     }
 
-    fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]) {
+    fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {
         // Handle any state changes
-        if self.next_state_change == t {
+        if self.state_time == self.next_state_change {
             let next_state = self.current_state.next();
-            self.handle_state_change(next_state, t);
+            self.handle_state_change(next_state);
         }
-        self.last_time = t;
+        self.state_time += 1;
 
-        // Update the multiplier
-        self.multiplier += self.multiplier_delta;
+        // Update the envelope
+        self.level += self.delta;
+        self.delta *= self.multiplier;
 
         // Apply the envelope
         for (i,s) in inputs.iter().enumerate() {
-            outputs[i] = s*self.multiplier;
+            outputs[i] = s*self.level;
         }
     }
 }
