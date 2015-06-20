@@ -80,22 +80,25 @@ impl DeviceGraph {
             match no_inputs.pop_front() {
                 Some(i) => {
                     topology.push(i);
-                    for (j, ins) in inputs.iter_mut().enumerate() {
-                        let mut idx = None;
-                        for k in 0..ins.len() {
-                            if ins[k] == i {
-                                idx = Some(k);
-                                break;
-                            }
-                        }
-                        match idx {
-                            Some(k) => {
-                                ins.swap_remove(k);
-                                if ins.len() == 0 {
-                                    no_inputs.push_back(j);
+                    let (out_start, out_end) = self.nodes[i].outputs;
+                    for out in out_start..out_end {
+                        for (j, ins) in inputs.iter_mut().enumerate() {
+                            let mut idx = None;
+                            for k in 0..ins.len() {
+                                if ins[k] == out {
+                                    idx = Some(k);
+                                    break;
                                 }
-                            },
-                            None => ()
+                            }
+                            match idx {
+                                Some(k) => {
+                                    ins.swap_remove(k);
+                                    if ins.len() == 0 {
+                                        no_inputs.push_back(j);
+                                    }
+                                },
+                                None => ()
+                            }
                         }
                     }
                 },
