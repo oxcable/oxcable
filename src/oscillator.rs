@@ -6,8 +6,6 @@ use rand::random;
 
 use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 
-pub use self::AntialiasType::{Aliased, PolyBlep};
-pub use self::Waveform::{Sine, Saw, Square, Tri, WhiteNoise, PulseTrain};
 
 /// Defines the messages that the Oscillator supports
 #[derive(Clone, Copy, Debug)]
@@ -16,7 +14,11 @@ pub enum OscillatorMessage {
     SetFreq(f32),
     /// Sets the waveform type
     SetWaveform(Waveform),
+    /// Sets the LFO vibrato depth, in steps
+    SetLFOIntensity(f32)
 }
+pub use self::OscillatorMessage::*;
+
 
 /// Antialiasing method for certain waveforms.
 ///
@@ -30,6 +32,8 @@ pub enum AntialiasType {
     /// Antialiasing using PolyBLEP.
     PolyBlep
 }
+pub use self::AntialiasType::*;
+
 
 /// Oscillator waveforms.
 ///
@@ -46,10 +50,13 @@ pub enum Waveform {
     WhiteNoise,
     PulseTrain
 }
+pub use self::Waveform::*;
+
 
 /// An oscillator that generates a periodic waveform.
 pub struct Oscillator {
     waveform: Waveform,
+    lfo_intensity: f32,
     phase: f32,
     phase_delta: f32,
     last_sample: Sample,
@@ -58,23 +65,37 @@ pub struct Oscillator {
 impl Oscillator {
     /// Returns an oscillator with the specified waveform at the specified
     /// frequency, in Hz.
-    pub fn new(waveform: Waveform, freq: f32) -> Oscillator {
+    pub fn new(waveform: Waveform) -> Oscillator {
         Oscillator {
             waveform: waveform,
+            lfo_intensity: 0.0,
             phase: 0.0,
-            phase_delta: freq*2.0*PI/(SAMPLE_RATE as f32),
+            phase_delta: 0.0,
             last_sample: 0.0
         }
+    }
+
+    pub fn freq(mut self, freq: f32) -> Oscillator {
+        self.handle_message(SetFreq(freq));
+        self
+    }
+
+    pub fn lfo_intensity(mut self, lfo_intensity: f32) -> Oscillator {
+        self.handle_message(SetLFOIntensity(lfo_intensity));
+        self
     }
 
     /// Applies the message to the oscillator
     pub fn handle_message(&mut self, msg: OscillatorMessage) {
         match msg {
-            OscillatorMessage::SetFreq(freq) => {
+            SetFreq(freq) => {
                 self.phase_delta = freq*2.0*PI/(SAMPLE_RATE as f32);
             },
-            OscillatorMessage::SetWaveform(waveform) => {
+            SetWaveform(waveform) => {
                 self.waveform = waveform;
+            },
+            SetLFOIntensity(steps) => {
+                self.lfo_intensity = steps/12.0;
             }
         }
     }
@@ -82,16 +103,21 @@ impl Oscillator {
 
 impl AudioDevice for Oscillator {
     fn num_inputs(&self) -> usize {
-        0
+        1
     }
 
     fn num_outputs(&self) -> usize {
         1
     }
 
-    fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {
+    fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {
         // Tick the phase
-        self.phase += self.phase_delta;
+        let phase_delta = if inputs.len() > 0 {
+            self.phase_delta*2.0.powf(inputs[0]*self.lfo_intensity)
+        } else {
+            self.phase_delta
+        };
+        self.phase += phase_delta;
         if self.phase >= 2.0*PI {
             self.phase -= 2.0*PI;
         }
@@ -104,7 +130,7 @@ impl AudioDevice for Oscillator {
                 match aa {
                     PolyBlep => {
                         out -= poly_belp_offset(self.phase/(2.0*PI),
-                                                self.phase_delta/(2.0*PI));
+                                                phase_delta/(2.0*PI));
                     },
                     _ => ()
                 }
@@ -116,9 +142,9 @@ impl AudioDevice for Oscillator {
                     PolyBlep => {
                         // two discontinuities, at rising and falling edges
                         out += poly_belp_offset(self.phase/(2.0*PI),
-                                                self.phase_delta/(2.0*PI));
+                                                phase_delta/(2.0*PI));
                         out -= poly_belp_offset(fmod(self.phase/(2.0*PI)+0.5, 1.0),
-                                                self.phase_delta/(2.0*PI));
+                                                phase_delta/(2.0*PI));
                     },
                     _ => ()
                 }
@@ -131,15 +157,15 @@ impl AudioDevice for Oscillator {
                     PolyBlep => {
                         // two discontinuities, at rising and falling edges
                         out += poly_belp_offset(self.phase/(2.0*PI),
-                                                self.phase_delta/(2.0*PI));
+                                                phase_delta/(2.0*PI));
                         out -= poly_belp_offset(fmod(self.phase/(2.0*PI)+0.5, 1.0),
-                                                self.phase_delta/(2.0*PI));
+                                                phase_delta/(2.0*PI));
                     },
                     _ => ()
                 }
 
                 // Perform leaky integration
-                self.phase_delta*out + (1.0-self.phase_delta)*self.last_sample
+                phase_delta*out + (1.0-phase_delta)*self.last_sample
             },
             WhiteNoise => 2.0*random::<f32>() - 1.0,
             PulseTrain => {
