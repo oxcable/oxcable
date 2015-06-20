@@ -117,8 +117,7 @@ impl AudioDevice for Oscillator {
                         // two discontinuities, at rising and falling edges
                         out += poly_belp_offset(self.phase/(2.0*PI),
                                                 self.phase_delta/(2.0*PI));
-                        out -= poly_belp_offset(fmod(self.phase/(2.0*PI)+0.5,
-                                                     1.0),
+                        out -= poly_belp_offset(fmod(self.phase/(2.0*PI)+0.5, 1.0),
                                                 self.phase_delta/(2.0*PI));
                     },
                     _ => ()
@@ -133,8 +132,7 @@ impl AudioDevice for Oscillator {
                         // two discontinuities, at rising and falling edges
                         out += poly_belp_offset(self.phase/(2.0*PI),
                                                 self.phase_delta/(2.0*PI));
-                        out -= poly_belp_offset(fmod(self.phase/(2.0*PI)+0.5,
-                                                     1.0),
+                        out -= poly_belp_offset(fmod(self.phase/(2.0*PI)+0.5, 1.0),
                                                 self.phase_delta/(2.0*PI));
                     },
                     _ => ()
@@ -155,6 +153,7 @@ impl AudioDevice for Oscillator {
         };
 
         // Push the sample out
+        self.last_sample = s;
         outputs[0] = s;
     }
 }
