@@ -7,7 +7,7 @@ fn main() {
     use oxcable::chain::DeviceChain;
     use oxcable::io::wav;
     use oxcable::types::AudioDevice;
-    use oxcable::utils::tick::tick_n_times;
+    use oxcable::tick::tick_n_times;
 
     println!("Initializing signal chain...");
     let inwav = wav::WavReader::new("wav/song.wav");

@@ -3,7 +3,7 @@
 use std::collections::VecDeque;
 
 use types::{AudioDevice, Sample, Time};
-use utils::tick::Tick;
+use tick::Tick;
 
 
 pub struct DeviceGraph {

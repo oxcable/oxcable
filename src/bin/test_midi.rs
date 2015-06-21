@@ -8,7 +8,7 @@ use oxcable::types::{AudioDevice, MidiDevice, MidiMessage, Time, Sample};
 use oxcable::io::audio::AudioEngine;
 use oxcable::io::midi::{MidiEngine, MidiIn};
 use oxcable::oscillator::{self, Oscillator};
-use oxcable::utils::tick::tick_until_enter;
+use oxcable::tick::tick_until_enter;
 
 
 struct WrappedAdsr {

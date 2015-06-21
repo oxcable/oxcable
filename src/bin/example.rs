@@ -11,7 +11,7 @@ fn main() {
     use oxcable::io::audio::AudioEngine;
     use oxcable::mixers::Gain;
     use oxcable::oscillator::*;
-    use oxcable::utils::tick::tick_until_enter;
+    use oxcable::tick::tick_until_enter;
 
     println!("Setting up signal chain...");
     let engine = AudioEngine::open().unwrap();

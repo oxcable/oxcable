@@ -1,7 +1,7 @@
 //! Provides a linear chain to cascade `AudioDevice`s together.
 
 use types::{AudioDevice, Sample, Time};
-use utils::tick::Tick;
+use tick::Tick;
 
 pub struct DeviceChain {
     devices: Vec<AudioNode>,

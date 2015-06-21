@@ -7,7 +7,7 @@ fn main() {
     use oxcable::chain::DeviceChain;
     use oxcable::io::wav::WavWriter;
     use oxcable::oscillator::*;
-    use oxcable::utils::tick::tick_n_times;
+    use oxcable::tick::tick_n_times;
 
     // Initialize objects
     println!("Initializing signal chain...");

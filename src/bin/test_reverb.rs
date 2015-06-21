@@ -8,7 +8,7 @@ fn main() {
     use oxcable::chain::DeviceChain;
     use oxcable::io::audio::AudioEngine;
     use oxcable::reverb::{MoorerReverb, rooms};
-    use oxcable::utils::tick::tick_until_enter;
+    use oxcable::tick::tick_until_enter;
 
     println!("Initializing signal chain...");
     let engine = AudioEngine::open().unwrap();
