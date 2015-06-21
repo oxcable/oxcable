@@ -71,11 +71,17 @@ impl AudioIn {
                                PORTAUDIO_T, None).unwrap();
         pa_stream.start().unwrap();
 
+        let buf_size = num_channels*BUFFER_SIZE;
+        let mut buffer = Vec::with_capacity(buf_size);
+        for _ in 0..buf_size {
+            buffer.push(0.0);
+        }
+
         AudioIn {
             engine: engine,
             pa_stream: pa_stream,
             num_channels: num_channels,
-            buffer: Vec::with_capacity(num_channels*BUFFER_SIZE),
+            buffer: buffer,
             samples_read: BUFFER_SIZE,
         }
     }
@@ -99,10 +105,10 @@ impl AudioDevice for AudioIn {
 
     fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {
         if self.samples_read == BUFFER_SIZE {
-            let result = self.pa_stream.read(BUFFER_SIZE as u32);
-            match result {
-                Ok(v) => self.buffer = v.clone(),
-                Err(e) => panic!(e)
+            let num_read = self.num_channels * BUFFER_SIZE;
+            let result = self.pa_stream.read(num_read as u32).unwrap();
+            for (i, &s) in result.iter().enumerate() {
+                self.buffer[i] = s;
             }
             self.samples_read = 0;
         }
