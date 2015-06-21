@@ -6,39 +6,30 @@ extern crate oxcable;
 fn main() {
     use oxcable::chain::DeviceChain;
     use oxcable::io::wav::WavWriter;
-    use oxcable::oscillator::{self, Oscillator};
+    use oxcable::oscillator::*;
     use oxcable::utils::tick::tick_n_times;
 
     // Initialize objects
     println!("Initializing signal chain...");
     let freq = 8000.0;
     let mut chains: Vec<DeviceChain> = Vec::new();
-    chains.push(DeviceChain::from(
-            Oscillator::new(oscillator::Sine, freq))
+    chains.push(DeviceChain::from(Oscillator::new(Sine).freq(freq))
         .into(WavWriter::new("wav/test_sine.wav", 1)));
-    chains.push(DeviceChain::from(
-            Oscillator::new(oscillator::Saw(oscillator::Aliased), freq))
+    chains.push(DeviceChain::from(Oscillator::new(Saw(Aliased)).freq(freq))
         .into(WavWriter::new("wav/test_saw_naive.wav", 1)));
-    chains.push(DeviceChain::from(
-            Oscillator::new(oscillator::Saw(oscillator::PolyBlep), freq))
+    chains.push(DeviceChain::from(Oscillator::new(Saw(PolyBlep)).freq(freq))
         .into(WavWriter::new("wav/test_saw_blep.wav", 1)));
-    chains.push(DeviceChain::from(
-            Oscillator::new(oscillator::Square(oscillator::Aliased), freq))
+    chains.push(DeviceChain::from(Oscillator::new(Square(Aliased)).freq(freq))
         .into(WavWriter::new("wav/test_square_naive.wav", 1)));
-    chains.push(DeviceChain::from(
-            Oscillator::new(oscillator::Square(oscillator::PolyBlep), freq))
+    chains.push(DeviceChain::from(Oscillator::new(Square(PolyBlep)).freq(freq))
         .into(WavWriter::new("wav/test_square_blep.wav", 1)));
-    chains.push(DeviceChain::from(
-            Oscillator::new(oscillator::Tri(oscillator::Aliased), freq))
+    chains.push(DeviceChain::from(Oscillator::new(Tri(Aliased)).freq(freq))
         .into(WavWriter::new("wav/test_tri_naive.wav", 1)));
-    chains.push(DeviceChain::from(
-            Oscillator::new(oscillator::Tri(oscillator::PolyBlep), freq))
+    chains.push(DeviceChain::from(Oscillator::new(Tri(PolyBlep)).freq(freq))
         .into(WavWriter::new("wav/test_tri_blep.wav", 1)));
-    chains.push(DeviceChain::from(
-            Oscillator::new(oscillator::WhiteNoise, freq))
+    chains.push(DeviceChain::from(Oscillator::new(WhiteNoise).freq(freq))
         .into(WavWriter::new("wav/test_white_noise.wav", 1)));
-    chains.push(DeviceChain::from(
-            Oscillator::new(oscillator::PulseTrain, freq))
+    chains.push(DeviceChain::from(Oscillator::new(PulseTrain).freq(freq))
         .into(WavWriter::new("wav/test_pulse_train.wav", 1)));
 
     // Write files

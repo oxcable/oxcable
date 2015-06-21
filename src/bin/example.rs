@@ -10,7 +10,7 @@ fn main() {
     use oxcable::graph::DeviceGraph;
     use oxcable::io::audio::AudioEngine;
     use oxcable::mixers::Gain;
-    use oxcable::oscillator::Oscillator;
+    use oxcable::oscillator::*;
     use oxcable::utils::tick::tick_until_enter;
 
     println!("Setting up signal chain...");
@@ -25,9 +25,7 @@ fn main() {
 
     let lfo = graph.add_node(Oscillator::new(oscillator::Sine).freq(10.0));
     let osc = graph.add_node(
-        Oscillator::new(oscillator::Tri(oscillator::PolyBlep))
-            .freq(440.0)
-            .lfo_intensity(0.1)
+        Oscillator::new(Tri(PolyBlep)).freq(440.0).lfo_intensity(0.1)
     );
     let gain = graph.add_node(Gain::new(-6.0, 1));
     graph.add_edge(lfo, 0, osc, 0).unwrap();

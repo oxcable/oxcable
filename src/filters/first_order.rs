@@ -15,8 +15,6 @@ use num::traits::Float;
 use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 
-pub use self::FilterMode::{LowPass, HighPass, LowShelf, HighShelf};
-
 
 /// Specifies the mode for a first order `Filter`.
 ///
@@ -31,6 +29,8 @@ pub enum FilterMode {
     LowShelf(f32, f32), // cutoff, gain
     HighShelf(f32, f32)
 }
+pub use self::FilterMode::*;
+
 
 /// A filter that uses a first order all pass filter to perform the specified
 /// mode. Each of the channels will be filtered independently.

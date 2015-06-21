@@ -6,6 +6,7 @@ use std::io::{self, Seek, SeekFrom};
 
 use types::{SAMPLE_RATE, AudioDevice, Time, Sample};
 
+
 /// Reads audio from a wav file.
 ///
 /// The reader will continue until it runs out of samples. When it does, the
@@ -38,11 +39,6 @@ impl WavReader {
     /// Returns the number of audio samples in the wav file.
     pub fn get_num_samples(&self) -> Time {
         self.num_samples
-    }
-
-    /// Returns the number of channels in the wav file.
-    pub fn get_num_channels(&self) -> usize {
-        self.num_channels
     }
 
     /// Returns true if we have read the entire wav file.
@@ -147,7 +143,7 @@ static FMT_: u32 = 0x20746d66;
 static DATA: u32 = 0x61746164;
 
 /// A struct container for the wav header
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 struct WavHeader {
     riff_hdr: u32,
     file_size: u32,

@@ -12,56 +12,6 @@ use types::{MidiDevice, MidiEvent, MidiMessage, Time};
 static BUFFER_SIZE: i32 = 256;
 
 
-/// Converts a raw portmidi message to an oxcable MIDI event
-fn midievent_from_portmidi(event: portmidi::MidiEvent, t: Time) -> MidiEvent {
-    let msg = event.message;
-    let channel = msg.status & 0x0F;
-    let payload = match msg.status >> 4 {
-        0b1000 => {
-            let note = msg.data1;
-            let velocity = (msg.data2 as f32) / 127.0;
-            MidiMessage::NoteOff(note, velocity)
-        },
-        0b1001 => {
-            let note = msg.data1;
-            let velocity = (msg.data2 as f32) / 127.0;
-            MidiMessage::NoteOn(note, velocity)
-        },
-        0b1110 => {
-            let int_value = ((msg.data2 as i16) << 7) | (msg.data1 as i16);
-            let bend = (int_value - 0x2000) as f32 /
-                (0x2000i16) as f32;
-            MidiMessage::PitchBend(bend)
-        },
-        0b1010 => {
-            let note = msg.data1;
-            let pressure = (msg.data2 as f32) / 127.0;
-            MidiMessage::KeyPressure(note, pressure)
-        },
-        0b1011 => match msg.data1 {
-            0x40 => MidiMessage::SustainPedal(msg.data2 >= 64),
-            _ => MidiMessage::ControlChange(msg.data1, msg.data2)
-        },
-        0b1100 => MidiMessage::ProgramChange(msg.data1),
-        0b1101 => MidiMessage::ChannelPressure(msg.data1 as f32 / 127.0),
-        _ => MidiMessage::Other(msg.status, msg.data1, msg.data2)
-    };
-
-    MidiEvent { channel: channel, time: t, payload: payload }
-}
-
-
-/// This empty struct is used as a RAII marker for an initialized portmidi
-/// connection. It is held in a Rc, and copies are passed to all streams opened
-/// with it.
-struct MidiEngineMarker;
-impl Drop for MidiEngineMarker {
-    fn drop(&mut self)
-    {
-        portmidi::terminate().unwrap();
-    }
-}
-
 /// Used to handle portmidi resources.
 pub struct MidiEngine {
     marker: Rc<MidiEngineMarker>
@@ -122,6 +72,19 @@ impl MidiEngine {
 }
 
 
+/// This empty struct is used as a RAII marker for an initialized portmidi
+/// connection. It is held in a Rc, and copies are passed to all streams opened
+/// with it. Once all the streams have been closed, and the engine falls out of
+/// scope, then portmidi will automatically be terminated.
+struct MidiEngineMarker;
+impl Drop for MidiEngineMarker {
+    fn drop(&mut self)
+    {
+        portmidi::terminate().unwrap();
+    }
+}
+
+
 /// Reads audio from the OS's default midi device.
 pub struct MidiIn {
     #[allow(dead_code)] // the engine is used as an RAII marker
@@ -160,4 +123,43 @@ impl MidiDevice for MidiIn {
         }
         events
     }
+}
+
+
+/// Converts a raw portmidi message to an oxcable MIDI event
+fn midievent_from_portmidi(event: portmidi::MidiEvent, t: Time) -> MidiEvent {
+    let msg = event.message;
+    let channel = msg.status & 0x0F;
+    let payload = match msg.status >> 4 {
+        0b1000 => {
+            let note = msg.data1;
+            let velocity = (msg.data2 as f32) / 127.0;
+            MidiMessage::NoteOff(note, velocity)
+        },
+        0b1001 => {
+            let note = msg.data1;
+            let velocity = (msg.data2 as f32) / 127.0;
+            MidiMessage::NoteOn(note, velocity)
+        },
+        0b1110 => {
+            let int_value = ((msg.data2 as i16) << 7) | (msg.data1 as i16);
+            let bend = (int_value - 0x2000) as f32 /
+                (0x2000i16) as f32;
+            MidiMessage::PitchBend(bend)
+        },
+        0b1010 => {
+            let note = msg.data1;
+            let pressure = (msg.data2 as f32) / 127.0;
+            MidiMessage::KeyPressure(note, pressure)
+        },
+        0b1011 => match msg.data1 {
+            0x40 => MidiMessage::SustainPedal(msg.data2 >= 64),
+            _ => MidiMessage::ControlChange(msg.data1, msg.data2)
+        },
+        0b1100 => MidiMessage::ProgramChange(msg.data1),
+        0b1101 => MidiMessage::ChannelPressure(msg.data1 as f32 / 127.0),
+        _ => MidiMessage::Other(msg.status, msg.data1, msg.data2)
+    };
+
+    MidiEvent { channel: channel, time: t, payload: payload }
 }

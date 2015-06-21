@@ -15,17 +15,6 @@ static PORTAUDIO_T: portaudio::pa::SampleFormat =
 static BUFFER_SIZE: usize = 256;
 
 
-/// This empty struct is used as a RAII marker for an initialized portaudio
-/// connection. It is held in a Rc, and copies are passed to all streams opened
-/// with it.
-struct AudioEngineMarker;
-impl Drop for AudioEngineMarker {
-    fn drop(&mut self)
-    {
-        portaudio::pa::terminate().unwrap();
-    }
-}
-
 /// The AudioEnginer opens and manages the resources associated with portaudio.
 /// It is used open new input/output streams and safely free them.
 pub struct AudioEngine {
@@ -46,6 +35,18 @@ impl AudioEngine {
 
     pub fn default_output(&self, num_channels: usize) -> AudioOut {
         AudioOut::new(self.marker.clone(), num_channels)
+    }
+}
+
+
+/// This empty struct is used as a RAII marker for an initialized portaudio
+/// connection. It is held in a Rc, and copies are passed to all streams opened
+/// with it.
+struct AudioEngineMarker;
+impl Drop for AudioEngineMarker {
+    fn drop(&mut self)
+    {
+        portaudio::pa::terminate().unwrap();
     }
 }
 

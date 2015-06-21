@@ -51,6 +51,7 @@ pub enum MidiMessage {
     Other(u8, u8, u8)
 }
 
+
 pub trait AudioDevice {
     fn num_inputs(&self) -> usize;
     fn num_outputs(&self) -> usize;
@@ -59,6 +60,7 @@ pub trait AudioDevice {
     /// once per time step, starting at `t=0`.
     fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]);
 }
+
 
 pub trait MidiDevice {
     fn get_events(&mut self, t: Time) -> Vec<MidiEvent>;

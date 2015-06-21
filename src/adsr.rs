@@ -6,7 +6,7 @@ use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 
 
 /// Defines the messages that the ADSR supports
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum AdsrMessage {
     NoteDown,
     NoteUp,
@@ -15,23 +15,7 @@ pub enum AdsrMessage {
     SetSustain(f32),
     SetRelease(f32),
 }
-
-
-/// Defines the current mode the ADSR is operating in
-enum AdsrState { Silent, Attack, Decay, Sustain, Release }
-
-impl AdsrState {
-    /// Given the current state, gets our next state
-    fn next(&self) -> AdsrState {
-        match self {
-            &AdsrState::Attack  => AdsrState::Decay,
-            &AdsrState::Decay   => AdsrState::Sustain,
-            &AdsrState::Sustain => AdsrState::Release,
-            &AdsrState::Release => AdsrState::Silent,
-            &AdsrState::Silent  => AdsrState::Silent
-        }
-    }
-}
+pub use self::AdsrMessage::*;
 
 
 /// A multichannel ADSR filter
@@ -181,6 +165,24 @@ impl AudioDevice for Adsr {
         // Apply the envelope
         for (i,s) in inputs.iter().enumerate() {
             outputs[i] = s*self.level;
+        }
+    }
+}
+
+
+/// Defines the current mode the ADSR is operating in
+#[derive(Clone, Copy, Debug)]
+enum AdsrState { Silent, Attack, Decay, Sustain, Release }
+
+impl AdsrState {
+    /// Given the current state, gets our next state
+    fn next(self) -> AdsrState {
+        match self {
+            AdsrState::Attack  => AdsrState::Decay,
+            AdsrState::Decay   => AdsrState::Sustain,
+            AdsrState::Sustain => AdsrState::Release,
+            AdsrState::Release => AdsrState::Silent,
+            AdsrState::Silent  => AdsrState::Silent
         }
     }
 }

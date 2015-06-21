@@ -5,6 +5,7 @@ use std::collections::VecDeque;
 use types::{AudioDevice, Sample, Time};
 use utils::tick::Tick;
 
+
 pub struct DeviceGraph {
     nodes: Vec<AudioNode>, // the actual nodes
     topology: Vec<usize>, // the order to tick the nodes
@@ -136,6 +137,8 @@ pub enum GraphError {
 
 #[derive(Copy, Clone, Debug)]
 pub struct AudioNodeIdx(usize);
+
+
 struct AudioNode {
     device: Box<AudioDevice>,
     inputs: Vec<Option<usize>>,

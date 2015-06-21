@@ -2,7 +2,7 @@
 
 extern crate oxcable;
 
-use oxcable::adsr::{Adsr, AdsrMessage};
+use oxcable::adsr;
 use oxcable::chain::DeviceChain;
 use oxcable::types::{AudioDevice, MidiDevice, MidiMessage, Time, Sample};
 use oxcable::io::audio::AudioEngine;
@@ -10,9 +10,10 @@ use oxcable::io::midi::{MidiEngine, MidiIn};
 use oxcable::oscillator::{self, Oscillator};
 use oxcable::utils::tick::tick_until_enter;
 
+
 struct WrappedAdsr {
     midi: MidiIn,
-    adsr: Adsr
+    adsr: adsr::Adsr
 }
 impl AudioDevice for WrappedAdsr {
     fn num_inputs(&self) -> usize {
@@ -28,15 +29,16 @@ impl AudioDevice for WrappedAdsr {
             println!("{:?}", event);
             match event.payload {
                 MidiMessage::NoteOn(_,_) =>
-                    self.adsr.handle_message(AdsrMessage::NoteDown),
+                    self.adsr.handle_message(adsr::NoteDown),
                 MidiMessage::NoteOff(_,_) =>
-                    self.adsr.handle_message(AdsrMessage::NoteUp),
+                    self.adsr.handle_message(adsr::NoteUp),
                 _ => ()
             }
         }
         self.adsr.tick(t, inputs, outputs);
     }
 }
+
 
 #[cfg(not(test))]
 fn main() {
@@ -47,11 +49,11 @@ fn main() {
 
 
     let mut chain = DeviceChain::from(
-        Oscillator::new(oscillator::Saw(oscillator::PolyBlep), 220.0)
+        Oscillator::new(oscillator::Saw(oscillator::PolyBlep)).freq(220.0)
     ).into(
         WrappedAdsr {
             midi: midi_engine.choose_input(),
-            adsr: Adsr::default(1)
+            adsr: adsr::Adsr::default(1)
         }
     ).into(
         audio_engine.default_output(1)
