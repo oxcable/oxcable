@@ -120,11 +120,7 @@ impl DeviceGraph {
 impl Tick for DeviceGraph {
     fn tick(&mut self) {
         for &i in self.topology.iter() {
-            let inputs: Vec<Sample> = self.nodes[i].inputs.iter().map(|input|
-                input.map_or(0.0, |ch| self.bus[ch])).collect();
-            let (start, end) = self.nodes[i].outputs;
-            self.nodes[i].device.tick(self.time, &inputs,
-                                        &mut self.bus[start..end]);
+            self.nodes[i].tick(self.time, &mut self.bus);
         }
         self.time += 1;
     }
@@ -142,6 +138,7 @@ pub struct AudioNodeIdx(usize);
 struct AudioNode {
     device: Box<AudioDevice>,
     inputs: Vec<Option<usize>>,
+    input_buf: Vec<Sample>,
     outputs: (usize, usize)
 }
 
@@ -150,8 +147,10 @@ impl AudioNode {
             where D: 'static+AudioDevice {
         let num_in = device.num_inputs();
         let mut inputs = Vec::with_capacity(num_in);
+        let mut input_buf = Vec::with_capacity(num_in);
         for _ in 0..num_in {
-            inputs.push(None)
+            inputs.push(None);
+            input_buf.push(0.0);
         }
 
         let num_out = device.num_outputs();
@@ -164,7 +163,16 @@ impl AudioNode {
         AudioNode {
             device: Box::new(device),
             inputs: inputs,
+            input_buf: input_buf,
             outputs: (start, end)
         }
+    }
+
+    fn tick(&mut self, t: Time, bus: &mut[Sample]) {
+        for (i, ch) in self.inputs.iter().enumerate() {
+            self.input_buf[i] = ch.map_or(0.0, |j| bus[j]);
+        }
+        let (start, end) = self.outputs;
+        self.device.tick(t, &self.input_buf, &mut bus[start..end]);
     }
 }
