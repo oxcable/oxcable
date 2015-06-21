@@ -15,7 +15,9 @@ pub enum OscillatorMessage {
     /// Sets the waveform type
     SetWaveform(Waveform),
     /// Sets the LFO vibrato depth, in steps
-    SetLFOIntensity(f32)
+    SetLFOIntensity(f32),
+    /// Sets the pitch bend, in steps
+    SetBend(f32),
 }
 pub use self::OscillatorMessage::*;
 
@@ -57,6 +59,7 @@ pub use self::Waveform::*;
 pub struct Oscillator {
     waveform: Waveform,
     lfo_intensity: f32,
+    bend: f32,
     phase: f32,
     phase_delta: f32,
     last_sample: Sample,
@@ -69,6 +72,7 @@ impl Oscillator {
         Oscillator {
             waveform: waveform,
             lfo_intensity: 0.0,
+            bend: 1.0,
             phase: 0.0,
             phase_delta: 0.0,
             last_sample: 0.0
@@ -96,7 +100,10 @@ impl Oscillator {
             },
             SetLFOIntensity(steps) => {
                 self.lfo_intensity = steps/12.0;
-            }
+            },
+            SetBend(steps) => {
+                self.bend = 2.0.powf(steps/12.0);
+            },
         }
     }
 }
@@ -113,9 +120,9 @@ impl AudioDevice for Oscillator {
     fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {
         // Tick the phase
         let phase_delta = if inputs.len() > 0 {
-            self.phase_delta*2.0.powf(inputs[0]*self.lfo_intensity)
+            self.phase_delta*2.0.powf(inputs[0]*self.lfo_intensity)*self.bend
         } else {
-            self.phase_delta
+            self.phase_delta*self.bend
         };
         self.phase += phase_delta;
         if self.phase >= 2.0*PI {
