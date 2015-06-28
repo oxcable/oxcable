@@ -108,9 +108,19 @@ impl AudioDevice for AudioIn {
     fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {
         if self.samples_read == self.buffer_size {
             let num_read = self.num_channels * self.buffer_size;
-            let result = self.pa_stream.read(num_read as u32).unwrap();
-            for (i, &s) in result.iter().enumerate() {
-                self.buffer[i] = s;
+            match self.pa_stream.read(num_read as u32) {
+                Ok(v) => {
+                    for (i, &s) in v.iter().enumerate() {
+                        self.buffer[i] = s;
+                    }
+                },
+                Err(portaudio::pa::Error::InputOverflowed) => {
+                    println!("Input overflowed");
+                    for i in 0..self.buffer.len() {
+                        self.buffer[i] = 0.0;
+                    }
+                },
+                Err(e) => panic!("{}", e)
             }
             self.samples_read = 0;
         }
@@ -184,8 +194,13 @@ impl AudioDevice for AudioOut {
         self.samples_written += 1;
 
         if self.samples_written == self.buffer_size {
-            self.pa_stream.write(self.buffer.clone(),
-                                 self.buffer_size as u32).unwrap();
+            match self.pa_stream.write(self.buffer.clone(),
+                                 self.buffer_size as u32) {
+                Ok(()) => (),
+                Err(portaudio::pa::Error::OutputUnderflowed) =>
+                    println!("Output underflowed"),
+                Err(e) => panic!("{}", e)
+            }
             self.samples_written = 0;
             self.buffer.clear()
         }
