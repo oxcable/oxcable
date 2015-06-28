@@ -25,14 +25,8 @@ impl Compressor {
     ///   signal after compression.
     pub fn new(threshold: f32, compression_ratio: f32, gain: f32,
                num_channels: usize) -> Compressor {
-        // Create our level detectors
-        let mut levels = Vec::with_capacity(num_channels);
-        for _ in (0 .. num_channels) {
-            levels.push(LevelDetector::default());
-        }
-
         Compressor {
-            level_detectors: levels,
+            level_detectors: vec![LevelDetector::default(); num_channels],
             num_channels: num_channels,
             threshold: decibel_to_ratio(threshold),
             compression_ratio: compression_ratio,

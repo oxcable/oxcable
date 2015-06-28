@@ -20,14 +20,8 @@ impl Limiter {
     /// * The specified `gain` (in decibels) will be applied to the
     ///   signal after compression.
     pub fn new(threshold: f32, gain: f32, num_channels: usize) -> Limiter {
-        // Create our level detectors
-        let mut levels = Vec::with_capacity(num_channels);
-        for _ in (0 .. num_channels) {
-            levels.push(LevelDetector::default());
-        }
-
         Limiter {
-            level_detectors: levels,
+            level_detectors: vec![LevelDetector::default(); num_channels],
             num_channels: num_channels,
             threshold: decibel_to_ratio(threshold),
             gain: decibel_to_ratio(gain)

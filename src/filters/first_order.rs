@@ -46,21 +46,13 @@ pub struct Filter {
 impl Filter {
     /// Creates a new first order filter with the provided mode.
     pub fn new(mode: FilterMode, num_channels: usize) -> Filter {
-        // Populate the last vectors
-        let mut x_last = Vec::<f32>::with_capacity(num_channels);
-        let mut y1_last = Vec::<f32>::with_capacity(num_channels);
-        for _ in (0 .. num_channels) {
-            x_last.push(0.0);
-            y1_last.push(0.0);
-        }
-
         // Compute the parameter values. H0 is ignored for Pass filters
         let (alpha, H0) = compute_parameters(mode.clone());
 
         Filter {
             num_channels: num_channels,
-            x_last: x_last,
-            y1_last: y1_last,
+            x_last: vec![0.0; num_channels],
+            y1_last: vec![0.0; num_channels],
             mode: mode,
             alpha: alpha,
             H0: H0

@@ -51,25 +51,15 @@ pub struct Filter {
 impl Filter {
     /// Creates a new second order filter with the provided mode.
     pub fn new(mode: FilterMode, num_channels: usize) -> Filter {
-        // Populate the delay elements
-        let mut x_last1 = Vec::<f32>::with_capacity(num_channels);
-        let mut x_last2 = Vec::<f32>::with_capacity(num_channels);
-        let mut y_last1 = Vec::<f32>::with_capacity(num_channels);
-        let mut y_last2 = Vec::<f32>::with_capacity(num_channels);
-        for _ in (0 .. num_channels) {
-            x_last1.push(0.0);
-            x_last2.push(0.0);
-            y_last1.push(0.0);
-            y_last2.push(0.0);
-        }
-
         // Compute the parameter values
         let (b0, b1, b2, a1, a2) = compute_parameters(mode);
 
         Filter {
             num_channels: num_channels,
-            x_last1: x_last1, x_last2: x_last2,
-            y_last1: y_last1, y_last2: y_last2,
+            x_last1: vec![0.0; num_channels],
+            x_last2: vec![0.0; num_channels],
+            y_last1: vec![0.0; num_channels],
+            y_last2: vec![0.0; num_channels],
             b0: b0, b1: b1, b2: b2, a1: a1, a2: a2
         }
     }

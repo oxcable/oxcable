@@ -12,6 +12,7 @@ use types::Time;
 /// A ring buffer can continue adding data on to the end of itself indefinitely.
 /// However, it has a limited capacity; when that capacity is reached, it will
 /// remove the oldest data to make space.
+#[derive(Clone, Debug)]
 pub struct RingBuffer<T: Clone> {
     buf: Vec<T>,
     capacity: usize,

@@ -146,13 +146,6 @@ impl AudioNode {
     fn new<D>(device: D, bus: &mut Vec<Sample>) -> AudioNode
             where D: 'static+AudioDevice {
         let num_in = device.num_inputs();
-        let mut inputs = Vec::with_capacity(num_in);
-        let mut input_buf = Vec::with_capacity(num_in);
-        for _ in 0..num_in {
-            inputs.push(None);
-            input_buf.push(0.0);
-        }
-
         let num_out = device.num_outputs();
         let start = bus.len();
         for _ in 0..num_out {
@@ -162,8 +155,8 @@ impl AudioNode {
 
         AudioNode {
             device: Box::new(device),
-            inputs: inputs,
-            input_buf: input_buf,
+            inputs: vec![None; num_in],
+            input_buf: vec![0.0; num_in],
             outputs: (start, end)
         }
     }

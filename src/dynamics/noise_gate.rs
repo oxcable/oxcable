@@ -26,14 +26,8 @@ impl NoiseGate {
     /// compression.
     pub fn new(on_threshold: f32, off_threshold: f32, gain: f32,
                num_channels: usize) -> NoiseGate {
-        // Create our level detectors
-        let mut levels = Vec::with_capacity(num_channels);
-        for _ in (0 .. num_channels) {
-            levels.push(LevelDetector::default());
-        }
-
         NoiseGate {
-            level_detectors: levels,
+            level_detectors: vec![LevelDetector::default(); num_channels],
             active: false,
             num_channels: num_channels,
             on_threshold: decibel_to_ratio(on_threshold),

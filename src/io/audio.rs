@@ -72,16 +72,12 @@ impl AudioIn {
         pa_stream.start().unwrap();
 
         let buf_size = num_channels*BUFFER_SIZE;
-        let mut buffer = Vec::with_capacity(buf_size);
-        for _ in 0..buf_size {
-            buffer.push(0.0);
-        }
 
         AudioIn {
             engine: engine,
             pa_stream: pa_stream,
             num_channels: num_channels,
-            buffer: buffer,
+            buffer: vec![0.0; buf_size],
             samples_read: BUFFER_SIZE,
         }
     }

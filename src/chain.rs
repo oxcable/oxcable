@@ -41,13 +41,9 @@ struct AudioNode {
 impl AudioNode {
     fn new<D>(device: D) -> AudioNode where D: 'static+AudioDevice {
         let n = device.num_outputs();
-        let mut outputs = Vec::with_capacity(n);
-        for _ in 0..n {
-            outputs.push(0.0);
-        }
         AudioNode {
             device: Box::new(device),
-            outputs: outputs
+            outputs: vec![0.0; n]
         }
     }
 
