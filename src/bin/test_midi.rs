@@ -44,7 +44,7 @@ impl AudioDevice for WrappedAdsr {
 fn main() {
 
     println!("Initializing signal chain...");
-    let audio_engine = AudioEngine::open().unwrap();
+    let audio_engine = AudioEngine::with_buffer_size(256).unwrap();
     let midi_engine = MidiEngine::open().unwrap();
 
 

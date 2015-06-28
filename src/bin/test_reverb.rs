@@ -11,7 +11,7 @@ fn main() {
     use oxcable::tick::tick_until_enter;
 
     println!("Initializing signal chain...");
-    let engine = AudioEngine::open().unwrap();
+    let engine = AudioEngine::with_buffer_size(256).unwrap();
     let mut chain = DeviceChain::from(
         engine.default_input(1)
     ).into(

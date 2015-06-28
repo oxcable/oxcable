@@ -11,30 +11,31 @@ use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 static PORTAUDIO_T: portaudio::pa::SampleFormat =
     portaudio::pa::SampleFormat::Float32;
 
-/// Defines the buffer size for Portaudio
-static BUFFER_SIZE: usize = 256;
-
 
 /// The AudioEnginer opens and manages the resources associated with portaudio.
 /// It is used open new input/output streams and safely free them.
 pub struct AudioEngine {
-    marker: Rc<AudioEngineMarker>
+    marker: Rc<AudioEngineMarker>,
+    buffer_size: usize,
 }
 
 impl AudioEngine {
-    pub fn open() -> Result<AudioEngine, String> {
+    pub fn with_buffer_size(samples: usize) -> Result<AudioEngine, String> {
         match portaudio::pa::initialize() {
-            Ok(()) => Ok(AudioEngine { marker: Rc::new(AudioEngineMarker) }),
+            Ok(()) => Ok(AudioEngine {
+                marker: Rc::new(AudioEngineMarker),
+                buffer_size: samples
+            }),
             Err(e) => Err(portaudio::pa::get_error_text(e))
         }
     }
 
     pub fn default_input(&self, num_channels: usize) -> AudioIn {
-        AudioIn::new(self.marker.clone(), num_channels)
+        AudioIn::new(self, num_channels)
     }
 
     pub fn default_output(&self, num_channels: usize) -> AudioOut {
-        AudioOut::new(self.marker.clone(), num_channels)
+        AudioOut::new(self, num_channels)
     }
 }
 
@@ -58,27 +59,32 @@ pub struct AudioIn {
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
     num_channels: usize,
     buffer: Vec<Sample>,
+    buffer_size: usize,
     samples_read: usize,
 }
 
 impl AudioIn {
     /// Opens an audio input stream reading `num_channels` inputs.
-    fn new(engine: Rc<AudioEngineMarker>, num_channels: usize) -> AudioIn {
+    fn new(engine: &AudioEngine, num_channels: usize) -> AudioIn {
         // Open a stream in blocking mode
         let mut pa_stream = portaudio::pa::Stream::new();
-        pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,
-                               num_channels as i32, 0i32,
-                               PORTAUDIO_T, None).unwrap();
+        pa_stream.open_default(SAMPLE_RATE as f64,
+                               engine.buffer_size as u32,
+                               num_channels as i32,
+                               0i32,
+                               PORTAUDIO_T,
+                               None).unwrap();
         pa_stream.start().unwrap();
 
-        let buf_size = num_channels*BUFFER_SIZE;
+        let buf_size = num_channels*engine.buffer_size;
 
         AudioIn {
-            engine: engine,
+            engine: engine.marker.clone(),
             pa_stream: pa_stream,
             num_channels: num_channels,
             buffer: vec![0.0; buf_size],
-            samples_read: BUFFER_SIZE,
+            samples_read: engine.buffer_size,
+            buffer_size: engine.buffer_size,
         }
     }
 }
@@ -100,8 +106,8 @@ impl AudioDevice for AudioIn {
     }
 
     fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {
-        if self.samples_read == BUFFER_SIZE {
-            let num_read = self.num_channels * BUFFER_SIZE;
+        if self.samples_read == self.buffer_size {
+            let num_read = self.num_channels * self.buffer_size;
             let result = self.pa_stream.read(num_read as u32).unwrap();
             for (i, &s) in result.iter().enumerate() {
                 self.buffer[i] = s;
@@ -124,24 +130,29 @@ pub struct AudioOut {
     pa_stream: portaudio::pa::Stream<Sample, Sample>,
     num_channels: usize,
     buffer: Vec<Sample>,
+    buffer_size: usize,
     samples_written: usize,
 }
 
 impl AudioOut {
     /// Opens an output stream writing `num_channels` outputs.
-    fn new(engine: Rc<AudioEngineMarker>, num_channels: usize) -> AudioOut {
+    fn new(engine: &AudioEngine, num_channels: usize) -> AudioOut {
         // Open a stream in blocking mode
         let mut pa_stream = portaudio::pa::Stream::new();
-        pa_stream.open_default(SAMPLE_RATE as f64, BUFFER_SIZE as u32,
-                               0i32, num_channels as i32,
-                               PORTAUDIO_T, None).unwrap();
+        pa_stream.open_default(SAMPLE_RATE as f64,
+                               engine.buffer_size as u32,
+                               0i32,
+                               num_channels as i32,
+                               PORTAUDIO_T,
+                               None).unwrap();
         pa_stream.start().unwrap();
 
         AudioOut {
-            engine: engine,
+            engine: engine.marker.clone(),
             pa_stream: pa_stream,
             num_channels: num_channels,
-            buffer: Vec::with_capacity(num_channels*BUFFER_SIZE),
+            buffer: Vec::with_capacity(num_channels*engine.buffer_size),
+            buffer_size: engine.buffer_size,
             samples_written: 0,
         }
     }
@@ -172,9 +183,9 @@ impl AudioDevice for AudioOut {
         }
         self.samples_written += 1;
 
-        if self.samples_written == BUFFER_SIZE {
+        if self.samples_written == self.buffer_size {
             self.pa_stream.write(self.buffer.clone(),
-                                 BUFFER_SIZE as u32).unwrap();
+                                 self.buffer_size as u32).unwrap();
             self.samples_written = 0;
             self.buffer.clear()
         }

@@ -14,7 +14,7 @@ fn main() {
     use oxcable::tick::tick_until_enter;
 
     println!("Setting up signal chain...");
-    let engine = AudioEngine::open().unwrap();
+    let engine = AudioEngine::with_buffer_size(256).unwrap();
     let mut graph = DeviceGraph::new();
     let spk = graph.add_node(engine.default_output(2));
 
