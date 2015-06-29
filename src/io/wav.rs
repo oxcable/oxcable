@@ -23,17 +23,16 @@ impl WavReader {
     ///
     /// This function panics if the file can't be opened, or is not a valid wav
     /// file.
-    pub fn new(filename: &str) -> WavReader {
-        let mut file = File::open(filename).unwrap();
-        let header = WavHeader::read_from_file(&mut file).unwrap();
-        assert!(header.is_valid());
-        WavReader {
+    pub fn open(filename: &str) -> Result<WavReader, WavError> {
+        let mut file = try!(File::open(filename));
+        let header = try!(WavHeader::read_from_file(&mut file));
+        Ok(WavReader {
             num_channels: header.num_channels as usize,
             num_samples: (header.data_size / ((header.bit_depth/8) as u32) /
                 (header.num_channels as u32)) as Time,
             samples_read: 0,
             file: file
-        }
+        })
     }
 
     /// Returns the number of audio samples in the wav file.
@@ -90,16 +89,17 @@ impl WavWriter {
     /// Returns a `WavWriting` writing to the provided file
     ///
     /// This function panics if the file can't be opened or written to
-    pub fn new(filename: &str, num_channels: usize) -> WavWriter {
-        let mut file = File::create(filename).unwrap();
+    pub fn create(filename: &str, num_channels: usize)
+            -> Result<WavWriter, WavError> {
+        let mut file = try!(File::create(filename));
         let header = WavHeader::new(num_channels as u16, SAMPLE_RATE as u32,
                                     0u32);
-        header.write_to_file(&mut file).unwrap();
-        WavWriter {
+        try!(header.write_to_file(&mut file));
+        Ok(WavWriter {
             num_channels: num_channels,
             file: file,
             samples_written: 0
-        }
+        })
     }
 }
 
@@ -132,6 +132,29 @@ impl AudioDevice for WavWriter {
             self.file.write_i16::<LittleEndian>((clipped*32768.0) as i16).unwrap();
         }
         self.samples_written += 1;
+    }
+}
+
+
+#[derive(Debug)]
+pub enum WavError {
+    InvalidFile,
+    Io(io::Error),
+    UnsupportedFeature(&'static str),
+}
+
+impl From<io::Error> for WavError {
+    fn from(e: io::Error) -> WavError {
+        WavError::Io(e)
+    }
+}
+
+impl From<byteorder::Error> for WavError {
+    fn from(e: byteorder::Error) -> WavError {
+        match e {
+            byteorder::Error::UnexpectedEOF => WavError::InvalidFile,
+            byteorder::Error::Io(e) => WavError::Io(e),
+        }
     }
 }
 
@@ -182,7 +205,7 @@ impl WavHeader {
     }
 
     /// Attempts to read a wav header from the provided file
-    fn read_from_file(f: &mut File) -> byteorder::Result<WavHeader> {
+    fn read_from_file(f: &mut File) -> Result<WavHeader, WavError> {
         let riff_hdr = try!(f.read_u32::<LittleEndian>());
         let file_size = try!(f.read_u32::<LittleEndian>());
         let wave_lbl = try!(f.read_u32::<LittleEndian>());
@@ -196,7 +219,7 @@ impl WavHeader {
         let bit_depth = try!(f.read_u16::<LittleEndian>());
         let data_hdr = try!(f.read_u32::<LittleEndian>());
         let data_size = try!(f.read_u32::<LittleEndian>());
-        Ok(WavHeader {
+        let header = WavHeader {
             riff_hdr: riff_hdr,
             file_size: file_size,
             wave_lbl: wave_lbl,
@@ -210,35 +233,48 @@ impl WavHeader {
             bit_depth: bit_depth,
             data_hdr: data_hdr,
             data_size: data_size
-        })
+        };
+        header.check()
     }
 
-    /// Returns true if this wav header has valid fields and uses the supported
-    /// formats
-    fn is_valid(&self) -> bool {
+    /// Returns the header if the wav header has valid fields and uses the
+    /// supported formats, otherwise return a descriptive error
+    fn check(self) -> Result<WavHeader, WavError> {
         // Check the headers are correct
-        if self.riff_hdr != RIFF { return false; }
-        if self.wave_lbl != WAVE { return false; }
-        if self.fmt_hdr  != FMT_ { return false; }
-        if self.data_hdr != DATA { return false; }
+        if self.riff_hdr != RIFF { return Err(WavError::InvalidFile); }
+        if self.wave_lbl != WAVE { return Err(WavError::InvalidFile); }
+        if self.fmt_hdr  != FMT_ { return Err(WavError::InvalidFile); }
+        if self.data_hdr != DATA { return Err(WavError::InvalidFile); }
 
         // Check sizes are correct
-        if self.file_size != self.data_size + 36 { return false; }
-        if self.section_size != 16 { return false; }
+        if self.file_size != self.data_size + 36 {
+            return Err(WavError::InvalidFile);
+        }
+        if self.section_size != 16 {
+            return Err(WavError::InvalidFile);
+        }
         if self.byte_rate != self.sample_rate*(self.num_channels as u32)*
             (self.bit_depth as u32)/8 {
-            return false;
+            return Err(WavError::InvalidFile);
         }
         if self.block_align != self.num_channels*self.bit_depth/8 {
-            return false;
+            return Err(WavError::InvalidFile);
         }
 
         // Check for formats we can read
-        if self.format != 1 { return false; }
-        if self.sample_rate != (SAMPLE_RATE as u32) { return false; }
-        if self.bit_depth != 16 { return false; }
+        if self.format != 1 {
+            return Err(WavError::UnsupportedFeature("Only PCM is supported"));
+        }
+        if self.sample_rate != (SAMPLE_RATE as u32) {
+            return Err(WavError::UnsupportedFeature(
+                    "Sample rate conversion not supported"));
+        }
+        if self.bit_depth != 16 {
+            return Err(WavError::UnsupportedFeature("Only 16-bit supported"));
+        }
 
-        true
+        // If this header is valid, then return it instead
+        Ok(self)
     }
 
     /// Attempts to write this wav header to the provided file
