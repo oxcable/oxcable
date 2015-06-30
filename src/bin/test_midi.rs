@@ -52,7 +52,7 @@ fn main() {
         Oscillator::new(oscillator::Saw(oscillator::PolyBlep)).freq(220.0)
     ).into(
         WrappedAdsr {
-            midi: midi_engine.choose_input(),
+            midi: midi_engine.choose_input().unwrap(),
             adsr: adsr::Adsr::default(1)
         }
     ).into(

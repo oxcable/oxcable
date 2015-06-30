@@ -18,17 +18,18 @@ pub struct MidiEngine {
 }
 
 impl MidiEngine {
-    pub fn open() -> Result<MidiEngine, portmidi::PortMidiError> {
+    pub fn open() -> Result<MidiEngine, MidiError> {
         try!(portmidi::initialize());
         Ok(MidiEngine { marker: Rc::new(MidiEngineMarker) })
     }
 
-    pub fn default_input(&self) -> MidiIn {
-        MidiIn::new(self.marker.clone(),
-            portmidi::get_default_input_device_id().unwrap())
+    pub fn default_input(&self) -> Result<MidiIn, MidiError> {
+        let device = try!(portmidi::get_default_input_device_id().ok_or(
+                MidiError::NoDevices));
+        MidiIn::new(self.marker.clone(), device)
     }
 
-    pub fn choose_input(&self) -> MidiIn {
+    pub fn choose_input(&self) -> Result<MidiIn, MidiError> {
         println!("Select a MIDI input:");
         let default_in = portmidi::get_default_input_device_id();
         let mut valids = Vec::new();
@@ -47,7 +48,7 @@ impl MidiEngine {
                 _ => ()
             }
         }
-        assert!(valids.len() > 0);
+        if valids.len() == 0 { return Err(MidiError::NoDevices); }
 
         let mut port = None;
         let mut s = String::new();
@@ -66,8 +67,8 @@ impl MidiEngine {
             s.clear();
         }
 
-        MidiIn::new(self.marker.clone(),
-                    port.unwrap() as portmidi::PortMidiDeviceId)
+        let port = port.unwrap() as portmidi::PortMidiDeviceId;
+        MidiIn::new(self.marker.clone(), port)
     }
 }
 
@@ -95,15 +96,15 @@ pub struct MidiIn {
 impl MidiIn {
     /// Opens a midi input stream.
     fn new(engine: Rc<MidiEngineMarker>, port: portmidi::PortMidiDeviceId)
-            -> MidiIn {
+            -> Result<MidiIn, MidiError> {
         // Open a stream. For now, use first device
         let mut pm_stream = portmidi::InputPort::new(port, BUFFER_SIZE);
-        pm_stream.open().unwrap();
+        try!(pm_stream.open());
 
-        MidiIn {
+        Ok(MidiIn {
             engine: engine,
             pm_stream: pm_stream,
-        }
+        })
     }
 
     /// Closes the portmidi stream
@@ -122,6 +123,19 @@ impl MidiDevice for MidiIn {
             }
         }
         events
+    }
+}
+
+
+#[derive(Debug)]
+pub enum MidiError {
+    NoDevices,
+    PortMidi(portmidi::PortMidiError)
+}
+
+impl From<portmidi::PortMidiError> for MidiError {
+    fn from(e: portmidi::PortMidiError) -> MidiError {
+        MidiError::PortMidi(e)
     }
 }
 
