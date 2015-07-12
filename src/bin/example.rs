@@ -11,7 +11,7 @@ fn main() {
     use oxcable::io::audio::AudioEngine;
     use oxcable::mixers::Gain;
     use oxcable::oscillator::*;
-    use oxcable::tick::tick_until_enter;
+    use oxcable::tick::Tick;
 
     println!("Setting up signal chain...");
     let engine = AudioEngine::with_buffer_size(256).unwrap();
@@ -33,6 +33,6 @@ fn main() {
     graph.add_edge(gain, 0, spk, 1).unwrap();
 
     println!("Playing. Press Enter to quit...");
-    tick_until_enter(&mut graph);
+    graph.tick_until_enter();
     println!("Done!");
 }

@@ -8,7 +8,7 @@ use oxcable::types::{AudioDevice, MidiDevice, MidiMessage, Time, Sample};
 use oxcable::io::audio::AudioEngine;
 use oxcable::io::midi::{MidiEngine, MidiIn};
 use oxcable::oscillator::{self, Oscillator};
-use oxcable::tick::tick_until_enter;
+use oxcable::tick::Tick;
 
 
 struct WrappedAdsr {
@@ -42,11 +42,9 @@ impl AudioDevice for WrappedAdsr {
 
 #[cfg(not(test))]
 fn main() {
-
     println!("Initializing signal chain...");
     let audio_engine = AudioEngine::with_buffer_size(256).unwrap();
     let midi_engine = MidiEngine::open().unwrap();
-
 
     let mut chain = DeviceChain::from(
         Oscillator::new(oscillator::Saw(oscillator::PolyBlep)).freq(220.0)
@@ -60,6 +58,6 @@ fn main() {
     );
 
     println!("Playing. Press Enter to quit...");
-    tick_until_enter(&mut chain);
+    chain.tick_until_enter();
     println!("Done!");
 }

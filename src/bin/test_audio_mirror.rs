@@ -6,7 +6,7 @@ extern crate oxcable;
 fn main() {
     use oxcable::chain::DeviceChain;
     use oxcable::io::audio::AudioEngine;
-    use oxcable::tick::tick_until_enter;
+    use oxcable::tick::Tick;
 
     println!("Initializing signal chain...");
     let engine = AudioEngine::with_buffer_size(128).unwrap();
@@ -17,6 +17,6 @@ fn main() {
     );
 
     println!("Mirroring microphone input to speaker. Press Enter to quit.");
-    tick_until_enter(&mut chain);
+    chain.tick_until_enter();
     println!("Done!");
 }

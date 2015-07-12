@@ -7,7 +7,7 @@ fn main() {
     use oxcable::io::wav::{WavReader, WavWriter};
     use oxcable::filters::second_order::*;
     use oxcable::graph::DeviceGraph;
-    use oxcable::tick::tick_n_times;
+    use oxcable::tick::Tick;
 
     // Initialize objects
     println!("Initializing signal chain...");
@@ -42,6 +42,6 @@ fn main() {
 
     // Write files
     println!("Writing second order filters to wav files...");
-    tick_n_times(&mut graph, 44100);
+    graph.tick_n_times(44100);
     println!("Done!");
 }

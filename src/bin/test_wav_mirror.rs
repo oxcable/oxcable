@@ -7,7 +7,7 @@ fn main() {
     use oxcable::chain::DeviceChain;
     use oxcable::io::wav::{WavReader, WavWriter};
     use oxcable::types::AudioDevice;
-    use oxcable::tick::tick_n_times;
+    use oxcable::tick::Tick;
 
     println!("Initializing signal chain...");
     let inwav = WavReader::open("wav/song.wav").unwrap();
@@ -16,6 +16,6 @@ fn main() {
     let mut chain = DeviceChain::from(inwav).into(outwav);
 
     println!("Mirroring wav/song.wav input to wav/test_wav.wav...");
-    tick_n_times(&mut chain, samples);
+    chain.tick_n_times(samples);
     println!("Done!");
 }

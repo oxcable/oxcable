@@ -8,7 +8,7 @@ fn main() {
     use oxcable::dynamics::*;
     use oxcable::graph::DeviceGraph;
     use oxcable::io::wav::{WavReader, WavWriter};
-    use oxcable::tick::tick_n_times;
+    use oxcable::tick::Tick;
 
     // Initialize objects
     println!("Initializing signal chain...");
@@ -37,6 +37,6 @@ fn main() {
 
     // Write files
     println!("Writing to wav files...");
-    tick_n_times(&mut graph, samples);
+    graph.tick_n_times(samples);
     println!("Done!");
 }
