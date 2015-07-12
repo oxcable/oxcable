@@ -263,8 +263,8 @@ mod test {
     fn test_naive_square() {
         use super::{AntialiasType, Waveform, Oscillator};
         use types::AudioDevice;
-        let mut osc = Oscillator::new(Waveform::Square(AntialiasType::Aliased),
-                                      4410.0);
+        let mut osc = Oscillator::new(Waveform::Square(AntialiasType::Aliased))
+            .freq(4410.0);
         let input = vec![];
         let mut output = vec![0.0];
 
@@ -284,8 +284,8 @@ mod test {
     fn test_naive_saw() {
         use super::{AntialiasType, Waveform, Oscillator};
         use types::AudioDevice;
-        let mut osc = Oscillator::new(Waveform::Saw(AntialiasType::Aliased),
-                                      4410.0);
+        let mut osc = Oscillator::new(Waveform::Saw(AntialiasType::Aliased))
+            .freq(4410.0);
         let input = vec![];
         let mut output = vec![0.0];
 
