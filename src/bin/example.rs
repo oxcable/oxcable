@@ -7,11 +7,10 @@ extern crate oxcable;
 fn main() {
     use oxcable::oscillator;
     use oxcable::delay::Delay;
-    use oxcable::graph::DeviceGraph;
+    use oxcable::graph::{DeviceGraph, Tick};
     use oxcable::io::audio::AudioEngine;
     use oxcable::mixers::Gain;
     use oxcable::oscillator::*;
-    use oxcable::tick::Tick;
 
     println!("Setting up signal chain...");
     let engine = AudioEngine::with_buffer_size(256).unwrap();

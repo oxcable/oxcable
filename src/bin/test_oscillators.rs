@@ -4,10 +4,9 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use oxcable::chain::DeviceChain;
+    use oxcable::chain::{DeviceChain, Tick};
     use oxcable::io::wav::WavWriter;
     use oxcable::oscillator::*;
-    use oxcable::tick::Tick;
 
     // Initialize objects
     println!("Initializing signal chain...");

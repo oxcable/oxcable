@@ -4,10 +4,9 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use oxcable::chain::DeviceChain;
+    use oxcable::chain::{DeviceChain, Tick};
     use oxcable::io::wav::{WavReader, WavWriter};
     use oxcable::types::AudioDevice;
-    use oxcable::tick::Tick;
 
     println!("Initializing signal chain...");
     let inwav = WavReader::open("wav/song.wav").unwrap();

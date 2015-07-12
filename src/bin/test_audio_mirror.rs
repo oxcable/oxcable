@@ -4,9 +4,8 @@ extern crate oxcable;
 
 #[cfg(not(test))]
 fn main() {
-    use oxcable::chain::DeviceChain;
+    use oxcable::chain::{DeviceChain, Tick};
     use oxcable::io::audio::AudioEngine;
-    use oxcable::tick::Tick;
 
     println!("Initializing signal chain...");
     let engine = AudioEngine::with_buffer_size(128).unwrap();

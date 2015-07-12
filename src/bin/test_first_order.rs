@@ -6,8 +6,7 @@ extern crate oxcable;
 fn main() {
     use oxcable::io::wav::{WavReader, WavWriter};
     use oxcable::filters::first_order::*;
-    use oxcable::graph::DeviceGraph;
-    use oxcable::tick::Tick;
+    use oxcable::graph::{DeviceGraph, Tick};
 
     // Initialize objects
     println!("Initializing signal chain...");

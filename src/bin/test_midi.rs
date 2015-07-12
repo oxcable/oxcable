@@ -3,12 +3,11 @@
 extern crate oxcable;
 
 use oxcable::adsr;
-use oxcable::chain::DeviceChain;
+use oxcable::chain::{DeviceChain, Tick};
 use oxcable::types::{AudioDevice, MidiDevice, MidiMessage, Time, Sample};
 use oxcable::io::audio::AudioEngine;
 use oxcable::io::midi::{MidiEngine, MidiIn};
 use oxcable::oscillator::{self, Oscillator};
-use oxcable::tick::Tick;
 
 
 struct WrappedAdsr {

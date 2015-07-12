@@ -6,9 +6,8 @@ extern crate oxcable;
 #[cfg(not(test))]
 fn main() {
     use oxcable::dynamics::*;
-    use oxcable::graph::DeviceGraph;
+    use oxcable::graph::{DeviceGraph, Tick};
     use oxcable::io::wav::{WavReader, WavWriter};
-    use oxcable::tick::Tick;
 
     // Initialize objects
     println!("Initializing signal chain...");
