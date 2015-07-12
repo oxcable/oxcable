@@ -56,7 +56,7 @@ fn main() {
             adsr: adsr::Adsr::default(1)
         }
     ).into(
-        audio_engine.default_output(1)
+        audio_engine.default_output(1).unwrap()
     );
 
     println!("Playing. Press Enter to quit...");

@@ -11,9 +11,9 @@ fn main() {
     println!("Initializing signal chain...");
     let engine = AudioEngine::with_buffer_size(128).unwrap();
     let mut chain = DeviceChain::from(
-        engine.default_input(1)
+        engine.default_input(1).unwrap()
     ).into(
-        engine.default_output(1)
+        engine.default_output(1).unwrap()
     );
 
     println!("Mirroring microphone input to speaker. Press Enter to quit.");
