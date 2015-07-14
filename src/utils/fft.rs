@@ -19,7 +19,7 @@ pub struct Transformer {
 
 impl Transformer {
     /// Returns a set precomputed information used to perform FFTs of the
-    /// provided size.
+    /// provided size. The size is rounded up to the nearest power of two.
     pub fn new(size: usize) -> Transformer {
         // Only operate in powers of two
         let bufsize = size.next_power_of_two();
@@ -53,22 +53,16 @@ impl Transformer {
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
-    ///
-    /// Returns `Error` if `output` is too small to hold the result.
-    pub fn fft(&self, input: &Vec<Complex>, output: &mut Vec<Complex>) ->
-        Result<(),()> {
-        self.transform(input, output, false)
+    pub fn fft(&self, input: &Vec<Complex>, output: &mut Vec<Complex>) {
+        self.transform(input, output, false);
     }
 
     /// Performs an inverse FFT on `input`, and places the result in `output`.
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
-    ///
-    /// Returns `Error` if `output` is too small to hold the result.
-    pub fn ifft(&self, input: &Vec<Complex>, output: &mut Vec<Complex>) ->
-        Result<(),()> {
-        self.transform(input, output, true)
+    pub fn ifft(&self, input: &Vec<Complex>, output: &mut Vec<Complex>) {
+        self.transform(input, output, true);
     }
 
     /// Performs the actual transform on `input`, placing the result in
@@ -80,15 +74,8 @@ impl Transformer {
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
-    ///
-    /// Returns `Error` if `output` is too small to hold the result.
     fn transform(&self, input: &Vec<Complex>, output: &mut Vec<Complex>,
-                     inverse: bool) -> Result<(),()> {
-        // Verify the provided vector is big enough for the result
-        if output.len() < self.size {
-            return Err(())
-        }
-
+                 inverse: bool) {
         // Copy the input into bit reverse order, zero padding if necessary,
         // conjugating if we are inverse transforming
         for i in (0 .. input.len()) {
@@ -133,8 +120,6 @@ impl Transformer {
                 output[i] = output[i].conj().scale(1.0/(self.size as f32));
             }
         }
-
-        Ok(())
     }
 }
 
@@ -214,7 +199,7 @@ mod test {
         }
 
         let t = Transformer::new(8);
-        t.fft(&impulse, &mut out).unwrap();
+        t.fft(&impulse, &mut out);
 
         for c in out.iter() {
             assert!(c.eq(one))
@@ -238,7 +223,7 @@ mod test {
         }
 
         let t = Transformer::new(8);
-        t.ifft(&impulse, &mut out).unwrap();
+        t.ifft(&impulse, &mut out);
 
         assert!(out[0].eq(one));
         for c in out[1 .. 8].iter() {
@@ -262,8 +247,8 @@ mod test {
         }
 
         let t = Transformer::new(8);
-        t.fft(&input, &mut fft).unwrap();
-        t.ifft(&fft, &mut out).unwrap();
+        t.fft(&input, &mut fft);
+        t.ifft(&fft, &mut out);
 
         for i in (0 .. 7) {
             println!("{}",out[i].real() - ((i+1) as f32));
@@ -291,31 +276,13 @@ mod test {
         }
 
         let t = Transformer::new(8);
-        t.fft(&input, &mut fft).unwrap();
-        t.ifft(&fft, &mut out).unwrap();
+        t.fft(&input, &mut fft);
+        t.ifft(&fft, &mut out);
 
         for i in (0 .. 7) {
             println!("{}",out[i].real() - ((i+1) as f32));
             assert!(out[i].real() - ((i+1) as f32) < epsilon);
             assert!(out[i].imag() < epsilon);
         }
-    }
-
-    /// Tests that the transformer fails when the output buffer is too short.
-    #[test]
-    fn test_fft_output_buffer_too_small() {
-        let zero = Complex::zero();
-
-        let mut input = Vec::with_capacity(8);
-        let mut out = Vec::with_capacity(7);
-        for i in (0 .. 8) {
-            input.push(zero);
-            if i < 7 {
-                out.push(zero);
-            }
-        }
-
-        let t = Transformer::new(8);
-        assert!(t.fft(&input, &mut out).is_err());
     }
 }
