@@ -53,7 +53,7 @@ impl Transformer {
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
-    pub fn fft(&self, input: &Vec<Complex>, output: &mut Vec<Complex>) {
+    pub fn fft(&self, input: &[Complex], output: &mut[Complex]) {
         self.transform(input, output, false);
     }
 
@@ -61,7 +61,7 @@ impl Transformer {
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
-    pub fn ifft(&self, input: &Vec<Complex>, output: &mut Vec<Complex>) {
+    pub fn ifft(&self, input: &[Complex], output: &mut[Complex]) {
         self.transform(input, output, true);
     }
 
@@ -74,7 +74,7 @@ impl Transformer {
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
-    fn transform(&self, input: &Vec<Complex>, output: &mut Vec<Complex>,
+    fn transform(&self, input: &[Complex], output: &mut[Complex],
                  inverse: bool) {
         // Copy the input into bit reverse order, zero padding if necessary,
         // conjugating if we are inverse transforming
