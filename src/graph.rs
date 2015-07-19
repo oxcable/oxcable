@@ -32,38 +32,47 @@ impl DeviceGraph {
         AudioNodeIdx(idx)
     }
 
-    pub fn add_edge(&mut self, from: AudioNodeIdx, from_ch: usize,
-                    to: AudioNodeIdx, to_ch: usize) -> Result<(), GraphError> {
+    /// Connect two devices in the graph. 
+    ///
+    /// `src` and `dest` are identifiers for the actual devices to connect.
+    ///
+    /// `src_ch` and `dest_ch` are the channel indices of the two devices.
+    ///
+    /// If invalid indices are provided, or if the specified edge would create
+    /// a cycle in the graph, an Err is returned and no changes dest the graph are
+    /// made.
+    pub fn add_edge(&mut self, src: AudioNodeIdx, src_ch: usize,
+                    dest: AudioNodeIdx, dest_ch: usize) -> Result<(), GraphError> {
         // Check device indices
-        let AudioNodeIdx(from_i) = from;
-        let AudioNodeIdx(to_i) = to;
-        if from_i >= self.nodes.len() {
-            return Err(GraphError::FromOutOfRange);
-        } else if to_i >= self.nodes.len() {
-            return Err(GraphError::ToOutOfRange);
+        let AudioNodeIdx(src_i) = src;
+        let AudioNodeIdx(dest_i) = dest;
+        if src_i >= self.nodes.len() {
+            return Err(GraphError::SrcOutOfRange);
+        } else if dest_i >= self.nodes.len() {
+            return Err(GraphError::DestOutOfRange);
         }
 
         // Check channels
-        if self.nodes[from_i].device.num_outputs() <= from_ch {
-            return Err(GraphError::FromChOutOfRange);
+        if self.nodes[src_i].device.num_outputs() <= src_ch {
+            return Err(GraphError::SrcChOutOfRange);
         }
-        if self.nodes[to_i].device.num_inputs() <= to_ch {
-            return Err(GraphError::ToChOutOfRange);
+        if self.nodes[dest_i].device.num_inputs() <= dest_ch {
+            return Err(GraphError::DestChOutOfRange);
         }
-        while self.nodes[to_i].inputs.len() < to_ch {
-            self.nodes[to_i].inputs.push(None);
+        while self.nodes[dest_i].inputs.len() < dest_ch {
+            self.nodes[dest_i].inputs.push(None);
         }
 
         // Set input
-        let (start,_) = self.nodes[from_i].outputs;
-        self.nodes[to_i].inputs[to_ch] = Some(start+from_ch);
-        self.topological_sort(to_i, to_ch)
+        let (start,_) = self.nodes[src_i].outputs;
+        self.nodes[dest_i].inputs[dest_ch] = Some(start+src_ch);
+        self.topological_sort(dest_i, dest_ch)
     }
 
     /// Determines the topology of our device graph. If the graph has a cycle,
     /// then we remove the last edge. Otherwise, we set self.topology to
     /// a topologically sorted order.
-    fn topological_sort(&mut self, to_i: usize, to_ch: usize) ->
+    fn topological_sort(&mut self, dest_i: usize, dest_ch: usize) ->
             Result<(), GraphError> {
         // Intialize our set of input edges, and our set of edgeless nodes
         let mut topology = Vec::new();
