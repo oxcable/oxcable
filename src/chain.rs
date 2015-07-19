@@ -20,6 +20,10 @@ impl DeviceChain {
         self.devices.push(AudioNode::new(device));
         self
     }
+
+    pub fn get_output(&self) -> Vec<Sample> {
+        self.devices[self.devices.len()-1].outputs.clone()
+    }
 }
 
 impl Tick for DeviceChain {
