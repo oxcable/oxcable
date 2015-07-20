@@ -11,6 +11,12 @@ This is a personal project of mine, with two goals:
 
 I am still fleshing out the core libraries, so interfaces are very unstable.
 
+Documentation
+-------------
+
+Documentation is available
+[here](http://thenyeguy.github.io/oxcable/oxcable/index.html).
+
 Examples
 --------
 
