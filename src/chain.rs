@@ -7,21 +7,27 @@
 //!
 //!
 //! # Example
-//! The following will send microphone input into a delay unit, into a speaker:
+//! The following will pass microphone input through a delay unit, then out to
+//! the speaker:
 //!
 //! ```
+//! # // this example uses tick_forever(), so we wrap it in a function that gets
+//! # // compiled by not run by doctest
+//! # fn dummy() {
 //! use oxcable::delay::Delay;
-//! use oxcable::chain::DeviceChain;
+//! use oxcable::chain::{DeviceChain, Tick};
 //! use oxcable::io::audio::AudioEngine;
 //!
 //! let engine = AudioEngine::with_buffer_size(256).unwrap();
-//! let chain = DeviceChain::from(
+//! let mut chain = DeviceChain::from(
 //!     engine.default_input(1).unwrap()
 //! ).into(
 //!     Delay::new(1.0, 0.5, 0.5, 1)
 //! ).into(
 //!     engine.default_output(1).unwrap()
 //! );
+//! chain.tick_forever();
+//! # }
 //! ```
 
 

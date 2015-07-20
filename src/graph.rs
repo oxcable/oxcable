@@ -10,13 +10,16 @@
 //!
 //! # Example
 //! 
-//! The following example has two different branches into a stereo output. It
-//! feeds an oscillator to the left channel, and a microphone with delay into
-//! the right channel.
+//! The following example creates a graph with two different branches into
+//! a stereo output. It feeds an oscillator to the left channel, and
+//! a microphone with delay into the right channel.
 //!
 //! ```
+//! # // this example uses tick_forever(), so we wrap it in a function that gets
+//! # // compiled by not run by doctest
+//! # fn dummy() {
 //! use oxcable::delay::Delay;
-//! use oxcable::graph::DeviceGraph;
+//! use oxcable::graph::{DeviceGraph, Tick};
 //! use oxcable::io::audio::AudioEngine;
 //! use oxcable::oscillator::*;
 //!
@@ -33,6 +36,10 @@
 //! graph.add_edge(oscillator, 0, speaker, 0);
 //! graph.add_edge(microphone, 0, delay, 0);
 //! graph.add_edge(delay, 0, speaker, 1);
+//!
+//! // Play audio ad nauseam.
+//! graph.tick_forever();
+//! # }
 //! ```
 
 use std::collections::VecDeque;
