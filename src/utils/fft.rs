@@ -3,6 +3,37 @@
 //! A `Transformer` must first be created to perform FFTs. The transformer
 //! stores precomputed information to speed up the transform, and can only be
 //! used to perform FFTs of the chosen size.
+//!
+//! # Example
+//!
+//! The following demonstrates how to use the `Transformer` to perform an 8-point FFT.
+//!
+//! ```
+//! # extern crate num;
+//! # extern crate oxcable;
+//! # fn main() {
+//! use num::complex::Complex32;
+//! use num::traits::Zero;
+//! use oxcable::utils::fft;
+//!
+//! // Initialize the FFT
+//! let transformer = fft::Transformer::new(8);
+//!
+//! // Generate an input signal
+//! let mut input = Vec::with_capacity(8);
+//! for i in 0..8 {
+//!     input.push(Complex32::new(i as f32, 0.0));
+//! }
+//!
+//! // Generate an empty output buffer
+//! let mut output = vec![Complex32::zero(); 8];
+//!
+//! // Perform the FFT
+//! transformer.fft(&input, &mut output);
+//! # }
+//! ```
+//!
+//! After this example, `output` will contain the FFT of `input`.
 
 use std::f32::consts::PI;
 use std::vec::Vec;
