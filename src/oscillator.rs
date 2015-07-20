@@ -32,6 +32,7 @@
 //! set up an antialiased saw wave at 440 Hz, with a 0.1 step vibrato:
 //!
 //! ```
+//! use oxcable::oscillator::*;
 //! Oscillator::new(Saw(PolyBlep)).freq(440.0).lfo_intensity(0.1);
 //! ```
 
