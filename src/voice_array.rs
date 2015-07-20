@@ -11,6 +11,11 @@
 //! is then returned so the implementor can trigger any changes needed in the
 //! voice.
 //!
+//! ## Example
+//!
+//! For an example instrument that uses `VoiceArray`, see
+//! [test_voice_array.rs](../../src/test_voice_array/test_voice_array.rs.html).
+//!
 //! ## Note selection
 //!
 //! When selecting which voice to use for a new note event, several criteria are
