@@ -1,15 +1,13 @@
 oxcable
 =======
 
-A simple audio processing and MIDI framework in Rust. The name is a play on
-words, referencing auxilary cables used for audio signals, and iron oxide (aka
-rust).
+A simple audio processing and MIDI framework in Rust.
 
 This is a personal project of mine, with two goals:
  1. To learn Rust.
  2. To work on design and implementation of real time audio systems.
 
-I am still fleshing out the core libraries, so interfaces are very unstable.
+I am still fleshing out the core libraries, so interfaces are still unstable.
 
 Documentation
 -------------
