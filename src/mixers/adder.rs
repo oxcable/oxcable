@@ -1,17 +1,15 @@
-//! `Device` for adding multiple channels into one.
-
 use types::{AudioDevice, Sample, Time};
 
 
 /// An adder.
 ///
-/// The adder sums all its inputs into a single output.
+/// The `Adder` simply sums all of its inputs.
 pub struct Adder {
     num_channels: usize
 }
 
 impl Adder {
-    /// Returns a new adder with `num_inputs` input channels.
+    /// Returns a new adder with `num_inputs` inputs and one output.
     pub fn new(num_channels: usize) -> Adder {
         Adder { num_channels: num_channels }
     }

@@ -1,8 +1,7 @@
-//! Provides first order IIR filters.
+//! A first order IIR filter.
 //!
 //! A `LowPass` or `HighPass` filter will provide a 3dB attenuation at the
-//! cutoff frequency, and roughly 6dB per octave rolloff in the attenuation
-//! region.
+//! cutoff frequency, and a 6dB per octave rolloff in the attenuation region.
 //!
 //! A `LowShelf` or `HighShelf` filter will provide a shelf starting at the
 //! cutoff frequency, and will provide the specified gain in the shelf region.
@@ -18,22 +17,22 @@ use utils::helpers::decibel_to_ratio;
 
 /// Specifies the mode for a first order `Filter`.
 ///
-/// `LowPass` and `HighPass` filters specify the cutoff frequency in Hz.
-///
-/// `LowShelf` and `HighShelf` filters specify the cutoff frequency in Hz, and
-/// the gain for the shelf region in decibels.
+/// Cutoffs are provided in Hz, gains are provided in decibels.
 #[derive(Clone, Copy, Debug)]
 pub enum FilterMode {
-    LowPass(f32),       // cutoff
+    /// LowPass(cutoff)
+    LowPass(f32),
+    /// HighPass(cutoff)
     HighPass(f32),
-    LowShelf(f32, f32), // cutoff, gain
+    /// LowShelf(cutoff, gain)
+    LowShelf(f32, f32),
+    /// HighShelf(cutoff, gain)
     HighShelf(f32, f32)
 }
 pub use self::FilterMode::*;
 
 
-/// A filter that uses a first order all pass filter to perform the specified
-/// mode. Each of the channels will be filtered independently.
+/// A single pole filter.
 pub struct Filter {
     num_channels: usize,
     x_last: Vec<Sample>,
@@ -44,7 +43,8 @@ pub struct Filter {
 }
 
 impl Filter {
-    /// Creates a new first order filter with the provided mode.
+    /// Creates a new first order filter with the provided mode. Each channel is
+    /// filtered independently.
     pub fn new(mode: FilterMode, num_channels: usize) -> Filter {
         // Compute the parameter values. H0 is ignored for Pass filters
         let (alpha, H0) = compute_parameters(mode.clone());

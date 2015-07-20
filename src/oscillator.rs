@@ -1,4 +1,39 @@
-//! Provides an oscillator that generates periodic waveforms.
+//! A antialiasing oscillator.
+//!
+//! ## Waveforms
+//!
+//! The oscillator supports several classical waveforms. The square, triangle,
+//! and saw waves support both aliased and antialiased variants.
+//!
+//! The aliased variants produce pure signals; for example, a square wave only
+//! emits two values: `-1.0` and `+1.0`. This is useful when a control signal is
+//! wanted, but produces aliasing in the frequency domain.
+//!
+//! The antialiased variants use PolyBLEP (polynomial bandlimited step) to
+//! mitigate the aliasing in the pure signals. This results in a much cleaner
+//! audible signal, and is more desirable for most musical purposes.
+//!
+//! ## Pitch Bend
+//!
+//! The oscillator supports pitch bending as an additional modifier of the base
+//! frequency. This makes it easier to bend a single note when working with
+//! MIDI, rather than manually tracking the base frequency and computing a new
+//! frequency yourself.
+//!
+//! ## Low Frequency Oscillator
+//!
+//! The oscillator supports a low frequency oscillator (LFO) as optional input.
+//! If provided, then the LFO is used to modulate the frequency of the
+//! oscillator, producing a vibrato.
+//!
+//! ## Example
+//!
+//! The oscillator uses a builder pattern for initialization. The following will
+//! set up an antialiased saw wave at 440 Hz, with a 0.1 step vibrato:
+//!
+//! ```
+//! Oscillator::new(Saw(PolyBlep)).freq(440.0).lfo_intensity(0.1);
+//! ```
 
 use std::f32::consts::PI;
 use num::traits::Float;
@@ -7,26 +42,22 @@ use rand::random;
 use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 
 
-/// Defines the messages that the Oscillator supports
+/// The messages that the Oscillator responds to.
 #[derive(Clone, Copy, Debug)]
 pub enum OscillatorMessage {
-    /// Sets the frequency in Hz
+    /// Set the frequency in Hz.
     SetFreq(f32),
-    /// Sets the waveform type
+    /// Set the waveform type.
     SetWaveform(Waveform),
-    /// Sets the LFO vibrato depth, in steps
+    /// Set the LFO vibrato depth, in steps.
     SetLFOIntensity(f32),
-    /// Sets the pitch bend, in steps
+    /// Set the pitch bend, in steps.
     SetBend(f32),
 }
 pub use self::OscillatorMessage::*;
 
 
 /// Antialiasing method for certain waveforms.
-///
-/// Aliased waveforms will use naive methods that produce aliasing.
-/// PolyBLEP (Polynomial Bandlimited Step) uses offsets to round off sharp edges
-/// and reduce aliasing.
 #[derive(Clone, Copy, Debug)]
 pub enum AntialiasType {
     /// Naive, aliasing waveforms.
@@ -38,18 +69,19 @@ pub use self::AntialiasType::*;
 
 
 /// Oscillator waveforms.
-///
-/// `Saw`, `Square`, and `Tri` provides either aliased waveforms, or antialiased
-/// waveforms using PolyBLEP. Aliased waveformsare useful for control signals,
-/// but not for raw audio signals. For audible signals, instead used the
-/// corresponding `PolyBlep` waveforms.
 #[derive(Clone, Copy, Debug)]
 pub enum Waveform {
+    /// A sine wave
     Sine,
+    /// A saw wave
     Saw(AntialiasType),
+    /// A square wave
     Square(AntialiasType),
+    /// A triangle wave
     Tri(AntialiasType),
+    /// Pure white noise
     WhiteNoise,
+    /// A series of impulses
     PulseTrain
 }
 pub use self::Waveform::*;
@@ -66,8 +98,7 @@ pub struct Oscillator {
 }
 
 impl Oscillator {
-    /// Returns an oscillator with the specified waveform at the specified
-    /// frequency, in Hz.
+    /// Return an oscillator with the specified waveform.
     pub fn new(waveform: Waveform) -> Oscillator {
         Oscillator {
             waveform: waveform,
@@ -79,17 +110,21 @@ impl Oscillator {
         }
     }
 
+    /// Set the frequency of the waveform, and return the same oscillator.
     pub fn freq(mut self, freq: f32) -> Oscillator {
         self.handle_message(SetFreq(freq));
         self
     }
 
+    /// Set the intensity of the LFO vibrato, and return the same oscillator.
+    ///
+    /// The intensity is provided in half steps (1/2ths of an octave).
     pub fn lfo_intensity(mut self, lfo_intensity: f32) -> Oscillator {
         self.handle_message(SetLFOIntensity(lfo_intensity));
         self
     }
 
-    /// Applies the message to the oscillator
+    /// Perform the action specified by the message.
     pub fn handle_message(&mut self, msg: OscillatorMessage) {
         match msg {
             SetFreq(freq) => {

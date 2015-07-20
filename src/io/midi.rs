@@ -1,4 +1,7 @@
-//! Provides MIDI input from OS MIDI devices.
+//! MIDI input from system MIDI devices.
+//!
+//! A `MidiEngine` is used to manage the MIDI driver and open new MIDI streams.
+//! All input streams must be opened through an engine instance.
 
 extern crate portmidi;
 
@@ -12,23 +15,27 @@ use types::{MidiDevice, MidiEvent, MidiMessage, Time};
 static BUFFER_SIZE: i32 = 256;
 
 
-/// Used to handle portmidi resources.
+/// A system resources manager.
 pub struct MidiEngine {
     marker: Rc<MidiEngineMarker>
 }
 
 impl MidiEngine {
+    /// Initialize the MIDI driver.
     pub fn open() -> Result<MidiEngine, MidiError> {
         try!(portmidi::initialize());
         Ok(MidiEngine { marker: Rc::new(MidiEngineMarker) })
     }
 
+    /// Open a MidiIn using the default OS device.
     pub fn default_input(&self) -> Result<MidiIn, MidiError> {
         let device = try!(portmidi::get_default_input_device_id().ok_or(
                 MidiError::NoDevices));
         MidiIn::new(self.marker.clone(), device)
     }
 
+    /// Launch a command-line input selection message, then open a MidiIn using
+    /// the user selected device.
     pub fn choose_input(&self) -> Result<MidiIn, MidiError> {
         println!("Select a MIDI input:");
         let default_in = portmidi::get_default_input_device_id();
@@ -79,14 +86,13 @@ impl MidiEngine {
 /// scope, then portmidi will automatically be terminated.
 struct MidiEngineMarker;
 impl Drop for MidiEngineMarker {
-    fn drop(&mut self)
-    {
+    fn drop(&mut self) {
         portmidi::terminate().unwrap();
     }
 }
 
 
-/// Reads audio from the OS's default midi device.
+/// Read audio from the OS's default midi device.
 pub struct MidiIn {
     #[allow(dead_code)] // the engine is used as an RAII marker
     engine: Rc<MidiEngineMarker>,
@@ -94,7 +100,7 @@ pub struct MidiIn {
 }
 
 impl MidiIn {
-    /// Opens a midi input stream.
+    /// Open a midi input stream.
     fn new(engine: Rc<MidiEngineMarker>, port: portmidi::PortMidiDeviceId)
             -> Result<MidiIn, MidiError> {
         // Open a stream. For now, use first device
@@ -129,9 +135,12 @@ impl MidiDevice for MidiIn {
 }
 
 
+/// An error type for MIDI stream management
 #[derive(Debug)]
 pub enum MidiError {
+    /// No MIDI devices can be found
     NoDevices,
+    /// Wraps a PortMidi error
     PortMidi(portmidi::PortMidiError)
 }
 

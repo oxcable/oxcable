@@ -1,18 +1,18 @@
-//! `Device` for selecting one of several channels.
-
 use types::{AudioDevice, Sample, Time};
 
 
 /// A multiplexer.
 ///
-/// Mirrors one of its inputs into a single output while ignoring the rest.
+/// A multiplexer takes in several inputs, and chooses only one of them to send
+/// to the output. Since the input can be changed, this can be used as a switch
+/// between multiple signals.
 pub struct Multiplexer {
     num_inputs: usize,
     selected: usize,
 }
 
 impl Multiplexer {
-    /// Returns a new multiplexer with `num_inputs` input channels.
+    /// Returns a new multiplexer with `num_inputs` input and one output.
     pub fn new(num_inputs: usize) -> Multiplexer {
         Multiplexer {
             num_inputs: num_inputs,
@@ -20,7 +20,7 @@ impl Multiplexer {
         }
     }
 
-    /// Mirror channel `i` to the output.
+    /// Select the `i`th channel as the output.
     ///
     /// Returns Err if the channel is out of range.
     pub fn select_input(&mut self, i: usize) -> Result<(),()> {

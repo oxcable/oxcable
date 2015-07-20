@@ -1,20 +1,16 @@
-//! Provides parameter sets to simulate different reverberant environments.
+//! Parameter sets for simulating different reverberant environments.
 //!
-//! These parameter sets use vectors, which can't easily be provided statically,
-//! so instead we use functions that generate a fixed set of parameters for each
-//! model.
+//! The tapped delays and tapped gains specify the start of the reverb, and must
+//! be the same length. They represent the initial reflection paths, and are
+//! used to sculpt the echoes of the room.
+//!
+//! The comb delays are used to fill out the reverberations and create a steady
+//! decay; they sculpt the color of the room.
 
 use types::Time;
 
 
-/// Provides parameter sets meant to simulate different environments.
-///
-/// The tapped delays and tapped gains specify the start of the reverb, and must
-/// be the same length. They represent the initial multipaths, and are used to
-/// sculpt the echoes of the room.
-///
-/// The comb delays are used to fill out the reverberations and create a steady
-/// decay; they sculpt the character of the room.
+/// A container for Moorer reverberator parameters.
 #[derive(Copy, Clone, Debug)]
 pub struct Room<'a> {
     pub tapped_delays: &'a[Time],
@@ -22,6 +18,11 @@ pub struct Room<'a> {
     pub comb_delays: &'a[Time]
 }
 
+
+/// A generic concert hall.
+///
+/// This room was modeled by Moorer in his original paper, where he described
+/// the Moorer reverbator.
 pub static HALL: Room<'static> = Room {
     // For these parameters, see pg. 24 from Moorer paper
     tapped_delays: &[190, 948, 992, 1182, 1191, 1314, 2020, 2139, 2523,

@@ -1,5 +1,4 @@
-//! Provides utility structures and functions for creating audio and MIDI
-//! devices.
+//! Utility functions and objects for signal processing.
 
 pub mod complex;
 pub mod helpers;

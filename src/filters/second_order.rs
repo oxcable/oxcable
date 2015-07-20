@@ -1,15 +1,14 @@
-//! Provides second order IIR filters.
+//! A second order IIR filter.
 //!
 //! A `LowPass` or `HighPass` filter will provide a 3dB attenuation at the
-//! cutoff frequency, and roughly 12dB per octave rolloff in the attenuation
-//! region.
+//! cutoff frequency, and a 12dB per octave rolloff in the attenuation region.
 //!
 //! A `LowShelf` or `HighShelf` filter will provide a shelf starting at the
 //! cutoff frequency, and will provide the specified gain in the shelf region.
 //!
 //! A `Peak` filter will provide the specified gain around a center frequency,
-//! with the width of the peak determined by the Q (higher Q means a narrower
-//! peak).
+//! with the width of the peak determined by the Q. A higher Q means a narrower
+//! peak.
 
 
 use std::f32::consts::PI;
@@ -19,28 +18,26 @@ use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 
 
-/// Specifies the mode for a first order `Filter`.
+/// Specifies the mode for a second order `Filter`.
 ///
-/// `LowPass` and `HighPass` filters specify the cutoff frequency in Hz.
-///
-/// `LowShelf` and `HighShelf` filters specify the cutoff frequency in Hz, and
-/// the gain for the shelf region in decibels.
-///
-/// `Peak` filters specify the center frequency in Hz, the gain for the peak in
-/// decibels, and the filter Q.
+/// Cutoffs are provided in Hz, gains are provided in decibels.
 #[derive(Clone, Copy, Debug)]
 pub enum FilterMode {
-    LowPass(f32),        // cutoff
+    /// LowPass(cutoff)
+    LowPass(f32),
+    /// HighPass(cutoff)
     HighPass(f32),
-    LowShelf(f32, f32),  // cutoff, gain
+    /// LowShelf(cutoff, gain)
+    LowShelf(f32, f32),
+    /// HighShelf(cutoff, gain)
     HighShelf(f32, f32),
-    Peak(f32, f32, f32), // center frequency, gain, Q
+    /// Peak(cutoff, gain, Q)
+    Peak(f32, f32, f32),
 }
 pub use self::FilterMode::*;
 
 
-/// A filter that uses a second order all pass filter to perform the specified
-/// mode. Each of the channels will be filtered independently.
+/// A two pole filter.
 pub struct Filter {
     num_channels: usize,
     x_last1: Vec<Sample>, x_last2: Vec<Sample>, // two time step delay elements
@@ -49,7 +46,8 @@ pub struct Filter {
 }
 
 impl Filter {
-    /// Creates a new second order filter with the provided mode.
+    /// Creates a new second order filter with the provided mode. Each channel
+    /// is filtered independently.
     pub fn new(mode: FilterMode, num_channels: usize) -> Filter {
         // Compute the parameter values
         let (b0, b1, b2, a1, a2) = compute_parameters(mode);

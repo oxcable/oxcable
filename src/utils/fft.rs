@@ -1,8 +1,8 @@
-//! Provides an efficient Fast Fourier transform.
+//! An efficient Fast Fourier transform.
 //!
-//! A `Transformer` must first be created that stores precomputed information to
-//! speed up the transform. This `Transformer` can then be used only to perform
-//! FFTs of the chosen size.
+//! A `Transformer` must first be created to perform FFTs. The transformer
+//! stores precomputed information to speed up the transform, and can only be
+//! used to perform FFTs of the chosen size.
 
 use std::f32::consts::PI;
 use std::vec::Vec;
@@ -18,8 +18,8 @@ pub struct Transformer {
 }
 
 impl Transformer {
-    /// Returns a set precomputed information used to perform FFTs of the
-    /// provided size. The size is rounded up to the nearest power of two.
+    /// Initialize a transformer to perform FFTs of the provided size, rounded
+    /// up to the nearest power of two.
     pub fn new(size: usize) -> Transformer {
         // Only operate in powers of two
         let bufsize = size.next_power_of_two();
@@ -44,12 +44,12 @@ impl Transformer {
             twiddles: twiddles }
     }
 
-    /// Returns the size FFTs this Transformer performs
+    /// Return the size FFT this Transformer performs.
     pub fn get_size(&self) -> usize {
         self.size
     }
 
-    /// Performs an FFT on `input`, and places the result in `output`.
+    /// Perform an FFT on `input`, and place the result in `output`.
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
@@ -57,7 +57,7 @@ impl Transformer {
         self.transform(input, output, false);
     }
 
-    /// Performs an inverse FFT on `input`, and places the result in `output`.
+    /// Perform an inverse FFT on `input`, and place the result in `output`.
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
@@ -65,8 +65,7 @@ impl Transformer {
         self.transform(input, output, true);
     }
 
-    /// Performs the actual transform on `input`, placing the result in
-    /// `output`.
+    /// Perform the actual transform on `input`, placing the result in `output`.
     ///
     /// This function performs both forward and backwards transforms, since
     /// there are only minor algorithmic differences in the beginning and end
@@ -124,7 +123,7 @@ impl Transformer {
 }
 
 
-/// Returns the bit reverse of `n`, for the lower `bits` bits.
+/// Return the bit reverse of `n`, for the lower `bits` bits.
 ///
 /// For small examples, the bit reverse of 0b00011010 is 0b01011000, but the bit
 /// reverse of just the lower 5 bits is 0b00001011.
@@ -138,7 +137,8 @@ fn bit_reverse(n: u32, bits: u32) -> u32 {
     i >> ((32 - bits) as u32)
 }
 
-/// Returns the log base 2 of n, rounded up.
+
+/// Return the log base 2 of n, rounded up.
 fn int_log(n: u32) -> u32 {
     let mut i = n-1; // correct for exact powers of 2
     let mut res = 0;

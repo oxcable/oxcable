@@ -1,4 +1,4 @@
-//! Defines `Device`s for reverberation effects
+//! A reverb filter.
 
 mod moorer_reverb;
 pub mod rooms;

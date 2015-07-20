@@ -1,11 +1,13 @@
-//! Provides a limiter filter.
-
 use types::{AudioDevice, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
 
 
 /// A limiter.
+///
+/// Limiters provide a hard limit on the maximum amplitude of a signal. When the
+/// signal amplitude exceeds the threshold, it is attenuated down to the
+/// threshold.
 pub struct Limiter {
     level_detectors: Vec<LevelDetector>,
     num_channels: usize,
@@ -16,9 +18,10 @@ pub struct Limiter {
 impl Limiter {
     /// Creates a new limiter.
     ///
-    /// * `threshold` specifies the decibel level to limit the signal to.
-    /// * The specified `gain` (in decibels) will be applied to the
-    ///   signal after compression.
+    /// The `threshold` specifies the decibel level to limit the signal to.
+    ///
+    /// The specified `gain` (in decibels) will be applied to the signal after
+    /// compression.
     pub fn new(threshold: f32, gain: f32, num_channels: usize) -> Limiter {
         Limiter {
             level_detectors: vec![LevelDetector::default(); num_channels],

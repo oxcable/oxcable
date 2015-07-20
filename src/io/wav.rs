@@ -1,4 +1,4 @@
-//! Provides audio IO from wav files.
+//! Audio IO from WAV files.
 
 use byteorder::{self, ReadBytesExt, WriteBytesExt, LittleEndian};
 use std::fs::File;

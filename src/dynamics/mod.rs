@@ -1,4 +1,9 @@
-//! Provides `Device`s that perform dynamics processing.
+//! Audio devices to perform dynamics processing.
+//!
+//! Dynamics processors use an estimate of the signal envelope to modify the
+//! dynamics of the final signal. The `LevelDetector` can be used to track the
+//! peak amplitude of a signal over time, and is uesd by the other three
+//! filters.
 
 mod compressor;
 mod level_detector;

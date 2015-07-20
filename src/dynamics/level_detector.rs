@@ -1,5 +1,3 @@
-//! Provides envelope estimation for a signal.
-
 extern crate num;
 use self::num::traits::Float;
 
@@ -8,13 +6,19 @@ use types::{SAMPLE_RATE, Sample};
 
 /// Performs envelope estimation for a signal.
 ///
-/// The level detector uses two leaky integration of our signal to estimate the
-/// envelope. The integrator uses two different values of alpha, depending on
-/// whether the signal is greater or less than the current envelope.
+/// The level detector performs leaky integration of the input signal to
+/// estimate the envelope. Therefore, for a signal `x(t)`, the level
+/// `l(t) = alpha*l(t-1) + (1-alpha)*x(t)`.
 ///
-/// This means the attack value can be set very low to respond quickly to bursts
-/// in signal power, while the release value can be high in order to coast
-/// through periodic troughs in the signal.
+/// When creating a new level detector, a tau is specified, rather than an
+/// alpha. Tau is the time constant, which corresponds to how quickly the
+/// envelope estimate reaches steady state.
+///
+/// The integration uses two different values of tau, depending on whether the
+/// signal is greater or less than the current envelope. This means the attack
+/// value can be set very low to respond quickly to bursts in signal power,
+/// while the release value can be high in order to coast through periodic
+/// troughs in the signal.
 #[derive(Clone, Copy, Debug)]
 pub struct LevelDetector {
     attack_alpha: f32,
@@ -23,6 +27,12 @@ pub struct LevelDetector {
 }
 
 impl LevelDetector {
+    /// Returns a level detector with default `tau` values tuned for reasonable
+    /// performance.
+    pub fn default() -> LevelDetector {
+        LevelDetector::new(1.0, 100.0)
+    }
+
     /// Returns a new level detector.
     ///
     /// * `attack_tau` specifies the time constant when the signal is growing,
@@ -37,16 +47,10 @@ impl LevelDetector {
         }
     }
 
-    /// Returns a level detector with default `tau` values tuned for reasonable
-    /// performance.
-    pub fn default() -> LevelDetector {
-        LevelDetector::new(1.0, 100.0)
-    }
-
-    /// Given the next input sample, computes the current estimate of the
+    /// Given the next input sample `s`, computes the current estimate of the
     /// envelope value.
     pub fn compute_next_level(&mut self, s: Sample) -> f32 {
-        // Perform leaky integration on the signal power
+        // Perform leaky integration on the signal power, rather than amplitude
         let pow = s*s;
         let alpha = if pow > self.last_power {
             self.attack_alpha

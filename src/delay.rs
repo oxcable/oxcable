@@ -1,5 +1,10 @@
-//! Provides a simple delay module.
-
+//! A simple delay filter.
+//!
+//! The delay filter plays back delayed copies of its input. The first delay is
+//! played at full amplitude, and is then decayed linearly by the feedback
+//! multiplier.
+//!
+//! The output is mixed with the raw input using the wetness percentage.
 
 use std::vec::Vec;
 
@@ -7,12 +12,6 @@ use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use utils::ringbuffer::RingBuffer;
 
 
-/// A delay that feeds back each channel independently.
-///
-/// The delay filter plays back delayed copies of its input. The first delay is
-/// played at full amplitude, and is then decayed linearly by the feedback
-/// multiplier. The output is mixed with the raw input using the wetness
-/// percentage.
 pub struct Delay {
     num_channels: usize,
     delay_buffers: Vec<RingBuffer<Sample>>,
@@ -25,9 +24,9 @@ impl Delay {
     ///
     /// * `delay`: the time to delay the input, in seconds
     /// * `feedback`: how much of our delayed signal to feed back into the next
-    ///               delay
+    ///               delay; should be between 0.0 and 1.0.
     /// * `wetness`: how much of our input signal to mix into the delayed signal
-    ///              in the output
+    ///              in the output; should be between 0.0 and 1.0.
     pub fn new(delay: f32, feedback: f32, wetness: f32,
                num_channels: usize) -> Delay {
         // Create the delay buffers, starting with silence

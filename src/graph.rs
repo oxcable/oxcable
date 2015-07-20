@@ -1,4 +1,39 @@
-//! Provides a way to link `AudioDevice`s into an acyclic graph.
+//! A container for audio devices in an acyclic graph.
+//!
+//! A graph can be used when many audio devices need to connect in complex
+//! topologies. It can connect each output channel of a device to any input
+//! channel, provided that connection does not create a cycle.
+//!
+//! A graph is initialized by adding each device as a node in the graph, and
+//! then specifying the edges between devices. The graph will automatically
+//! process the devices in order of their dependencies.
+//!
+//! # Example
+//! 
+//! The following example has two different branches into a stereo output. It
+//! feeds an oscillator to the left channel, and a microphone with delay into
+//! the right channel.
+//!
+//! ```
+//! use oxcable::delay::Delay;
+//! use oxcable::graph::DeviceGraph;
+//! use oxcable::io::audio::AudioEngine;
+//! use oxcable::oscillator::*;
+//!
+//! let engine = AudioEngine::with_buffer_size(256).unwrap();
+//! let mut graph = DeviceGraph::new();
+//!
+//! // Add nodes to graph
+//! let oscillator = graph.add_node(Oscillator::new(Sine).freq(440.0));
+//! let microphone = graph.add_node(engine.default_input(1).unwrap());
+//! let delay = graph.add_node(Delay::new(0.5, 0.5, 0.5, 1));
+//! let speaker = graph.add_node(engine.default_output(2).unwrap());
+//!
+//! // Connect devices together
+//! graph.add_edge(oscillator, 0, speaker, 0);
+//! graph.add_edge(microphone, 0, delay, 0);
+//! graph.add_edge(delay, 0, speaker, 1);
+//! ```
 
 use std::collections::VecDeque;
 
@@ -6,6 +41,7 @@ use types::{AudioDevice, Sample, Time};
 pub use tick::Tick;
 
 
+/// An acyclic graph for audio devices.
 pub struct DeviceGraph {
     nodes: Vec<AudioNode>, // the actual nodes
     topology: Vec<usize>, // the order to tick the nodes
@@ -14,6 +50,7 @@ pub struct DeviceGraph {
 }
 
 impl DeviceGraph {
+    /// Create an empty graph.
     pub fn new() -> DeviceGraph {
         DeviceGraph {
             nodes: Vec::new(),
@@ -23,6 +60,8 @@ impl DeviceGraph {
         }
     }
 
+    /// Add a new device into the graph, with no connections. Returns
+    /// a identifier that refers back to this device.
     pub fn add_node<D>(&mut self, device: D) -> AudioNodeIdx
             where D: 'static+AudioDevice {
         let node = AudioNode::new(device, &mut self.bus);
@@ -120,7 +159,7 @@ impl DeviceGraph {
             self.topology = topology;
             Ok(())
         } else {
-            self.nodes[to_i].inputs[to_ch] = None;
+            self.nodes[dest_i].inputs[dest_ch] = None;
             Err(GraphError::CreatesCycle)
         }
     }
@@ -135,23 +174,40 @@ impl Tick for DeviceGraph {
     }
 }
 
+
+/// Errors returned while modifying the graph.
 #[derive(Copy, Clone, Debug)]
 pub enum GraphError {
-    FromOutOfRange, FromChOutOfRange, ToOutOfRange, ToChOutOfRange, CreatesCycle
+    /// The provided source device does not exist.
+    SrcOutOfRange,
+    /// The source device does not have that channel.
+    SrcChOutOfRange,
+    /// The provided destination device does not exist.
+    DestOutOfRange,
+    /// The destination device does not have that channel.
+    DestChOutOfRange,
+    /// Adding this edge would create a cycle.
+    CreatesCycle
 }
 
+
+/// An identifier used to refer back to a node in the graph.
 #[derive(Copy, Clone, Debug)]
 pub struct AudioNodeIdx(usize);
 
 
+/// A wrapper for a node in the graph.
+///
+/// Management of indices in the bus is handled in the graph itself.
 struct AudioNode {
-    device: Box<AudioDevice>,
-    inputs: Vec<Option<usize>>,
-    input_buf: Vec<Sample>,
-    outputs: (usize, usize)
+    device: Box<AudioDevice>, // wraps the device
+    inputs: Vec<Option<usize>>, // bus indices of the inputs
+    input_buf: Vec<Sample>, // an allocated buffer for containing inputs
+    outputs: (usize, usize) // the range of outputs in the bus
 }
 
 impl AudioNode {
+    /// Wrap the device in a new node
     fn new<D>(device: D, bus: &mut Vec<Sample>) -> AudioNode
             where D: 'static+AudioDevice {
         let num_in = device.num_inputs();
@@ -170,6 +226,8 @@ impl AudioNode {
         }
     }
 
+    /// Extract the inputs out of the bus, tick the device and place the outputs
+    /// back into the bus.
     fn tick(&mut self, t: Time, bus: &mut[Sample]) {
         for (i, ch) in self.inputs.iter().enumerate() {
             self.input_buf[i] = ch.map_or(0.0, |j| bus[j]);

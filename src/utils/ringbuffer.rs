@@ -1,4 +1,8 @@
-//! Provides a generic ring buffer
+//! A generic circular ring buffer.
+//!
+//! A ring buffer can continue appending data to itself indefinitely.  However,
+//! it has a limited capacity; when that capacity is reached, it will overwrite
+//! the oldest data to make space.
 
 use std::clone::Clone;
 use std::ops::Add;
@@ -7,11 +11,7 @@ use std::vec::Vec;
 use types::Time;
 
 
-/// A generic ring buffer
-///
-/// A ring buffer can continue adding data on to the end of itself indefinitely.
-/// However, it has a limited capacity; when that capacity is reached, it will
-/// remove the oldest data to make space.
+/// A generic ring buffer.
 #[derive(Clone, Debug)]
 pub struct RingBuffer<T: Clone> {
     buf: Vec<T>,
@@ -22,7 +22,7 @@ pub struct RingBuffer<T: Clone> {
 }
 
 impl<T: Clone> RingBuffer<T> {
-    /// Returns an empty ring buffer that can hold at most `capacity` elements.
+    /// Return an empty ring buffer that can hold at most `capacity` elements.
     pub fn new(capacity: usize) -> RingBuffer<T> {
         RingBuffer {
             buf: Vec::with_capacity(capacity),
@@ -33,7 +33,7 @@ impl<T: Clone> RingBuffer<T> {
         }
     }
 
-    /// Attempts to return the data stored at time `t`. If the requested time is
+    /// Attempt to return the data stored at time `t`. If the requested time is
     /// not in the buffer, instead returns `None`.
     pub fn get(&self, t: Time) -> Option<T> {
         if self.start_t <= t && t < self.end_t {
@@ -43,7 +43,7 @@ impl<T: Clone> RingBuffer<T> {
         }
     }
 
-    /// Pushes the supplied data onto the end of the buffer. If the buffer is
+    /// Push the supplied data onto the end of the buffer. If the buffer is
     /// full, this will overwrite the oldest data.
     pub fn push(&mut self, data: T) {
         if self.size < self.capacity {
@@ -57,8 +57,8 @@ impl<T: Clone> RingBuffer<T> {
         }
     }
 
-    /// Attempts to change the value at time `t` to `data`. If the requested
-    /// time is not in the buffer, instead returns `Err`.
+    /// Attempt to change the value at time `t` to `data`. If the requested time
+    /// is not in the buffer, instead returns `Err`.
     pub fn update(&mut self, t: Time, data: T) -> Result<(),()> {
         if self.start_t <= t && t < self.end_t {
             self.buf[(t % self.capacity as Time) as usize] = data;
@@ -70,8 +70,8 @@ impl<T: Clone> RingBuffer<T> {
 }
 
 impl<T: Add+Clone> RingBuffer<T> where T: Add<Output = T> {
-    /// Attempts to add to the provided value to the current value at time `t`.
-    /// If the requested time is not in the buffer, instead returns `Err`.
+    /// Attempt to add the provided value to the current value at time `t`. If
+    /// the requested time is not in the buffer, instead returns `Err`.
     pub fn add(&mut self, t: Time, data: T) -> Result<(),()> {
         if self.start_t <= t && t < self.end_t {
             let i = (t % self.capacity as Time) as usize;

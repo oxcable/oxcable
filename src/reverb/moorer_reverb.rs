@@ -1,8 +1,3 @@
-//! A simple IIR reverb filter.
-//!
-//! This algorithmic reverb filter follows the basic design specified by James
-//! Moorer in his seminal paper, "About This Reverberation Business".
-
 use num::traits::Float;
 
 use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
@@ -11,7 +6,10 @@ use utils::helpers::decibel_to_ratio;
 use reverb::rooms::Room;
 
 
-/// A multichannel reverb filter, that operates on each channel indepedently.
+/// An algorithmic, IIR reverberation filter.
+///
+/// This algorithmic reverb filter follows the basic design specified by James
+/// Moorer in his seminal paper, "About This Reverberation Business".
 pub struct MoorerReverb {
     num_channels: usize,
     gain: f32,
@@ -29,14 +27,14 @@ pub struct MoorerReverb {
 }
 
 impl MoorerReverb {
-    /// Creates and initializes a new reverberator.
+    /// Create and initialize a new reverberator.
     ///
-    /// * `room`: a `Room` struct, as described in `rooms.rs`. This specifies
+    /// * `room`: a [`Room`](rooms/struct.Room.html) struct. This specifies
     ///   aspects of the reverberation character.
-    /// * `rev_time`: the -60dB time, in seconds
-    /// * `gain`: the output gain, in decibels
-    /// * `wetness`: how much of the input signal to mix into the output
-    /// * `num_channels`: number of channels to process
+    /// * `rev_time`: the -60dB time, in seconds.
+    /// * `gain`: the output gain, in decibels.
+    /// * `wetness`: how much of the input signal to mix into the output.
+    /// * `num_channels`: number of channels to process.
     pub fn new(room: Room, rev_time: f32, gain: f32, wetness:f32,
            num_channels: usize) -> MoorerReverb {
         assert!(room.tapped_delays.len() == room.tapped_gains.len());

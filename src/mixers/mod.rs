@@ -1,4 +1,4 @@
-//! Defines `Device`s for mixing signals
+//! Tools for combining several audio signals.
 
 mod adder;
 mod gain;

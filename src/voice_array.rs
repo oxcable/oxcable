@@ -1,4 +1,27 @@
-//! Provides polyphonic voice arrays.
+//! A polyphonic voice array.
+//!
+//! The voice array maintains a set of identical voices, and is designed to
+//! simplify building polyphonic instruments.
+//!
+//! Each voice may be in two states: playing or free. The array tracks the play
+//! state and note of each voice, and uses them to select a voice to handle new
+//! note events.
+//!
+//! When a voice is selected to start or stop playing, a reference to that voice
+//! is then returned so the implementor can trigger any changes needed in the
+//! voice.
+//!
+//! ## Note selection
+//!
+//! When selecting which voice to use for a new note event, several criteria are
+//! used:
+//!
+//! 1. If the triggered note is already playing, return the same voice already
+//!    playing it.
+//! 2. If there are free voices, return the voice that has been free the
+//!    longest.
+//! 3. If there are no free voices, return the voice that has been held the
+//!    longest.
 
 use std::collections::{VecDeque, HashMap};
 use std::slice::{Iter, IterMut};
@@ -19,7 +42,9 @@ pub struct VoiceArray<T> {
 }
 
 impl<T> VoiceArray<T> {
-    /// Creates a new VoiceArray from the provifed vector of voices.
+    /// Creates a new VoiceArray from the provided vector of voices.
+    ///
+    /// `voices` is moved inside the array.
     pub fn new(voices: Vec<T>) -> VoiceArray<T> {
         let num_voices = voices.len();
         let mut free_voices = VecDeque::new();
@@ -35,23 +60,24 @@ impl<T> VoiceArray<T> {
         }
     }
 
-    /// Get an iterator over the voice objects
+    /// Get an iterator over the voice objects.
     pub fn iter(&self) -> Iter<T> {
         self.voices.iter()
     }
 
-    /// Get a mutable iterator over the voice objects
+    /// Get a mutable iterator over the voice objects.
     pub fn iter_mut(&mut self) -> IterMut<T> {
         self.voices.iter_mut()
     }
 
-    /// Selects a new voice, marks it as used, and loans it out
+    /// Select a new voice, mark it as playing, and loan it out for
+    /// modification.
     pub fn note_on(&mut self, note: u8) -> &mut T {
         let i = match self.note_to_voice.get(&note) {
             Some(&i) => {
                 // This note is already being played, so retrigger it and move
                 // it to the back of the queue
-                self.remove_from_queue(i);
+                self.remove_from_held_queue(i);
                 i
             },
             None => {
@@ -74,11 +100,13 @@ impl<T> VoiceArray<T> {
         &mut self.voices[i]
     }
 
-    /// Find the voice playing this note and mark it as done
+    /// Find the voice playing the provided note, marking it as free, then
+    /// loaning it out for modification. If no voice is playing the provided
+    /// note, then `None` is returned instead.
     pub fn note_off(&mut self, note: u8) -> Option<&mut T> {
         match self.note_to_voice.remove(&note) {
             Some(i) => {
-                self.remove_from_queue(i);
+                self.remove_from_held_queue(i);
                 self.free_voices.push_back(i);
                 Some(&mut self.voices[i])
             },
@@ -86,8 +114,8 @@ impl<T> VoiceArray<T> {
         }
     }
 
-    // Finds a voice in the queue and removes it
-    fn remove_from_queue(&mut self, voice: usize) {
+    // Find a voice in the held queue and remove it.
+    fn remove_from_held_queue(&mut self, voice: usize) {
         for i in (0 .. self.held_voices.len()) {
             let (j, _) = self.held_voices[i];
             if j == voice {

@@ -1,4 +1,12 @@
-//! Provides audio IO from OS sound devices.
+//! Audio IO from system sound devices.
+//!
+//! An `AudioEngine` is used to manage the audio driver and open new audio
+//! streams. All input and output streams must be opened through an engine
+//! instance.
+//!
+//! The engine also sets the buffer size to be used for IO. The best buffer size
+//! is going to vary from system to system, but should ideally be as small as
+//! possible without causing skipping in the audio.
 
 extern crate portaudio;
 use std::rc::Rc;
@@ -12,14 +20,14 @@ use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 static PORTAUDIO_T: pa::SampleFormat = pa::SampleFormat::Float32;
 
 
-/// The AudioEnginer opens and manages the resources associated with portaudio.
-/// It is used open new input/output streams and safely free them.
+/// A system resources manager.
 pub struct AudioEngine {
     marker: Rc<AudioEngineMarker>,
     buffer_size: usize,
 }
 
 impl AudioEngine {
+    /// Initialize the audio driver and sets the buffer size to be used for IO.
     pub fn with_buffer_size(samples: usize) -> Result<AudioEngine, pa::Error> {
         try!(portaudio::pa::initialize());
         Ok(AudioEngine {
@@ -28,11 +36,13 @@ impl AudioEngine {
         })
     }
 
+    /// Open an AudioIn using the default OS device.
     pub fn default_input(&self, num_channels: usize)
             -> Result<AudioIn, pa::Error> {
         AudioIn::new(self, num_channels)
     }
 
+    /// Open an AudioOut using the default OS device.
     pub fn default_output(&self, num_channels: usize)
             -> Result<AudioOut, pa::Error> {
         AudioOut::new(self, num_channels)
@@ -52,7 +62,7 @@ impl Drop for AudioEngineMarker {
 }
 
 
-/// Reads audio from the OS's default input device.
+/// Read audio from the OS's default input device.
 pub struct AudioIn {
     #[allow(dead_code)] // the engine is used as an RAII marker
     engine: Rc<AudioEngineMarker>,
@@ -64,7 +74,7 @@ pub struct AudioIn {
 }
 
 impl AudioIn {
-    /// Opens an audio input stream reading `num_channels` inputs.
+    /// Open an audio input stream reading `num_channels` inputs.
     fn new(engine: &AudioEngine, num_channels: usize)
             -> Result<AudioIn, pa::Error> {
         // Open a stream in blocking mode
@@ -133,7 +143,7 @@ impl AudioDevice for AudioIn {
 }
 
 
-/// Writes audio to the OS's default output device.
+/// Write audio to the OS's default output device.
 pub struct AudioOut {
     #[allow(dead_code)] // the engine is used as an RAII marker
     engine: Rc<AudioEngineMarker>,
@@ -145,7 +155,7 @@ pub struct AudioOut {
 }
 
 impl AudioOut {
-    /// Opens an output stream writing `num_channels` outputs.
+    /// Open an output stream writing `num_channels` outputs.
     fn new(engine: &AudioEngine, num_channels: usize)
             -> Result<AudioOut, pa::Error> {
         // Open a stream in blocking mode

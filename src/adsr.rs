@@ -1,4 +1,4 @@
-//! Provides an ADSR filter
+//! An ADSR envelope filter.
 
 use num::traits::Float;
 

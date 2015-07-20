@@ -1,4 +1,4 @@
-//! Defines `Device`s for getting audio/midi into and out of oxcable.
+//! Tools for interacting with the outside world.
 
 pub mod audio;
 pub mod midi;

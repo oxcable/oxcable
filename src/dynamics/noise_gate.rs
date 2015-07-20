@@ -1,11 +1,16 @@
-//! Provides a noise gate filter.
-
 use types::{AudioDevice, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
 
 
-/// A noise gate
+/// A noise gate.
+///
+/// Noise gates provides a floor the signal must exceed; anything below the
+/// floor is muted instead.
+///
+/// The noise gate provides two different thresholds. The gate will open once
+/// the signal exceeds the on threshold, and close when the signal level drops
+/// below the off threshold.
 pub struct NoiseGate {
     level_detectors: Vec<LevelDetector>,
     active: bool,
@@ -18,9 +23,8 @@ pub struct NoiseGate {
 impl NoiseGate {
     /// Creates a new compressor.
     ///
-    /// The noise gate will pass audio once it hits the `on_threshold` (in
-    /// decibels), and continue passing until the signal level drops below the
-    /// `off_threshold` (also in decibels).
+    /// The `on_threshold` and `off_threshold` specify the signal floors in
+    /// decibels.
     ///
     /// The specified `gain` (in decibels) will be applied to the signal after
     /// compression.

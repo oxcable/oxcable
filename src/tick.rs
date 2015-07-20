@@ -1,23 +1,35 @@
+//! A trait for objects that process in discrete time steps.
+
 use std::sync::mpsc::channel;
 use std::thread;
 
 use types::{SAMPLE_RATE, Time};
 
+
+/// Methods for processing something in discrete time steps.
+///
+/// The implementor must only implement the `tick` method.  By defining `tick`
+/// this trait provides several more convenience methods for controlling time.
 pub trait Tick {
+    /// Handle a single time step.
     fn tick(&mut self);
 
-    fn tick_n_times(&mut self, times: Time) {
-        for _ in 0..times {
+    /// Run `tick` `n` times. Returns after processing.
+    fn tick_n_times(&mut self, n: Time) {
+        for _ in 0..n {
             self.tick();
         }
     }
 
+    /// Tick into infinity. Never returns.
     fn tick_forever(&mut self) {
         loop {
             self.tick();
         }
     }
 
+    /// Ticks while waiting for the user to press `Enter`. When enter is
+    /// pressed, ticking stops and the method returns.
     fn tick_until_enter(&mut self) {
         let (tx, rx) = channel();
         let _ = thread::spawn(move || {

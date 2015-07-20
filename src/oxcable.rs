@@ -1,3 +1,12 @@
+//! A signal processing framework for making music with rust.
+//!
+//! `oxcable` is designed with simple but powerful abstractions, with minimal
+//! performance loss, while functioning in real-time.
+//!
+//! `oxcable` seeks to provide the basic building blocks necessary to build
+//! digital instruments and effects, and provide the tools to chain these
+//! devices together quickly and easily.
+
 #![crate_name = "oxcable"]
 
 extern crate byteorder;

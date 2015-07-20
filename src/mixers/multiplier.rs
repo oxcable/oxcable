@@ -1,17 +1,15 @@
-//! `Device` for multiplying multiple channels into one.
-
 use types::{AudioDevice, Sample, Time};
 
 
 /// A multiplier.
 ///
-/// Multiplies all its inputs into a single output.
+/// The `Multiplier` simply multiplies all of its inputs.
 pub struct Multiplier{
     num_channels: usize
 }
 
 impl Multiplier {
-    /// Returns a new multiplier with `num_inputs` input channels
+    /// Returns a new multiplier with `num_inputs` inputs and one output.
     pub fn new(num_channels: usize) -> Multiplier {
         Multiplier { num_channels: num_channels }
     }
