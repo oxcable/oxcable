@@ -1,4 +1,10 @@
-//! Writes wav files for every Oscillator waveform for analysis
+//! Generate sample files for testing each oscillator waveform.
+//!
+//! For each waveform, 1 second of audio is generated at a specific frequency.
+//! These waveforms are written outto wav files for analysis.
+//!
+//! A high frequency is selected to make aliasing more noticeable, and thus
+//! testing of the antialiasing easier.
 
 extern crate oxcable;
 

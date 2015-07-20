@@ -1,4 +1,6 @@
-//! Reads input from a microphone and mirrors it to a speaker ad nauseum.
+//! Reads input from a wav file and mirrors it to a different wav file.
+//!
+//! The destination wav file should be an exact duplicate of the source.
 
 extern crate oxcable;
 

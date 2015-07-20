@@ -1,5 +1,7 @@
-//! Reads a linearly ramped sin wave, applies each dynamic processor to it and
-//! writes the results out to wav files for analysis.
+//! Generate sample files for testing each dynamics processor.
+//!
+//! Reads a linearly ramping sine wave, passes this signal through each dynamics
+//! processor, and writes the results out to wav files for analysis.
 
 extern crate oxcable;
 

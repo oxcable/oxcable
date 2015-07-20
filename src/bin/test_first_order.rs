@@ -1,4 +1,7 @@
-//! Writes wav files for every first order filter for analysis
+//! Generates sample files for testing each first order filter mode.
+//!
+//! Reads in an impulse, generates the impulse response for each filter mode,
+//! and writes the results out to wav files for analysis.
 
 extern crate oxcable;
 

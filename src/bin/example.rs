@@ -1,5 +1,7 @@
-//! A simple example using several components
-//! Also a lazy, cheeky way to test some simple processors
+//! A simple example meant to demonstrate some basic usage of oxcable.
+//!
+//! This example is prone to minor changes, because I also use it as an easy way
+//! to try out new audio devices.
 
 extern crate oxcable;
 

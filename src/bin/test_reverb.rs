@@ -1,5 +1,4 @@
-//! A simple example using several components
-//! Also a lazy, cheeky way to test some simple processors
+//! Applies reverb to microphone input, then plays back out to the speakers.
 
 extern crate oxcable;
 

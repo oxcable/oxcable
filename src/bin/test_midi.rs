@@ -1,4 +1,12 @@
-//! Reads in MIDI events and uses them to trigger an ADSR
+//! Test script for monitoring MIDI input.
+//!
+//! The test operates on two levels:
+//!
+//! 1. All MIDI events are printed to the console.
+//! 2. NoteOn/NoteOff events are used to trigger an ADSR.
+//!
+//! The ADSR gates an oscillator, so that triggering notes can also be heard
+//! through the default audio out, and usage of note events can be tested.
 
 extern crate oxcable;
 
