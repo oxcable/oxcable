@@ -106,9 +106,11 @@ impl MidiIn {
             pm_stream: pm_stream,
         })
     }
+}
 
-    /// Closes the portmidi stream
-    pub fn stop(&mut self) {
+impl Drop for MidiIn {
+    fn drop(&mut self) {
+        // Close the portmidi stream
         self.pm_stream.close().unwrap();
     }
 }
