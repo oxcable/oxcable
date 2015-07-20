@@ -18,9 +18,9 @@ Documentation is available
 Examples
 --------
 
-For many simple examples, the `src/bin` directory contains many sample test
-scripts. For an example of a project leveraging the tools this framework
-contains, see my [sample subtractive
+For many simple examples, the [`src/bin`](src/bin) directory contains many
+sample test scripts. For an example of a project leveraging the tools this
+framework contains, see my [sample subtractive
 synthesizer](https://github.com/thenyeguy/oxcable-subtractive-synth).
 
 Installing
