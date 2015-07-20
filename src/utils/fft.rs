@@ -7,14 +7,15 @@
 use std::f32::consts::PI;
 use std::vec::Vec;
 
-use utils::complex::Complex;
+use num::complex::Complex32;
+use num::traits::Zero;
 
 
 /// A container for precomputed values to perform FFTs of a fixed size.
 pub struct Transformer {
     size: usize,
     bit_reverses: Vec<usize>,
-    twiddles: Vec<Complex>,
+    twiddles: Vec<Complex32>,
 }
 
 impl Transformer {
@@ -35,9 +36,11 @@ impl Transformer {
         // Populate the twiddle factors w_n^i
         // w_n = exp(-j*2*pi*n/N)
         let mut twiddles = Vec::with_capacity(bufsize);
-        let exponent = Complex::new(0.0, -2.0*PI/(bufsize as f32));
+        let exponent = Complex32::new(0.0, -2.0*PI/(bufsize as f32));
         for i in (0 .. bufsize) {
-            twiddles.push(exponent.scale(i as f32).exp());
+            let c1 = exponent.scale(i as f32);
+            let c = Complex32::new(c1.im.cos(), c1.im.sin()).scale(c1.re.exp());
+            twiddles.push(c);
         }
 
         Transformer { size: bufsize, bit_reverses: bit_reverses,
@@ -53,7 +56,7 @@ impl Transformer {
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
-    pub fn fft(&self, input: &[Complex], output: &mut[Complex]) {
+    pub fn fft(&self, input: &[Complex32], output: &mut[Complex32]) {
         self.transform(input, output, false);
     }
 
@@ -61,7 +64,7 @@ impl Transformer {
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
-    pub fn ifft(&self, input: &[Complex], output: &mut[Complex]) {
+    pub fn ifft(&self, input: &[Complex32], output: &mut[Complex32]) {
         self.transform(input, output, true);
     }
 
@@ -73,7 +76,7 @@ impl Transformer {
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
-    fn transform(&self, input: &[Complex], output: &mut[Complex],
+    fn transform(&self, input: &[Complex32], output: &mut[Complex32],
                  inverse: bool) {
         // Copy the input into bit reverse order, zero padding if necessary,
         // conjugating if we are inverse transforming
@@ -86,7 +89,7 @@ impl Transformer {
                 }
         }
         for i in self.bit_reverses[input.len() .. self.size].iter() {
-            output[*i] = Complex::from_real(0.0);
+            output[*i] = Complex32::zero();
         }
 
         // Iteratively perform FFT, starting at 2 points
@@ -155,7 +158,9 @@ fn int_log(n: u32) -> u32 {
 mod test {
     use std::vec::Vec;
 
-    use utils::complex::Complex;
+    use num::complex::Complex32;
+    use num::traits::Zero;
+
     use super::{Transformer, int_log, bit_reverse};
 
     /// Tests int_log with many values
@@ -188,21 +193,21 @@ mod test {
     /// Analytically, an impulse function has a constant fourier transform.
     #[test]
     fn test_fft_impulse() {
-        let zero = Complex::zero();
-        let one = Complex::from_real(1.0);
+        let zero = Complex32::zero();
+        let one = Complex32::new(1.0, 0.0);
 
         let mut impulse = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
         for i in (0 .. 8) {
             impulse.push(if i == 0 { one } else { zero });
-            out.push(Complex::zero());
+            out.push(Complex32::zero());
         }
 
         let t = Transformer::new(8);
         t.fft(&impulse, &mut out);
 
         for c in out.iter() {
-            assert!(c.eq(one))
+            assert!(c.eq(&one))
         }
     }
 
@@ -212,8 +217,8 @@ mod test {
     /// function.
     #[test]
     fn test_ifft_impulse() {
-        let zero = Complex::zero();
-        let one = Complex::from_real(1.0);
+        let zero = Complex32::zero();
+        let one = Complex32::new(1.0, 0.0);
 
         let mut impulse = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
@@ -225,23 +230,23 @@ mod test {
         let t = Transformer::new(8);
         t.ifft(&impulse, &mut out);
 
-        assert!(out[0].eq(one));
+        assert!(out[0].eq(&one));
         for c in out[1 .. 8].iter() {
-            assert!(c.eq(zero));
+            assert!(c.eq(&zero));
         }
     }
 
     /// Tests that the identify property, i.e. IFFT(FTT(f)) == f
     #[test]
     fn test_fft_identity() {
-        let zero = Complex::zero();
+        let zero = Complex32::zero();
         let epsilon = 1e-6;
 
         let mut input = Vec::with_capacity(8);
         let mut fft = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
         for i in (0 .. 8) {
-            input.push(Complex::from_real((i+1) as f32));
+            input.push(Complex32::new((i+1) as f32, 0.0));
             fft.push(zero);
             out.push(zero);
         }
@@ -251,9 +256,9 @@ mod test {
         t.ifft(&fft, &mut out);
 
         for i in (0 .. 7) {
-            println!("{}",out[i].real() - ((i+1) as f32));
-            assert!(out[i].real() - ((i+1) as f32) < epsilon);
-            assert!(out[i].imag() < epsilon);
+            println!("{}",out[i].re - ((i+1) as f32));
+            assert!(out[i].re - ((i+1) as f32) < epsilon);
+            assert!(out[i].im < epsilon);
         }
     }
 
@@ -261,7 +266,7 @@ mod test {
     /// short by zero padding them.
     #[test]
     fn test_fft_zero_pad() {
-        let zero = Complex::zero();
+        let zero = Complex32::zero();
         let epsilon = 1e-6;
 
         let mut input = Vec::with_capacity(7);
@@ -269,7 +274,7 @@ mod test {
         let mut out = Vec::with_capacity(8);
         for i in (0 .. 8) {
             if i < 7 {
-                input.push(Complex::from_real((i+1) as f32));
+                input.push(Complex32::new((i+1) as f32, 0.0));
             }
             fft.push(zero);
             out.push(zero);
@@ -280,9 +285,9 @@ mod test {
         t.ifft(&fft, &mut out);
 
         for i in (0 .. 7) {
-            println!("{}",out[i].real() - ((i+1) as f32));
-            assert!(out[i].real() - ((i+1) as f32) < epsilon);
-            assert!(out[i].imag() < epsilon);
+            println!("{}",out[i].re - ((i+1) as f32));
+            assert!(out[i].re - ((i+1) as f32) < epsilon);
+            assert!(out[i].im < epsilon);
         }
     }
 }
