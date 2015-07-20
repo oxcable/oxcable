@@ -95,6 +95,7 @@ mod instrument {
     }
 }
 
+#[cfg(not(test))]
 fn main() {
     use oxcable::chain::{DeviceChain, Tick};
     use oxcable::io::audio::AudioEngine;
