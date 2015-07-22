@@ -1,2 +1,3 @@
 Cargo.lock
 /target
+scripts/__pycache__

@@ -1,10 +1,13 @@
 [package]
 name = "oxcable"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Michael Nye <thenyeguy@gmail.com>"]
-license = "Creative Commons BY-NC-SA 4.0"
-repository = "https://github.com/thenyeguy/OxilaryCable"
+license = "CC-BY-NC-4.0"
+homepage = "https://github.com/thenyeguy/oxcable"
+repository = "https://github.com/thenyeguy/oxcable"
+documentation = "http://thenyeguy.github.io/oxcable/doc/oxcable/index.html"
 description = "A simple audio processing and MIDI framework in Rust."
+exclude= [ "wav/*" ]
 
 [lib]
 name = "oxcable"
