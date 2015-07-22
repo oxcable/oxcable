@@ -1,7 +1,9 @@
 oxcable
 =======
 
-A simple audio processing and MIDI framework in Rust.
+[Documentation](http://thenyeguy.github.io/oxcable/doc/oxcable/index.html)
+
+A signal processing framework for making music with Rust.
 
 This is a personal project of mine, with two goals:
  1. To learn Rust.
@@ -9,24 +11,39 @@ This is a personal project of mine, with two goals:
 
 I am still fleshing out the core libraries, so interfaces are still unstable.
 
-Documentation
--------------
-
-Documentation is available
-[here](http://thenyeguy.github.io/oxcable/oxcable/index.html).
-
 Examples
 --------
 
-For many simple examples, the [`src/bin`](src/bin) directory contains many
-sample test scripts. For an example of a project leveraging the tools this
-framework contains, see my [sample subtractive
-synthesizer](https://github.com/thenyeguy/oxcable-subtractive-synth).
+The following example will play back your computer's microphone input to the
+speakers, with an echo effect:
+
+```rust
+use oxcable::delay::Delay;
+use oxcable::chain::{DeviceChain, Tick};
+use oxcable::io::audio::AudioEngine;
+
+let engine = AudioEngine::with_buffer_size(256).unwrap();
+let mut chain = DeviceChain::from(
+    engine.default_input(1).unwrap()
+).into(
+    Delay::new(1.0, 0.5, 0.5, 1)
+).into(
+    engine.default_output(1).unwrap()
+);
+chain.tick_forever();
+```
+
+For more simple examples, the [`src/bin`](src/bin) directory contains many
+sample test scripts.
+
+For an example of a project leveraging the tools this framework contains, see my
+[sample subtractive synthesizer](https://github.com/thenyeguy/oxcable-subtractive-synth).
 
 Installing
 ----------
 
-Currently oxcable requires PortAudio and PortMIDI be installed on your machine.
+Currently, oxcable requires PortAudio and PortMIDI be installed on your machine.
+
 On Mac, these are available on Homebrew. To install, run:
 
     brew install portaudio
