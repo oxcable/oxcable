@@ -61,6 +61,16 @@ impl Filter {
             b0: b0, b1: b1, b2: b2, a1: a1, a2: a2
         }
     }
+
+    /// Update the filter mode to be used.
+    pub fn set_mode(&mut self, mode: FilterMode) {
+        let (b0, b1, b2, a1, a2) = compute_parameters(mode);
+        self.b0 = b0;
+        self.b1 = b1;
+        self.b2 = b2;
+        self.a1 = a1;
+        self.a2 = a2;
+    }
 }
 
 /// Computes the parameters for our filter

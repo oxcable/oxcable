@@ -47,7 +47,7 @@ impl Filter {
     /// filtered independently.
     pub fn new(mode: FilterMode, num_channels: usize) -> Filter {
         // Compute the parameter values. H0 is ignored for Pass filters
-        let (alpha, H0) = compute_parameters(mode.clone());
+        let (alpha, H0) = compute_parameters(mode);
 
         Filter {
             num_channels: num_channels,
@@ -57,6 +57,14 @@ impl Filter {
             alpha: alpha,
             H0: H0
         }
+    }
+
+    /// Update the filter mode to be used.
+    pub fn set_mode(&mut self, mode: FilterMode) {
+        let (alpha, H0) = compute_parameters(mode);
+        self.mode = mode;
+        self.alpha = alpha;
+        self.H0 = H0;
     }
 }
 
