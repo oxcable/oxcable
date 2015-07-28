@@ -52,6 +52,8 @@ pub enum OscillatorMessage {
     SetWaveform(Waveform),
     /// Set the LFO vibrato depth, in steps.
     SetLFOIntensity(f32),
+    /// Set the pitch transposition, in steps.
+    SetTranspose(f32),
     /// Set the pitch bend, in steps.
     SetBend(f32),
 }
@@ -92,6 +94,7 @@ pub use self::Waveform::*;
 pub struct Oscillator {
     waveform: Waveform,
     lfo_intensity: f32,
+    transpose: f32,
     bend: f32,
     phase: f32,
     phase_delta: f32,
@@ -104,6 +107,7 @@ impl Oscillator {
         Oscillator {
             waveform: waveform,
             lfo_intensity: 0.0,
+            transpose: 1.0,
             bend: 1.0,
             phase: 0.0,
             phase_delta: 0.0,
@@ -114,6 +118,13 @@ impl Oscillator {
     /// Set the frequency of the waveform, and return the same oscillator.
     pub fn freq(mut self, freq: f32) -> Oscillator {
         self.handle_message(SetFreq(freq));
+        self
+    }
+
+    /// Set the frequency transposition (in steps), and return the same
+    /// oscillator.
+    pub fn transpose(mut self, steps: f32) -> Oscillator {
+        self.handle_message(SetTranspose(steps));
         self
     }
 
@@ -137,6 +148,9 @@ impl Oscillator {
             SetLFOIntensity(steps) => {
                 self.lfo_intensity = steps/12.0;
             },
+            SetTranspose(steps) => {
+                self.transpose = 2.0.powf(steps/12.0);
+            },
             SetBend(steps) => {
                 self.bend = 2.0.powf(steps/12.0);
             },
@@ -156,10 +170,10 @@ impl AudioDevice for Oscillator {
     fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {
         // Tick the phase
         let phase_delta = if inputs.len() > 0 {
-            self.phase_delta*2.0.powf(inputs[0]*self.lfo_intensity)*self.bend
+            self.phase_delta*2.0.powf(inputs[0]*self.lfo_intensity)
         } else {
-            self.phase_delta*self.bend
-        };
+            self.phase_delta
+        } * self.bend * self.transpose;
         self.phase += phase_delta;
         if self.phase >= 2.0*PI {
             self.phase -= 2.0*PI;
