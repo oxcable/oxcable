@@ -102,6 +102,7 @@ pub mod mixers;
 pub mod oscillator;
 pub mod reverb;
 pub mod tick;
+pub mod tremolo;
 pub mod types;
 pub mod utils;
 pub mod voice_array;
