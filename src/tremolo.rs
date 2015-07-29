@@ -32,8 +32,7 @@
 //! graph.add_edge(tremolo, 0, speaker, 0);
 //! ```
 
-extern crate num;
-use self::num::traits::Float;
+use num::traits::Float;
 
 use types::{AudioDevice, Sample, Time};
 

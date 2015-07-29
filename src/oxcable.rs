@@ -85,10 +85,10 @@
 //! straight into generic containers like [`DeviceChain`](chain/index.html) or
 //! [`DeviceGraph`](graph/index.html).
 
-#![crate_name = "oxcable"]
-
 extern crate byteorder;
 extern crate num;
+extern crate portaudio;
+extern crate portmidi;
 extern crate rand;
 
 pub mod adsr;

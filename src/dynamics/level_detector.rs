@@ -1,5 +1,4 @@
-extern crate num;
-use self::num::traits::Float;
+use num::traits::Float;
 
 use types::{SAMPLE_RATE, Sample};
 

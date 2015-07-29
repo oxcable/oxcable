@@ -3,10 +3,10 @@
 //! A `MidiEngine` is used to manage the MIDI driver and open new MIDI streams.
 //! All input streams must be opened through an engine instance.
 
-extern crate portmidi;
-
 use std::io::{self, Read, Write};
 use std::rc::Rc;
+
+use portmidi;
 
 use types::{MidiDevice, MidiEvent, MidiMessage, Time};
 

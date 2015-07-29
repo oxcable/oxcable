@@ -8,10 +8,9 @@
 //! is going to vary from system to system, but should ideally be as small as
 //! possible without causing skipping in the audio.
 
-extern crate portaudio;
 use std::rc::Rc;
 
-use self::portaudio::pa;
+use portaudio::pa;
 
 use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 
@@ -29,7 +28,7 @@ pub struct AudioEngine {
 impl AudioEngine {
     /// Initialize the audio driver and sets the buffer size to be used for IO.
     pub fn with_buffer_size(samples: usize) -> Result<AudioEngine, pa::Error> {
-        try!(portaudio::pa::initialize());
+        try!(pa::initialize());
         Ok(AudioEngine {
             marker: Rc::new(AudioEngineMarker),
             buffer_size: samples
@@ -57,7 +56,7 @@ struct AudioEngineMarker;
 impl Drop for AudioEngineMarker {
     fn drop(&mut self)
     {
-        portaudio::pa::terminate().unwrap();
+        pa::terminate().unwrap();
     }
 }
 
@@ -66,7 +65,7 @@ impl Drop for AudioEngineMarker {
 pub struct AudioIn {
     #[allow(dead_code)] // the engine is used as an RAII marker
     engine: Rc<AudioEngineMarker>,
-    pa_stream: portaudio::pa::Stream<Sample, Sample>,
+    pa_stream: pa::Stream<Sample, Sample>,
     num_channels: usize,
     buffer: Vec<Sample>,
     buffer_size: usize,
@@ -78,7 +77,7 @@ impl AudioIn {
     fn new(engine: &AudioEngine, num_channels: usize)
             -> Result<AudioIn, pa::Error> {
         // Open a stream in blocking mode
-        let mut pa_stream = portaudio::pa::Stream::new();
+        let mut pa_stream = pa::Stream::new();
         try!(pa_stream.open_default(SAMPLE_RATE as f64,
                                     engine.buffer_size as u32,
                                     num_channels as i32,
@@ -124,7 +123,7 @@ impl AudioDevice for AudioIn {
                         self.buffer[i] = s;
                     }
                 },
-                Err(portaudio::pa::Error::InputOverflowed) => {
+                Err(pa::Error::InputOverflowed) => {
                     println!("Input overflowed");
                     for i in 0..self.buffer.len() {
                         self.buffer[i] = 0.0;
@@ -147,7 +146,7 @@ impl AudioDevice for AudioIn {
 pub struct AudioOut {
     #[allow(dead_code)] // the engine is used as an RAII marker
     engine: Rc<AudioEngineMarker>,
-    pa_stream: portaudio::pa::Stream<Sample, Sample>,
+    pa_stream: pa::Stream<Sample, Sample>,
     num_channels: usize,
     buffer: Vec<Sample>,
     buffer_size: usize,
@@ -159,7 +158,7 @@ impl AudioOut {
     fn new(engine: &AudioEngine, num_channels: usize)
             -> Result<AudioOut, pa::Error> {
         // Open a stream in blocking mode
-        let mut pa_stream = portaudio::pa::Stream::new();
+        let mut pa_stream = pa::Stream::new();
         try!(pa_stream.open_default(SAMPLE_RATE as f64,
                                     engine.buffer_size as u32,
                                     0i32,

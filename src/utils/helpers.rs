@@ -1,7 +1,7 @@
 //! A collection of small utility functions.
 
-extern crate num;
-use self::num::traits::Float;
+use num::traits::Float;
+
 
 /// Compare floating point numbers for equality.
 ///
