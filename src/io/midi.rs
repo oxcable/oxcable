@@ -22,7 +22,7 @@ pub struct MidiEngine {
 
 impl MidiEngine {
     /// Initialize the MIDI driver.
-    pub fn open() -> Result<MidiEngine, MidiError> {
+    pub fn open() -> Result<Self, MidiError> {
         try!(portmidi::initialize());
         Ok(MidiEngine { marker: Rc::new(MidiEngineMarker) })
     }
@@ -102,7 +102,7 @@ pub struct MidiIn {
 impl MidiIn {
     /// Open a midi input stream.
     fn new(engine: Rc<MidiEngineMarker>, port: portmidi::PortMidiDeviceId)
-            -> Result<MidiIn, MidiError> {
+            -> Result<Self, MidiError> {
         // Open a stream. For now, use first device
         let mut pm_stream = portmidi::InputPort::new(port, BUFFER_SIZE);
         try!(pm_stream.open());

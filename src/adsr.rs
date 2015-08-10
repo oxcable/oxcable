@@ -45,7 +45,7 @@ impl Adsr {
     /// * `release_time` specifies the length of the release in seconds.
     /// * `num_channels` defines how many channels of audio to filter.
     pub fn new(attack_time: f32, decay_time: f32, sustain_level: f32,
-               release_time: f32, num_channels: usize) -> Adsr {
+               release_time: f32, num_channels: usize) -> Self {
         // Convert times to samples
         let attack_samples = (attack_time*SAMPLE_RATE as f32) as Time;
         let decay_samples = (decay_time*SAMPLE_RATE as f32) as Time;
@@ -67,7 +67,7 @@ impl Adsr {
     }
 
     /// Returns an ADSR with reasonable default values for the envelope.
-    pub fn default(num_channels: usize) -> Adsr {
+    pub fn default(num_channels: usize) -> Self {
         Adsr::new(0.05, 0.5, 0.5, 0.5, num_channels)
     }
 
@@ -176,7 +176,7 @@ enum AdsrState { Silent, Attack, Decay, Sustain, Release }
 
 impl AdsrState {
     /// Given the current state, gets our next state
-    fn next(self) -> AdsrState {
+    fn next(self) -> Self {
         match self {
             AdsrState::Attack  => AdsrState::Decay,
             AdsrState::Decay   => AdsrState::Sustain,

@@ -52,7 +52,7 @@ pub struct Transformer {
 impl Transformer {
     /// Initialize a transformer to perform FFTs of the provided size, rounded
     /// up to the nearest power of two.
-    pub fn new(size: usize) -> Transformer {
+    pub fn new(size: usize) -> Self {
         // Only operate in powers of two
         let bufsize = size.next_power_of_two();
 

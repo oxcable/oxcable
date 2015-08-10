@@ -50,7 +50,7 @@ impl<T> VoiceArray<T> {
     /// Creates a new VoiceArray from the provided vector of voices.
     ///
     /// `voices` is moved inside the array.
-    pub fn new(voices: Vec<T>) -> VoiceArray<T> {
+    pub fn new(voices: Vec<T>) -> Self {
         let num_voices = voices.len();
         let mut free_voices = VecDeque::new();
         for i in (0 .. num_voices) {

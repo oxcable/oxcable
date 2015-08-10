@@ -28,7 +28,7 @@ pub struct LevelDetector {
 impl LevelDetector {
     /// Returns a level detector with default `tau` values tuned for reasonable
     /// performance.
-    pub fn default() -> LevelDetector {
+    pub fn default() -> Self {
         LevelDetector::new(1.0, 100.0)
     }
 
@@ -38,7 +38,7 @@ impl LevelDetector {
     ///   in milliseconds.
     /// * `release_tau` specifies the time constant when the signal id decaying,
     ///   in milliseconds.
-    pub fn new(attack_tau: f32, release_tau: f32) -> LevelDetector {
+    pub fn new(attack_tau: f32, release_tau: f32) -> Self {
         LevelDetector {
             attack_alpha: time_constant_to_multiplier(attack_tau),
             release_alpha: time_constant_to_multiplier(release_tau),

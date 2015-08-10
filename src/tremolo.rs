@@ -53,7 +53,7 @@ impl Tremolo {
     /// Returns a new single-channel tremolo filter.
     ///
     /// `intensity` is in decibels.
-    pub fn new(intensity: f32) -> Tremolo {
+    pub fn new(intensity: f32) -> Self {
         Tremolo {
             intensity: intensity
         }

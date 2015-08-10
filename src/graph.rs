@@ -58,7 +58,7 @@ pub struct DeviceGraph {
 
 impl DeviceGraph {
     /// Create an empty graph.
-    pub fn new() -> DeviceGraph {
+    pub fn new() -> Self {
         DeviceGraph {
             nodes: Vec::new(),
             topology: Vec::new(),

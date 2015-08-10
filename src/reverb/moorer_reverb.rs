@@ -36,7 +36,7 @@ impl MoorerReverb {
     /// * `wetness`: how much of the input signal to mix into the output.
     /// * `num_channels`: number of channels to process.
     pub fn new(room: Room, rev_time: f32, gain: f32, wetness:f32,
-           num_channels: usize) -> MoorerReverb {
+           num_channels: usize) -> Self {
         assert!(room.tapped_delays.len() == room.tapped_gains.len());
 
         // Calculate delays

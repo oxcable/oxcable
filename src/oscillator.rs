@@ -103,7 +103,7 @@ pub struct Oscillator {
 
 impl Oscillator {
     /// Return an oscillator with the specified waveform.
-    pub fn new(waveform: Waveform) -> Oscillator {
+    pub fn new(waveform: Waveform) -> Self {
         Oscillator {
             waveform: waveform,
             lfo_intensity: 0.0,
@@ -116,14 +116,14 @@ impl Oscillator {
     }
 
     /// Set the frequency of the waveform, and return the same oscillator.
-    pub fn freq(mut self, freq: f32) -> Oscillator {
+    pub fn freq(mut self, freq: f32) -> Self {
         self.handle_message(SetFreq(freq));
         self
     }
 
     /// Set the frequency transposition (in steps), and return the same
     /// oscillator.
-    pub fn transpose(mut self, steps: f32) -> Oscillator {
+    pub fn transpose(mut self, steps: f32) -> Self {
         self.handle_message(SetTranspose(steps));
         self
     }
@@ -131,7 +131,7 @@ impl Oscillator {
     /// Set the intensity of the LFO vibrato, and return the same oscillator.
     ///
     /// The intensity is provided in half steps (1/2ths of an octave).
-    pub fn lfo_intensity(mut self, lfo_intensity: f32) -> Oscillator {
+    pub fn lfo_intensity(mut self, lfo_intensity: f32) -> Self {
         self.handle_message(SetLFOIntensity(lfo_intensity));
         self
     }

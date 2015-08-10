@@ -22,7 +22,7 @@ impl Limiter {
     ///
     /// The specified `gain` (in decibels) will be applied to the signal after
     /// compression.
-    pub fn new(threshold: f32, gain: f32, num_channels: usize) -> Limiter {
+    pub fn new(threshold: f32, gain: f32, num_channels: usize) -> Self {
         Limiter {
             level_detectors: vec![LevelDetector::default(); num_channels],
             num_channels: num_channels,

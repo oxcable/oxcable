@@ -10,7 +10,7 @@ pub struct Adder {
 
 impl Adder {
     /// Returns a new adder with `num_inputs` inputs and one output.
-    pub fn new(num_channels: usize) -> Adder {
+    pub fn new(num_channels: usize) -> Self {
         Adder { num_channels: num_channels }
     }
 }

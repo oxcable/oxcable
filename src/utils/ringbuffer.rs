@@ -23,7 +23,7 @@ pub struct RingBuffer<T: Clone> {
 
 impl<T: Clone> RingBuffer<T> {
     /// Return an empty ring buffer that can hold at most `capacity` elements.
-    pub fn new(capacity: usize) -> RingBuffer<T> {
+    pub fn new(capacity: usize) -> Self {
         RingBuffer {
             buf: Vec::with_capacity(capacity),
             capacity: capacity,

@@ -23,7 +23,7 @@ impl WavReader {
     ///
     /// This function panics if the file can't be opened, or is not a valid wav
     /// file.
-    pub fn open(filename: &str) -> Result<WavReader, WavError> {
+    pub fn open(filename: &str) -> Result<Self, WavError> {
         let mut file = try!(File::open(filename));
         let header = try!(WavHeader::read_from_file(&mut file));
         Ok(WavReader {
@@ -90,7 +90,7 @@ impl WavWriter {
     ///
     /// This function panics if the file can't be opened or written to
     pub fn create(filename: &str, num_channels: usize)
-            -> Result<WavWriter, WavError> {
+            -> Result<Self, WavError> {
         let mut file = try!(File::create(filename));
         let header = WavHeader::new(num_channels as u16, SAMPLE_RATE as u32,
                                     0u32);
@@ -144,13 +144,13 @@ pub enum WavError {
 }
 
 impl From<io::Error> for WavError {
-    fn from(e: io::Error) -> WavError {
+    fn from(e: io::Error) -> Self {
         WavError::Io(e)
     }
 }
 
 impl From<byteorder::Error> for WavError {
-    fn from(e: byteorder::Error) -> WavError {
+    fn from(e: byteorder::Error) -> Self {
         match e {
             byteorder::Error::UnexpectedEOF => WavError::InvalidFile,
             byteorder::Error::Io(e) => WavError::Io(e),
@@ -186,7 +186,7 @@ struct WavHeader {
 impl WavHeader {
     /// Returns a new wav header with all values initalized for our supported
     /// audio formats
-    fn new(num_channels: u16, sample_rate: u32, data_size: u32) -> WavHeader {
+    fn new(num_channels: u16, sample_rate: u32, data_size: u32) -> Self {
         WavHeader {
             riff_hdr: RIFF,
             file_size: data_size+36,
@@ -205,7 +205,7 @@ impl WavHeader {
     }
 
     /// Attempts to read a wav header from the provided file
-    fn read_from_file(f: &mut File) -> Result<WavHeader, WavError> {
+    fn read_from_file(f: &mut File) -> Result<Self, WavError> {
         let riff_hdr = try!(f.read_u32::<LittleEndian>());
         let file_size = try!(f.read_u32::<LittleEndian>());
         let wave_lbl = try!(f.read_u32::<LittleEndian>());
@@ -239,7 +239,7 @@ impl WavHeader {
 
     /// Returns the header if the wav header has valid fields and uses the
     /// supported formats, otherwise return a descriptive error
-    fn check(self) -> Result<WavHeader, WavError> {
+    fn check(self) -> Result<Self, WavError> {
         // Check the headers are correct
         if self.riff_hdr != RIFF { return Err(WavError::InvalidFile); }
         if self.wave_lbl != WAVE { return Err(WavError::InvalidFile); }

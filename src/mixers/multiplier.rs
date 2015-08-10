@@ -10,7 +10,7 @@ pub struct Multiplier{
 
 impl Multiplier {
     /// Returns a new multiplier with `num_inputs` inputs and one output.
-    pub fn new(num_channels: usize) -> Multiplier {
+    pub fn new(num_channels: usize) -> Self {
         Multiplier { num_channels: num_channels }
     }
 }

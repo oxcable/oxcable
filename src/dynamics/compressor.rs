@@ -31,7 +31,7 @@ impl Compressor {
     /// The `gain` (in decibels) will be applied to the signal after
     /// compression.
     pub fn new(threshold: f32, compression_ratio: f32, gain: f32,
-               num_channels: usize) -> Compressor {
+               num_channels: usize) -> Self {
         Compressor {
             level_detectors: vec![LevelDetector::default(); num_channels],
             num_channels: num_channels,

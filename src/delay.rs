@@ -28,7 +28,7 @@ impl Delay {
     /// * `wetness`: how much of our input signal to mix into the delayed signal
     ///              in the output; should be between 0.0 and 1.0.
     pub fn new(delay: f32, feedback: f32, wetness: f32,
-               num_channels: usize) -> Delay {
+               num_channels: usize) -> Self {
         // Create the delay buffers, starting with silence
         let delay_samples = (delay * SAMPLE_RATE as f32) as u32;
         let mut bufs = Vec::with_capacity(num_channels);

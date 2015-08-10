@@ -13,7 +13,7 @@ pub struct Multiplexer {
 
 impl Multiplexer {
     /// Returns a new multiplexer with `num_inputs` input and one output.
-    pub fn new(num_inputs: usize) -> Multiplexer {
+    pub fn new(num_inputs: usize) -> Self {
         Multiplexer {
             num_inputs: num_inputs,
             selected: 0

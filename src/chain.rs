@@ -42,14 +42,14 @@ pub struct DeviceChain {
 impl DeviceChain {
     /// Create a new chain that starts from the provided device. This device
     /// will receive no inputs.
-    pub fn from<D>(device: D) -> DeviceChain where D: 'static+AudioDevice {
+    pub fn from<D>(device: D) -> Self where D: 'static+AudioDevice {
         DeviceChain { devices: vec![AudioNode::new(device)], time: 0 }
     }
 
     /// Append the provided device to the end of the chain. This device will be
     /// passed the output of the last device as input. This method returns the
     /// same chain it was passed.
-    pub fn into<D>(mut self, device: D) -> DeviceChain where D: 'static+AudioDevice {
+    pub fn into<D>(mut self, device: D) -> Self where D: 'static+AudioDevice {
         if self.devices[self.devices.len()-1].outputs.len() != device.num_inputs() {
             panic!("DeviceChain: number of outputs must match number of inputs");
         }

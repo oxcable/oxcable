@@ -48,7 +48,7 @@ pub struct Filter {
 impl Filter {
     /// Creates a new second order filter with the provided mode. Each channel
     /// is filtered independently.
-    pub fn new(mode: FilterMode, num_channels: usize) -> Filter {
+    pub fn new(mode: FilterMode, num_channels: usize) -> Self {
         // Compute the parameter values
         let (b0, b1, b2, a1, a2) = compute_parameters(mode);
 

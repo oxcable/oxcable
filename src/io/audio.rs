@@ -27,7 +27,7 @@ pub struct AudioEngine {
 
 impl AudioEngine {
     /// Initialize the audio driver and sets the buffer size to be used for IO.
-    pub fn with_buffer_size(samples: usize) -> Result<AudioEngine, pa::Error> {
+    pub fn with_buffer_size(samples: usize) -> Result<Self, pa::Error> {
         try!(pa::initialize());
         Ok(AudioEngine {
             marker: Rc::new(AudioEngineMarker),
@@ -75,7 +75,7 @@ pub struct AudioIn {
 impl AudioIn {
     /// Open an audio input stream reading `num_channels` inputs.
     fn new(engine: &AudioEngine, num_channels: usize)
-            -> Result<AudioIn, pa::Error> {
+            -> Result<Self, pa::Error> {
         // Open a stream in blocking mode
         let mut pa_stream = pa::Stream::new();
         try!(pa_stream.open_default(SAMPLE_RATE as f64,
@@ -156,7 +156,7 @@ pub struct AudioOut {
 impl AudioOut {
     /// Open an output stream writing `num_channels` outputs.
     fn new(engine: &AudioEngine, num_channels: usize)
-            -> Result<AudioOut, pa::Error> {
+            -> Result<Self, pa::Error> {
         // Open a stream in blocking mode
         let mut pa_stream = pa::Stream::new();
         try!(pa_stream.open_default(SAMPLE_RATE as f64,

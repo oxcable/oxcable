@@ -29,7 +29,7 @@ impl NoiseGate {
     /// The specified `gain` (in decibels) will be applied to the signal after
     /// compression.
     pub fn new(on_threshold: f32, off_threshold: f32, gain: f32,
-               num_channels: usize) -> NoiseGate {
+               num_channels: usize) -> Self {
         NoiseGate {
             level_detectors: vec![LevelDetector::default(); num_channels],
             active: false,
