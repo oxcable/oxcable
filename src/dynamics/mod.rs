@@ -10,7 +10,11 @@ mod level_detector;
 mod limiter;
 mod noise_gate;
 
+#[doc(inline)]
 pub use self::compressor::Compressor;
+#[doc(inline)]
 pub use self::level_detector::LevelDetector;
+#[doc(inline)]
 pub use self::limiter::Limiter;
+#[doc(inline)]
 pub use self::noise_gate::NoiseGate;
