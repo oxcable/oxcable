@@ -33,7 +33,7 @@
 //!
 //! ```
 //! use oxcable::oscillator::*;
-//! Oscillator::new(Saw(PolyBlep)).freq(440.0).lfo_intensity(0.1);
+//! let osc = Oscillator::new(Saw(PolyBlep)).freq(440.0).lfo_intensity(0.1);
 //! ```
 
 use std::f32::consts::PI;
