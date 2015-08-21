@@ -6,7 +6,7 @@ license = "CC-BY-NC-4.0"
 homepage = "https://github.com/thenyeguy/oxcable"
 repository = "https://github.com/thenyeguy/oxcable"
 documentation = "http://thenyeguy.github.io/oxcable/doc/oxcable/index.html"
-description = "A simple audio processing and MIDI framework in Rust."
+description = "A signal processing framework for making music with Rust."
 exclude= [ "wav/*" ]
 
 [lib]
