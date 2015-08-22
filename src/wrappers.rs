@@ -18,9 +18,14 @@ pub struct Buffered<D> where D: AudioDevice {
 }
 
 impl<D> Buffered<D> where D: AudioDevice {
-    /// Wrap the provided `AudioDevice`, and allocates input and output buffers
-    /// for the device.
-    pub fn wrap(device: D) -> Self {
+    /// Calls the device's tick method using the wrapper's buffers.
+    pub fn tick(&mut self, t: Time) {
+        self.device.tick(t, &self.inputs, &mut self.outputs);
+    }
+}
+
+impl<D> From<D> for Buffered<D> where D: AudioDevice {
+    fn from(device: D) -> Self {
         let inputs = device.num_inputs();
         let outputs = device.num_outputs();
         Buffered {
@@ -28,10 +33,5 @@ impl<D> Buffered<D> where D: AudioDevice {
             inputs: vec![0.0; inputs],
             outputs: vec![0.0; outputs],
         }
-    }
-
-    /// Calls the device's tick method using the wrapper's buffers.
-    pub fn tick(&mut self, t: Time) {
-        self.device.tick(t, &self.inputs, &mut self.outputs);
     }
 }

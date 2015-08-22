@@ -98,7 +98,7 @@
 //! # }
 //! #
 //! use oxcable::wrappers::Buffered;
-//! let mut filter = Buffered::wrap(IdentityFilter);
+//! let mut filter = Buffered::from(IdentityFilter);
 //!
 //! for i in 0..8 {
 //!     filter.inputs[0] = i as f32;
