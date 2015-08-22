@@ -1,5 +1,7 @@
 //! Tools for wrapping devices.
 
+use std::ops::{Deref, DerefMut};
+
 use types::{AudioDevice, Sample, Time};
 
 
@@ -33,5 +35,17 @@ impl<D> From<D> for Buffered<D> where D: AudioDevice {
             inputs: vec![0.0; inputs],
             outputs: vec![0.0; outputs],
         }
+    }
+}
+
+impl<D> Deref for Buffered<D> where D: AudioDevice {
+    type Target = D;
+    fn deref(&self) -> &D {
+        &self.device
+    }
+}
+impl<D> DerefMut for Buffered<D> where D: AudioDevice {
+    fn deref_mut(&mut self) -> &mut D {
+        &mut self.device
     }
 }
