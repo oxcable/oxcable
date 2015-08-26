@@ -45,7 +45,7 @@ use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 
 /// The messages that the Oscillator responds to.
 #[derive(Clone, Copy, Debug)]
-pub enum OscillatorMessage {
+pub enum Message {
     /// Set the frequency in Hz.
     SetFreq(f32),
     /// Set the waveform type.
@@ -57,7 +57,7 @@ pub enum OscillatorMessage {
     /// Set the pitch bend, in steps.
     SetBend(f32),
 }
-pub use self::OscillatorMessage::*;
+pub use self::Message::*;
 
 
 /// Antialiasing method for certain waveforms.
@@ -137,7 +137,7 @@ impl Oscillator {
     }
 
     /// Perform the action specified by the message.
-    pub fn handle_message(&mut self, msg: OscillatorMessage) {
+    pub fn handle_message(&mut self, msg: Message) {
         match msg {
             SetFreq(freq) => {
                 self.phase_delta = freq*2.0*PI/(SAMPLE_RATE as f32);

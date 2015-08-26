@@ -39,10 +39,10 @@ use types::{AudioDevice, Sample, Time};
 
 /// Defines the messages that the ADSR supports
 #[derive(Clone, Copy, Debug)]
-pub enum TremoloMessage {
+pub enum Message {
     SetIntensity(f32)
 }
-pub use self::TremoloMessage::*;
+pub use self::Message::*;
 
 
 pub struct Tremolo {
@@ -60,7 +60,7 @@ impl Tremolo {
     }
 
     /// Applies the message to our Tremolo
-    pub fn handle_message(&mut self, msg: TremoloMessage) {
+    pub fn handle_message(&mut self, msg: Message) {
         match msg {
             SetIntensity(intensity) => self.intensity = intensity
         }

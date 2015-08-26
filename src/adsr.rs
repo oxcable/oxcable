@@ -7,7 +7,7 @@ use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 
 /// Defines the messages that the ADSR supports
 #[derive(Clone, Copy, Debug)]
-pub enum AdsrMessage {
+pub enum Message {
     NoteDown,
     NoteUp,
     SetAttack(f32),
@@ -15,7 +15,7 @@ pub enum AdsrMessage {
     SetSustain(f32),
     SetRelease(f32),
 }
-pub use self::AdsrMessage::*;
+pub use self::Message::*;
 
 
 /// A multichannel ADSR filter
@@ -72,24 +72,24 @@ impl Adsr {
     }
 
     /// Applies the message to our Adsr
-    pub fn handle_message(&mut self, msg: AdsrMessage) {
+    pub fn handle_message(&mut self, msg: Message) {
         match msg {
-            AdsrMessage::NoteDown => {
+            NoteDown => {
                 self.handle_state_change(AdsrState::Attack);
             },
-            AdsrMessage::NoteUp => {
+            NoteUp => {
                 self.handle_state_change(AdsrState::Release);
             },
-            AdsrMessage::SetAttack(attack) => {
+            SetAttack(attack) => {
                 self.attack_time = (attack*SAMPLE_RATE as f32) as Time;
             },
-            AdsrMessage::SetDecay(decay) => {
+            SetDecay(decay) => {
                 self.decay_time = (decay*SAMPLE_RATE as f32) as Time;
             },
-            AdsrMessage::SetSustain(sustain) => {
+            SetSustain(sustain) => {
                 self.sustain_level = sustain;
             },
-            AdsrMessage::SetRelease(release) => {
+            SetRelease(release) => {
                 self.release_time = (release*SAMPLE_RATE as f32) as Time;
             },
         }
