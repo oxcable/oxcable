@@ -16,7 +16,7 @@ use types::Time;
 pub struct RingBuffer<T> {
     buf: Vec<T>,
     capacity: usize,
-    size: usize,
+    start_i: usize,
     start_t: Time,
     end_t: Time,
 }
@@ -26,8 +26,8 @@ impl<T> RingBuffer<T> {
     pub fn new(capacity: usize) -> Self {
         RingBuffer {
             buf: Vec::with_capacity(capacity),
+            start_i: 0,
             capacity: capacity,
-            size: 0,
             start_t: 0,
             end_t: 0
         }
@@ -72,12 +72,13 @@ impl<T> RingBuffer<T> {
     /// Push the supplied data onto the end of the buffer. If the buffer is
     /// full, this will overwrite the oldest data.
     pub fn push(&mut self, data: T) {
-        if self.size < self.capacity {
+        if self.buf.len() < self.capacity {
             self.buf.push(data);
-            self.size += 1;
             self.end_t += 1;
         } else {
-            self.buf[(self.end_t % self.capacity as Time) as usize] = data;
+            let i = self.start_i + (self.end_t - self.start_t) as usize;
+            self.buf[i % self.capacity] = data;
+            self.start_i = (self.start_i+1) % self.capacity;
             self.start_t += 1;
             self.end_t += 1;
         }
@@ -145,6 +146,30 @@ impl<T> RingBuffer<T> {
     }
 }
 
+impl<T: Clone> RingBuffer<T> {
+    /// Resize the ringbuffer to hold up to `capacity` elements. If the new
+    /// capacity is smaller than the old one, then the oldest elements will be
+    /// removed from the buffer.
+    pub fn resize(&mut self, capacity: usize) {
+        let mut elems = (self.end_t - self.start_t) as usize;
+        if capacity < elems {
+            let drops = elems - capacity;
+            self.start_i += drops;
+            self.start_t += drops as Time;
+            elems = capacity;
+        }
+
+        let mut new_buf = Vec::with_capacity(capacity);
+        for i in self.start_i..(self.start_i+elems) {
+            new_buf.push(self.buf[i % self.capacity].clone());
+        }
+        self.buf = new_buf;
+
+        self.start_i = 0;
+        self.capacity = capacity;
+    }
+}
+
 impl<T> Index<Time> for RingBuffer<T> {
     type Output = T;
     fn index(&self, t: Time) -> &T {
@@ -152,7 +177,8 @@ impl<T> Index<Time> for RingBuffer<T> {
             panic!("index out of bounds: buffer has range [{},{}), but index is {}",
                 self.start_t, self.end_t, t);
         }
-        &self.buf[(t % self.capacity as Time) as usize]
+        let i = self.start_i + (t - self.start_t) as usize;
+        &self.buf[i % self.capacity]
     }
 }
 
@@ -162,7 +188,8 @@ impl<T> IndexMut<Time> for RingBuffer<T> {
             panic!("index out of bounds: buffer has range [{},{}), but index is {}",
                 self.start_t, self.end_t, t);
         }
-        &mut self.buf[(t % self.capacity as Time) as usize]
+        let i = self.start_i + (t - self.start_t) as usize;
+        &mut self.buf[i % self.capacity]
     }
 }
 
@@ -233,7 +260,7 @@ mod tests {
         RingBuffer {
             buf: vec![7,13],
             capacity: 2,
-            size: 2,
+            start_i: 1,
             start_t: 7,
             end_t: 9
         }
@@ -244,20 +271,17 @@ mod tests {
         let mut rb = RingBuffer::<i32>::new(2);
 
         rb.push(13);
-        assert_eq!(rb.size, 1);
         assert_eq!(rb.start_t, 0);
         assert_eq!(rb.end_t, 1);
         assert_eq!(rb.buf[0], 13);
 
         rb.push(7);
-        assert_eq!(rb.size, 2);
         assert_eq!(rb.start_t, 0);
         assert_eq!(rb.end_t, 2);
         assert_eq!(rb.buf[0], 13);
         assert_eq!(rb.buf[1], 7);
 
         rb.push(3);
-        assert_eq!(rb.size, 2);
         assert_eq!(rb.start_t, 1);
         assert_eq!(rb.end_t, 3);
         assert_eq!(rb.buf[0], 3);
@@ -295,7 +319,7 @@ mod tests {
         assert_eq!(rb[8], 7);
 
         // Test with even start
-        rb.start_t = 6; rb.end_t = 8;
+        rb.start_i = 0; rb.start_t = 6; rb.end_t = 8;
         assert_eq!(rb[6], 7);
         assert_eq!(rb[7], 13);
     }
@@ -318,7 +342,6 @@ mod tests {
     fn test_index_mut() {
         let mut rb = get_test_rb();
 
-        // Test in range
         rb[7] = 22;
         rb[8] = 23;
         assert_eq!(rb.buf[1], 22);
@@ -337,5 +360,36 @@ mod tests {
     fn test_index_mut_over() {
         let mut rb = get_test_rb();
         rb[9] = 3;
+    }
+
+    #[test]
+    fn test_resize() {
+        // Test expanding
+        let mut rb = get_test_rb();
+        rb.resize(4);
+        rb.push(19);
+        rb.push(21);
+        rb.push(23);
+        assert_eq!(rb.iter().cloned().collect::<Vec<_>>(), [7,19,21,23]);
+
+        // Test contracting
+        rb.resize(2);
+        assert_eq!(rb.iter().cloned().collect::<Vec<_>>(), [21,23]);
+
+        // Test expanding a partially full buffer
+        let mut rb = RingBuffer::new(2);
+        rb.push(1);
+        rb.resize(4);
+        rb.push(2);
+        rb.push(3);
+        assert_eq!(rb.iter().cloned().collect::<Vec<_>>(), [1,2,3]);
+
+        // Test contracting a partially full buffer
+        let mut rb = RingBuffer::new(4);
+        rb.push(1);
+        rb.resize(2);
+        rb.push(2);
+        rb.push(3);
+        assert_eq!(rb.iter().cloned().collect::<Vec<_>>(), [2,3]);
     }
 }
