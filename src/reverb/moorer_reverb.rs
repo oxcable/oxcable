@@ -110,17 +110,17 @@ impl AudioDevice for MoorerReverb {
             // Advance tapped delay line
             self.tapped_delay_lines[i].push(0.0);
             for (delay, gain) in self.tapped_delays.iter()
-                .zip(self.tapped_gains.iter()) {
-                self.tapped_delay_lines[i].add(t + *delay, *gain * x).unwrap();
+                    .zip(self.tapped_gains.iter()) {
+                self.tapped_delay_lines[i][t + *delay] += *gain * x;
             }
-            let tapped_out = (x + self.tapped_delay_lines[i].get(t).unwrap()) /
+            let tapped_out = (x + self.tapped_delay_lines[i][t]) /
                 (self.tapped_delays.len() as f32);
 
             // Update comb filters
             let mut comb_out = 0.0;
             for j in (0 .. self.comb_delays.len()) {
                 let gain  = self.comb_gains[j];
-                let feedback = self.comb_delay_lines[i][j].get(t).unwrap();
+                let feedback = self.comb_delay_lines[i][j][t];
                 self.comb_delay_lines[i][j].push(tapped_out + gain * feedback);
                 comb_out += feedback;
             }
@@ -129,7 +129,7 @@ impl AudioDevice for MoorerReverb {
 
 
             // Finally store result
-            let wet_out = tapped_out + self.comb_out_buffer[i].get(t).unwrap();
+            let wet_out = tapped_out + self.comb_out_buffer[i][t];
             let y = self.gain * (self.wetness*wet_out + (1.0-self.wetness)*x);
             outputs[i] = y;
         }

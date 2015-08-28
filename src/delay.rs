@@ -60,7 +60,7 @@ impl AudioDevice for Delay {
     fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]) {
         for (i,s) in inputs.iter().enumerate() {
             // Get our delayed signal and feed it back with our input
-            let delayed = self.delay_buffers[i].get(t).unwrap();
+            let delayed = self.delay_buffers[i][t];
             self.delay_buffers[i].push(s + self.feedback*delayed);
 
             // Mix our wet signal with the input

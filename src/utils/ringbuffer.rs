@@ -4,8 +4,7 @@
 //! it has a limited capacity; when that capacity is reached, it will overwrite
 //! the oldest data to make space.
 
-use std::clone::Clone;
-use std::ops::Add;
+use std::ops::{Index, IndexMut};
 use std::vec::Vec;
 
 use types::Time;
@@ -13,7 +12,7 @@ use types::Time;
 
 /// A generic ring buffer.
 #[derive(Clone, Debug)]
-pub struct RingBuffer<T: Clone> {
+pub struct RingBuffer<T> {
     buf: Vec<T>,
     capacity: usize,
     size: usize,
@@ -21,7 +20,7 @@ pub struct RingBuffer<T: Clone> {
     end_t: Time,
 }
 
-impl<T: Clone> RingBuffer<T> {
+impl<T> RingBuffer<T> {
     /// Return an empty ring buffer that can hold at most `capacity` elements.
     pub fn new(capacity: usize) -> Self {
         RingBuffer {
@@ -33,11 +32,31 @@ impl<T: Clone> RingBuffer<T> {
         }
     }
 
-    /// Attempt to return the data stored at time `t`. If the requested time is
-    /// not in the buffer, instead returns `None`.
-    pub fn get(&self, t: Time) -> Option<T> {
+    /// Returns the number of elements the ringbuffer currently contains
+    pub fn len(&self) -> usize {
+        (self.end_t - self.start_t) as usize
+    }
+
+    /// Returns the number of elements the ringbuffer can hold at one time.
+    pub fn capacity(&self) -> usize {
+        self.capacity
+    }
+
+    /// Attempt to return a ref to the data stored at time `t`. If the requested
+    /// time is not in the buffer, instead returns `None`.
+    pub fn get(&self, t: Time) -> Option<&T> {
         if self.start_t <= t && t < self.end_t {
-            Some(self.buf[(t % self.capacity as Time) as usize].clone())
+            Some(&self[t])
+        } else {
+            None
+        }
+    }
+
+    /// Attempt to return a mutable ref to the data stored at time `t`. If the
+    /// requested time is not in the buffer, instead returns `None`.
+    pub fn get_mut(&mut self, t: Time) -> Option<&mut T> {
+        if self.start_t <= t && t < self.end_t {
+            Some(&mut self[t])
         } else {
             None
         }
@@ -57,30 +76,30 @@ impl<T: Clone> RingBuffer<T> {
         }
     }
 
-    /// Attempt to change the value at time `t` to `data`. If the requested time
-    /// is not in the buffer, instead returns `Err`.
-    pub fn update(&mut self, t: Time, data: T) -> Result<(),()> {
-        if self.start_t <= t && t < self.end_t {
-            self.buf[(t % self.capacity as Time) as usize] = data;
-            Ok(())
-        } else {
-            Err(())
-        }
+    /// Clear all the elements from the buffer.
+    pub fn clear(&mut self) {
+        self.start_t = self.end_t;
     }
 }
 
-impl<T: Add+Clone> RingBuffer<T> where T: Add<Output = T> {
-    /// Attempt to add the provided value to the current value at time `t`. If
-    /// the requested time is not in the buffer, instead returns `Err`.
-    pub fn add(&mut self, t: Time, data: T) -> Result<(),()> {
-        if self.start_t <= t && t < self.end_t {
-            let i = (t % self.capacity as Time) as usize;
-            let res: T = self.buf[i].clone() + data;
-            self.buf[i] = res;
-            Ok(())
-        } else {
-            Err(())
+impl<T> Index<Time> for RingBuffer<T> {
+    type Output = T;
+    fn index(&self, t: Time) -> &T {
+        if t < self.start_t || t >= self.end_t {
+            panic!("index out of bounds: buffer has range [{},{}), but index is {}",
+                self.start_t, self.end_t, t);
         }
+        &self.buf[(t % self.capacity as Time) as usize]
+    }
+}
+
+impl<T> IndexMut<Time> for RingBuffer<T> {
+    fn index_mut(&mut self, t: Time) -> &mut T {
+        if t < self.start_t || t >= self.end_t {
+            panic!("index out of bounds: buffer has range [{},{}), but index is {}",
+                self.start_t, self.end_t, t);
+        }
+        &mut self.buf[(t % self.capacity as Time) as usize]
     }
 }
 
@@ -88,6 +107,16 @@ impl<T: Add+Clone> RingBuffer<T> where T: Add<Output = T> {
 #[cfg(test)]
 mod tests {
     use super::RingBuffer;
+
+    fn get_test_rb() -> RingBuffer<i32> {
+        RingBuffer {
+            buf: vec![7,13],
+            capacity: 2,
+            size: 2,
+            start_t: 7,
+            end_t: 9
+        }
+    }
 
     #[test]
     fn test_push() {
@@ -116,67 +145,76 @@ mod tests {
 
     #[test]
     fn test_get() {
-        let mut rb: RingBuffer<i32> = RingBuffer {
-            buf: vec![7,13],
-            capacity: 2,
-            size: 2,
-            start_t: 7,
-            end_t: 9
-        };
-
-        // Test with odd start
+        // get is just a wrapper around Index, so just do some simple black box
+        // testing; glass box is handled in test_index.
+        let rb = get_test_rb();
         assert_eq!(rb.get(6), None);
-        assert_eq!(rb.get(7), Some(13));
-        assert_eq!(rb.get(8), Some(7));
+        assert_eq!(rb.get(7), Some(&13));
+        assert_eq!(rb.get(8), Some(&7));
         assert_eq!(rb.get(9), None);
-
-        // Test with even start
-        rb.start_t = 6; rb.end_t = 8;
-        assert_eq!(rb.get(5), None);
-        assert_eq!(rb.get(6), Some(7));
-        assert_eq!(rb.get(7), Some(13));
-        assert_eq!(rb.get(8), None);
     }
 
     #[test]
-    fn test_update() {
-        let mut rb: RingBuffer<i32> = RingBuffer {
-            buf: vec![7,13],
-            capacity: 2,
-            size: 2,
-            start_t: 7,
-            end_t: 9
-        };
+    fn test_get_mut() {
+        // get_mut is just a wrapper around IndexMut, so just do some simple
+        // black box testing; glass box is handled in test_index_mut.
+        let mut rb = get_test_rb();
+        assert_eq!(rb.get_mut(6), None);
+        assert_eq!(rb.get_mut(7), Some(&mut 13));
+        assert_eq!(rb.get_mut(8), Some(&mut 7));
+        assert_eq!(rb.get_mut(9), None);
+    }
 
-        // Test out of range
-        assert_eq!(rb.update(6, 22), Err(()));
-        assert_eq!(rb.update(9, 22), Err(()));
+    #[test]
+    fn test_index() {
+        let mut rb = get_test_rb();
+
+        // Test with odd start
+        assert_eq!(rb[7], 13);
+        assert_eq!(rb[8], 7);
+
+        // Test with even start
+        rb.start_t = 6; rb.end_t = 8;
+        assert_eq!(rb[6], 7);
+        assert_eq!(rb[7], 13);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_index_under() {
+        let rb = get_test_rb();
+        rb[6];
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_index_over() {
+        let rb = get_test_rb();
+        rb[9];
+    }
+
+    #[test]
+    fn test_index_mut() {
+        let mut rb = get_test_rb();
 
         // Test in range
-        assert_eq!(rb.update(7, 22), Ok(()));
+        rb[7] = 22;
+        rb[8] = 23;
         assert_eq!(rb.buf[1], 22);
-        assert_eq!(rb.update(8, 23), Ok(()));
         assert_eq!(rb.buf[0], 23);
     }
 
     #[test]
-    fn test_add() {
-        let mut rb: RingBuffer<i32> = RingBuffer {
-            buf: vec![7,13],
-            capacity: 2,
-            size: 2,
-            start_t: 7,
-            end_t: 9
-        };
+    #[should_panic]
+    fn test_index_mut_under() {
+        let mut rb = get_test_rb();
+        rb[6] = 3;
+    }
 
-        // Test out of range
-        assert_eq!(rb.add(6, 22), Err(()));
-        assert_eq!(rb.add(9, 22), Err(()));
-
-        // Test in range
-        assert_eq!(rb.add(7, 1), Ok(()));
-        assert_eq!(rb.buf[1], 14);
-        assert_eq!(rb.add(8, 1), Ok(()));
-        assert_eq!(rb.buf[0], 8);
+    #[test]
+    #[should_panic]
+    fn test_index_mut_over() {
+        let mut rb = get_test_rb();
+        rb[9] = 3;
     }
 }
