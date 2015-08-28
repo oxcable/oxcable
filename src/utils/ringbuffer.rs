@@ -147,7 +147,20 @@ impl<T> RingBuffer<T> {
 }
 
 impl<T: Clone> RingBuffer<T> {
-    /// Resize the ringbuffer to hold up to `capacity` elements. If the new
+    /// Remove the oldest element from the ringbuffer and return it. If there
+    /// are no elements, returns `None` insteads.
+    pub fn pop(&mut self) -> Option<T> {
+        if self.start_t == self.end_t {
+            None
+        } else {
+            let result = self[self.start_t].clone();
+            self.start_i = (self.start_i+1) % self.capacity;
+            self.start_t += 1;
+            Some(result)
+        }
+    }
+
+    /// Resizes the ringbuffer to hold up to `capacity` elements. If the new
     /// capacity is smaller than the old one, then the oldest elements will be
     /// removed from the buffer.
     pub fn resize(&mut self, capacity: usize) {
@@ -286,6 +299,15 @@ mod tests {
         assert_eq!(rb.end_t, 3);
         assert_eq!(rb.buf[0], 3);
         assert_eq!(rb.buf[1], 7);
+    }
+
+    #[test]
+    fn test_pop() {
+        let mut rb = get_test_rb();
+        assert_eq!(rb.pop(), Some(13));
+        assert_eq!(rb.iter().cloned().collect::<Vec<_>>(), [7]);
+        assert_eq!(rb.pop(), Some(7));
+        assert_eq!(rb.pop(), None);
     }
 
     #[test]
