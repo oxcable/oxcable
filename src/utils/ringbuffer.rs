@@ -4,6 +4,7 @@
 //! it has a limited capacity; when that capacity is reached, it will overwrite
 //! the oldest data to make space.
 
+use std::iter::Zip;
 use std::ops::{Index, IndexMut};
 use std::vec::Vec;
 
@@ -32,7 +33,7 @@ impl<T> RingBuffer<T> {
         }
     }
 
-    /// Returns the number of elements the ringbuffer currently contains
+    /// Returns the number of elements the ringbuffer currently contains.
     pub fn len(&self) -> usize {
         (self.end_t - self.start_t) as usize
     }
@@ -40,6 +41,12 @@ impl<T> RingBuffer<T> {
     /// Returns the number of elements the ringbuffer can hold at one time.
     pub fn capacity(&self) -> usize {
         self.capacity
+    }
+
+    /// Returns the range of timestamps stored in the ringbuffer, as a tuple
+    /// (first, last). First is inclusive, while last is exlusive.
+    pub fn times(&self) -> (Time, Time) {
+        (self.start_t, self.end_t)
     }
 
     /// Attempt to return a ref to the data stored at time `t`. If the requested
@@ -80,6 +87,62 @@ impl<T> RingBuffer<T> {
     pub fn clear(&mut self) {
         self.start_t = self.end_t;
     }
+
+    /// Returns an iterator over the buffer.
+    /// 
+    /// # Example
+    ///
+    /// ```
+    /// # use oxcable::utils::ringbuffer::RingBuffer;
+    /// let mut rb = RingBuffer::new(2);
+    /// rb.push("first");
+    /// rb.push("second");
+    /// rb.push("third");
+    ///
+    /// let values: Vec<_> = rb.iter().collect();
+    /// assert_eq!(values, [&"second", &"third"]);
+    /// ```
+    pub fn iter(&self) -> Iter<T> {
+        Iter { buffer: self, t: self.start_t }
+    }
+
+    /// Returns an iterator over the buffer's timestamps.
+    /// 
+    /// # Example
+    ///
+    /// ```
+    /// # use oxcable::utils::ringbuffer::RingBuffer;
+    /// let mut rb = RingBuffer::new(2);
+    /// rb.push("first");
+    /// rb.push("second");
+    /// rb.push("third");
+    ///
+    /// let times: Vec<_> = rb.timestamp_iter().collect();
+    /// assert_eq!(times, [1, 2]);
+    /// ```
+    pub fn timestamp_iter(&self) -> IterTimes {
+        IterTimes { t: self.start_t, end: self.end_t }
+    }
+
+    /// Returns an iterator that pairs values with their timestamp.
+    ///
+    /// Equivalent to `self.timestamp_iter().zip(self.iter())`.
+    /// 
+    /// # Example
+    ///
+    /// ```
+    /// # use oxcable::utils::ringbuffer::RingBuffer;
+    /// let mut rb = RingBuffer::new(2);
+    /// rb.push("first");
+    /// rb.push("second");
+    /// rb.push("third");
+    ///
+    /// let zipped: Vec<_> = rb.zipped_iter().collect();
+    /// assert_eq!(zipped, [(1, &"second"), (2, &"third")]);
+    /// ```
+    pub fn zipped_iter(&self) -> Zip<IterTimes, Iter<T>> {
+        self.timestamp_iter().zip(self.iter())
+    }
 }
 
 impl<T> Index<Time> for RingBuffer<T> {
@@ -100,6 +163,64 @@ impl<T> IndexMut<Time> for RingBuffer<T> {
                 self.start_t, self.end_t, t);
         }
         &mut self.buf[(t % self.capacity as Time) as usize]
+    }
+}
+
+
+/// An iterator over RingBuffer values.
+pub struct Iter<'a, T: 'a> {
+    buffer: &'a RingBuffer<T>,
+    t: Time
+}
+
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.t == self.buffer.end_t {
+            None
+        } else {
+            let result = &self.buffer[self.t];
+            self.t += 1;
+            Some(result)
+        }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let exact = (self.buffer.end_t - self.t) as usize;
+        (exact, Some(exact))
+    }
+
+    fn count(self) -> usize {
+        self.size_hint().0
+    }
+}
+
+
+/// An iterator over RingBuffer timestamps.
+pub struct IterTimes {
+    t: Time,
+    end: Time
+}
+
+impl Iterator for IterTimes {
+    type Item = Time;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.t == self.end {
+            None
+        } else {
+            let result = self.t;
+            self.t += 1;
+            Some(result)
+        }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let exact = (self.end - self.t) as usize;
+        (exact, Some(exact))
+    }
+
+    fn count(self) -> usize {
+        self.size_hint().0
     }
 }
 
