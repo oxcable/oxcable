@@ -16,6 +16,28 @@ use types::Time;
 /// The buffer is indexed with `Time` values. As data is overwritten, the
 /// times stored in the buffer continue to slide forward.
 ///
+/// # Initialization from slices
+///
+/// Sometimes, it helps to be able to specify the initial state of a ring
+/// buffer. One example of this is to create a silent buffer of audio that
+/// delayed samples can be accumulated in, such as may be used to generate
+/// delays.
+///
+/// To make this easier, a buffer can be created from a slice. When created from
+/// a slice, the buffer will be have a capacity that matches the size of the
+/// slice, and the values of the slice will be inserted into the buffer,
+/// starting at time `t=0`.
+///
+/// ```
+/// # use oxcable::utils::ringbuffer::RingBuffer;
+/// let values = ["first", "second", "third"];
+/// let rb = RingBuffer::from(&values[..]);
+/// assert_eq!(rb.capacity(), 3);
+/// assert_eq!(rb[0], "first");
+/// assert_eq!(rb[1], "second");
+/// assert_eq!(rb[2], "third");
+/// ```
+///
 /// # Example
 ///
 /// ```
@@ -257,6 +279,19 @@ impl<T> IndexMut<Time> for RingBuffer<T> {
         }
         let i = self.start_i + (t - self.start_t) as usize;
         &mut self.buf[i % self.capacity]
+    }
+}
+
+impl<'a, T> From<&'a [T]> for RingBuffer<T> where T: Clone {
+    /// Test
+    fn from(s: &'a [T]) -> RingBuffer<T> {
+        RingBuffer {
+            buf: Vec::from(s),
+            start_i: 0,
+            capacity: s.len(),
+            start_t: 0,
+            end_t: s.len() as Time
+        }
     }
 }
 
