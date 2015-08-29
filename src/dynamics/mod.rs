@@ -5,16 +5,12 @@
 //! peak amplitude of a signal over time, and is uesd by the other three
 //! filters.
 
-mod compressor;
-mod level_detector;
-mod limiter;
-mod noise_gate;
+pub mod compressor;
+pub mod level_detector;
+pub mod limiter;
+pub mod noise_gate;
 
-#[doc(inline)]
 pub use self::compressor::Compressor;
-#[doc(inline)]
 pub use self::level_detector::LevelDetector;
-#[doc(inline)]
 pub use self::limiter::Limiter;
-#[doc(inline)]
 pub use self::noise_gate::NoiseGate;

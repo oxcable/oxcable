@@ -1,6 +1,16 @@
-use types::{AudioDevice, Sample, Time};
+use types::{AudioDevice, MessageReceiver, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
+
+
+/// Defines the messages that the Compressor supports
+#[derive(Clone, Copy, Debug)]
+pub enum Message {
+    SetThreshold(f32),
+    SetRatio(f32),
+    SetGain(f32)
+}
+pub use self::Message::*;
 
 
 /// A compression filter.
@@ -38,6 +48,23 @@ impl Compressor {
             threshold: decibel_to_ratio(threshold),
             compression_ratio: compression_ratio,
             gain: decibel_to_ratio(gain)
+        }
+    }
+}
+
+impl MessageReceiver for Compressor {
+    type Msg = Message;
+    fn handle_message(&mut self, msg: Message) {
+        match msg {
+            SetThreshold(threshold) => {
+                self.threshold = decibel_to_ratio(threshold);
+            },
+            SetRatio(ratio) => {
+                self.compression_ratio = ratio;
+            }
+            SetGain(gain) => {
+                self.gain = decibel_to_ratio(gain);
+            }
         }
     }
 }

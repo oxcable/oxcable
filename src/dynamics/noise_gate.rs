@@ -1,6 +1,16 @@
-use types::{AudioDevice, Sample, Time};
+use types::{AudioDevice, MessageReceiver, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
+
+
+/// Defines the messages that the NoiseGate supports
+#[derive(Clone, Copy, Debug)]
+pub enum Message {
+    SetOnThreshold(f32),
+    SetOffThreshold(f32),
+    SetGain(f32)
+}
+pub use self::Message::*;
 
 
 /// A noise gate.
@@ -37,6 +47,23 @@ impl NoiseGate {
             on_threshold: decibel_to_ratio(on_threshold),
             off_threshold: decibel_to_ratio(off_threshold),
             gain: decibel_to_ratio(gain)
+        }
+    }
+}
+
+impl MessageReceiver for NoiseGate {
+    type Msg = Message;
+    fn handle_message(&mut self, msg: Message) {
+        match msg {
+            SetOnThreshold(threshold) => {
+                self.on_threshold = decibel_to_ratio(threshold);
+            },
+            SetOffThreshold(threshold) => {
+                self.off_threshold = decibel_to_ratio(threshold);
+            },
+            SetGain(gain) => {
+                self.gain = decibel_to_ratio(gain);
+            }
         }
     }
 }

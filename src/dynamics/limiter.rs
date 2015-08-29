@@ -1,6 +1,15 @@
-use types::{AudioDevice, Sample, Time};
+use types::{AudioDevice, MessageReceiver, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
+
+
+/// Defines the messages that the Limiter supports
+#[derive(Clone, Copy, Debug)]
+pub enum Message {
+    SetThreshold(f32),
+    SetGain(f32)
+}
+pub use self::Message::*;
 
 
 /// A limiter.
@@ -28,6 +37,20 @@ impl Limiter {
             num_channels: num_channels,
             threshold: decibel_to_ratio(threshold),
             gain: decibel_to_ratio(gain)
+        }
+    }
+}
+
+impl MessageReceiver for Limiter {
+    type Msg = Message;
+    fn handle_message(&mut self, msg: Message) {
+        match msg {
+            SetThreshold(threshold) => {
+                self.threshold = decibel_to_ratio(threshold);
+            },
+            SetGain(gain) => {
+                self.gain = decibel_to_ratio(gain);
+            }
         }
     }
 }
