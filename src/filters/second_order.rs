@@ -14,8 +14,16 @@
 use std::f32::consts::PI;
 use num::traits::Float;
 
-use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, MessageReceiver, Sample, Time};
 use utils::helpers::decibel_to_ratio;
+
+
+/// Defines the messages that the Filter supports
+#[derive(Clone, Copy, Debug)]
+pub enum Message {
+    SetMode(FilterMode),
+}
+pub use self::Message::*;
 
 
 /// Specifies the mode for a second order `Filter`.
@@ -61,9 +69,12 @@ impl Filter {
             b0: b0, b1: b1, b2: b2, a1: a1, a2: a2
         }
     }
+}
 
-    /// Update the filter mode to be used.
-    pub fn set_mode(&mut self, mode: FilterMode) {
+impl MessageReceiver for Filter {
+    type Msg = Message;
+    fn handle_message(&mut self, msg: Message) {
+        let SetMode(mode) = msg;
         let (b0, b1, b2, a1, a2) = compute_parameters(mode);
         self.b0 = b0;
         self.b1 = b1;
