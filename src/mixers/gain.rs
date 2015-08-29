@@ -1,5 +1,13 @@
-use types::{AudioDevice, Sample, Time};
+use types::{AudioDevice, MessageReceiver, Sample, Time};
 use utils::helpers::decibel_to_ratio;
+
+
+/// Defines the messages that the Gain supports
+#[derive(Clone, Copy, Debug)]
+pub enum Message {
+    SetGain(f32)
+}
+pub use self::Message::*;
 
 
 /// A gain filter.
@@ -17,6 +25,14 @@ impl Gain {
             num_channels: num_channels,
             gain: decibel_to_ratio(gain)
         }
+    }
+}
+
+impl MessageReceiver for Gain {
+    type Msg = Message;
+    fn handle_message(&mut self, msg: Message) {
+        let SetGain(gain) = msg;
+        self.gain = decibel_to_ratio(gain);
     }
 }
 

@@ -1,4 +1,12 @@
-use types::{AudioDevice, Sample, Time};
+use types::{AudioDevice, MessageReceiver, Sample, Time};
+
+
+/// Defines the messages that the Multiplexer supports
+#[derive(Clone, Copy, Debug)]
+pub enum Message {
+    SelectChannel(usize)
+}
+pub use self::Message::*;
 
 
 /// A multiplexer.
@@ -20,9 +28,11 @@ impl Multiplexer {
         }
     }
 
-    /// Select the `i`th channel as the output.
+    /// Select the `i`th channel as the output. Returns Err if the channel is
+    /// out of range.
     ///
-    /// Returns Err if the channel is out of range.
+    /// While this has identical behavior to the `SetChannel` message, the
+    /// method is retained so that it may return a result.
     pub fn select_input(&mut self, i: usize) -> Result<(),()> {
         if i < self.num_inputs {
             self.selected = i;
@@ -30,6 +40,14 @@ impl Multiplexer {
         } else {
             Err(())
         }
+    }
+}
+
+impl MessageReceiver for Multiplexer {
+    type Msg = Message;
+    fn handle_message(&mut self, msg: Message) {
+        let SelectChannel(i) = msg;
+        let _ = self.select_input(i);
     }
 }
 
