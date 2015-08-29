@@ -83,29 +83,8 @@
 //!
 //! By adhering to the `AudioDevice` trait, however, this new device will drop
 //! straight into generic containers like [`DeviceChain`](chain/index.html) or
-//! [`DeviceGraph`](graph/index.html), and into wrappers such as the `Buffered`
-//! wrapper:
-//!
-//! ```
-//! # use oxcable::types::{AudioDevice, Sample, Time};
-//! # struct IdentityFilter;
-//! # impl AudioDevice for IdentityFilter {
-//! #     fn num_inputs(&self) -> usize { 1 }
-//! #     fn num_outputs(&self) -> usize { 1 }
-//! #     fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {
-//! #         outputs[0] = inputs[0];
-//! #     }
-//! # }
-//! #
-//! use oxcable::wrappers::Buffered;
-//! let mut filter = Buffered::from(IdentityFilter);
-//!
-//! for i in 0..8 {
-//!     filter.inputs[0] = i as f32;
-//!     filter.tick(i);
-//!     assert_eq!(i as f32, filter.outputs[0]);
-//! }
-//! ```
+//! [`DeviceGraph`](graph/index.html), and into wrappers such as the [`Buffered`
+//! wrapper](wrappers/struct.Buffered.html).
 //!
 //! `oxcable` defines many simple devices itself. A list of these devices may be
 //! found under the [`AudioDevice`

@@ -3,11 +3,34 @@ use std::ops::{Deref, DerefMut};
 use types::{AudioDevice, Sample, Time};
 
 
-/// Bundles an AudioDevice with allocated input and output buffers.
+/// Bundles an `AudioDevice` with allocated input and output buffers.
 ///
 /// To use the device, input samples must first be manually dropped into the
 /// `inputs` buffer, then `tick` may be called to generate outputs. The output
 /// samples can be found in the `outputs` buffer.
+///
+/// # Example
+///
+/// ```
+/// use oxcable::types::{AudioDevice, Sample, Time};
+/// struct IdentityFilter;
+/// impl AudioDevice for IdentityFilter {
+///     fn num_inputs(&self) -> usize { 1 }
+///     fn num_outputs(&self) -> usize { 1 }
+///     fn tick(&mut self, _: Time, inputs: &[Sample], outputs: &mut[Sample]) {
+///         outputs[0] = inputs[0];
+///     }
+/// }
+///
+/// use oxcable::wrappers::Buffered;
+/// let mut filter = Buffered::from(IdentityFilter);
+///
+/// for i in 0..8 {
+///     filter.inputs[0] = i as f32;
+///     filter.tick(i);
+///     assert_eq!(i as f32, filter.outputs[0]);
+/// }
+/// ```
 pub struct Buffered<D> where D: AudioDevice {
     /// The AudioDevice being wrapped.
     pub device: D,
