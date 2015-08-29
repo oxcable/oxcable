@@ -2,7 +2,7 @@
 
 use num::traits::Float;
 
-use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, MessageReceiver, Sample, Time};
 
 
 /// Defines the messages that the ADSR supports
@@ -71,30 +71,6 @@ impl Adsr {
         Adsr::new(0.05, 0.5, 0.5, 0.5, num_channels)
     }
 
-    /// Applies the message to our Adsr
-    pub fn handle_message(&mut self, msg: Message) {
-        match msg {
-            NoteDown => {
-                self.handle_state_change(AdsrState::Attack);
-            },
-            NoteUp => {
-                self.handle_state_change(AdsrState::Release);
-            },
-            SetAttack(attack) => {
-                self.attack_time = (attack*SAMPLE_RATE as f32) as Time;
-            },
-            SetDecay(decay) => {
-                self.decay_time = (decay*SAMPLE_RATE as f32) as Time;
-            },
-            SetSustain(sustain) => {
-                self.sustain_level = sustain;
-            },
-            SetRelease(release) => {
-                self.release_time = (release*SAMPLE_RATE as f32) as Time;
-            },
-        }
-    }
-
     /// Triggers a state change and updates the corresponding state
     fn handle_state_change(&mut self, to: AdsrState) {
         match to {
@@ -138,6 +114,32 @@ impl Adsr {
         let tau = self.next_state_change as f32/4.0;
         self.multiplier = (-1.0/tau).exp();
         self.delta = (dest-self.level)*((1.0/tau).exp() - 1.0);
+    }
+}
+
+impl MessageReceiver for Adsr {
+    type Msg = Message;
+    fn handle_message(&mut self, msg: Message) {
+        match msg {
+            NoteDown => {
+                self.handle_state_change(AdsrState::Attack);
+            },
+            NoteUp => {
+                self.handle_state_change(AdsrState::Release);
+            },
+            SetAttack(attack) => {
+                self.attack_time = (attack*SAMPLE_RATE as f32) as Time;
+            },
+            SetDecay(decay) => {
+                self.decay_time = (decay*SAMPLE_RATE as f32) as Time;
+            },
+            SetSustain(sustain) => {
+                self.sustain_level = sustain;
+            },
+            SetRelease(release) => {
+                self.release_time = (release*SAMPLE_RATE as f32) as Time;
+            },
+        }
     }
 }
 

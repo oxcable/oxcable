@@ -34,7 +34,7 @@
 
 use num::traits::Float;
 
-use types::{AudioDevice, Sample, Time};
+use types::{AudioDevice, MessageReceiver, Sample, Time};
 
 
 /// Defines the messages that the ADSR supports
@@ -58,9 +58,11 @@ impl Tremolo {
             intensity: intensity
         }
     }
+}
 
-    /// Applies the message to our Tremolo
-    pub fn handle_message(&mut self, msg: Message) {
+impl MessageReceiver for Tremolo {
+    type Msg = Message;
+    fn handle_message(&mut self, msg: Message) {
         match msg {
             SetIntensity(intensity) => self.intensity = intensity
         }

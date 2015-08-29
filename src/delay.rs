@@ -6,7 +6,7 @@
 //!
 //! The output is mixed with the raw input using the wetness percentage.
 
-use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, MessageReceiver, Sample, Time};
 use utils::ringbuffer::RingBuffer;
 
 
@@ -48,9 +48,11 @@ impl Delay {
             wetness: wetness
         }
     }
+}
 
-    /// Applies the message to our Delay
-    pub fn handle_message(&mut self, msg: Message) {
+impl MessageReceiver for Delay {
+    type Msg = Message;
+    fn handle_message(&mut self, msg: Message) {
         match msg {
             SetDelay(delay) => {
                 let delay_samples = (delay * SAMPLE_RATE as f32) as usize;

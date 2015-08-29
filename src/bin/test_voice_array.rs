@@ -10,7 +10,8 @@ extern crate oxcable;
 mod instrument {
     use oxcable::io::midi::MidiIn;
     use oxcable::oscillator::*;
-    use oxcable::types::{AudioDevice, MidiDevice, MidiEvent, MidiMessage, Sample, Time};
+    use oxcable::types::{AudioDevice, MessageReceiver, MidiDevice, MidiEvent,
+            MidiMessage, Sample, Time};
     use oxcable::voice_array::VoiceArray;
     use oxcable::utils::helpers::midi_note_to_freq;
 

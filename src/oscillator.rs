@@ -40,7 +40,7 @@ use std::f32::consts::PI;
 use num::traits::Float;
 use rand::random;
 
-use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, MessageReceiver, Sample, Time};
 
 
 /// The messages that the Oscillator responds to.
@@ -135,9 +135,11 @@ impl Oscillator {
         self.handle_message(SetLFOIntensity(lfo_intensity));
         self
     }
+}
 
-    /// Perform the action specified by the message.
-    pub fn handle_message(&mut self, msg: Message) {
+impl MessageReceiver for Oscillator {
+    type Msg = Message;
+    fn handle_message(&mut self, msg: Message) {
         match msg {
             SetFreq(freq) => {
                 self.phase_delta = freq*2.0*PI/(SAMPLE_RATE as f32);

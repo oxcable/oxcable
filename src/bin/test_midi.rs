@@ -15,7 +15,8 @@ extern crate oxcable;
 mod wrapper {
     use oxcable::adsr;
     use oxcable::io::midi::MidiIn;
-    use oxcable::types::{AudioDevice, MidiDevice, MidiMessage, Time, Sample};
+    use oxcable::types::{AudioDevice, MessageReceiver, MidiDevice, MidiMessage,
+            Time, Sample};
 
     pub struct WrappedAdsr {
         pub midi: MidiIn,
