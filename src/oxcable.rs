@@ -9,19 +9,20 @@
 //!
 //! # Getting started
 //!
-//! Let's start with a simple example. This script will read from your
-//! computer's microphone and feed the audio back ito your computer's speakers
-//! or headphones in an infinite loop:
+//! Let's start with a simple example. This script will generate a sine wave at
+//! 440Hz, and play it on your computer's speakers or headphones in an infinite
+//! loop:
 //!
 //! ```
 //! extern crate oxcable;
 //! use oxcable::chain::{DeviceChain, Tick};
 //! use oxcable::io::audio::AudioEngine;
+//! use oxcable::oscillator::{Oscillator, Sine};
 //!
 //! fn main() {
 //!     let engine = AudioEngine::with_buffer_size(256).unwrap();
 //!     let mut chain = DeviceChain::from(
-//!         engine.default_input(1).unwrap()
+//!         Oscillator::new(Sine).freq(440.0)
 //!     ).into(
 //!         engine.default_output(1).unwrap()
 //!     );
@@ -36,8 +37,7 @@
 //! # Devices
 //!
 //! Defining an audio device can be done by implenting the
-//! [`AudioDevice` trait](types/trait.AudioDevice.html). This adheres to
-//! a simple interface.
+//! [`AudioDevice` trait](types/trait.AudioDevice.html).
 //!
 //! Let's define a very simple audio device: one that simply passes its input
 //! straight to the output. This can be done in just a few lines:
@@ -77,7 +77,7 @@
 //! for i in 0..8 {
 //!     input[0] = i as f32;
 //!     filter.tick(i, &input, &mut output);
-//!     assert_eq!(input[0], output[0]);
+//!     assert_eq!(i as f32, output[0]);
 //! }
 //! ```
 //!
@@ -103,9 +103,13 @@
 //! for i in 0..8 {
 //!     filter.inputs[0] = i as f32;
 //!     filter.tick(i);
-//!     assert_eq!(filter.inputs[0], filter.outputs[0]);
+//!     assert_eq!(i as f32, filter.outputs[0]);
 //! }
 //! ```
+//!
+//! `oxcable` defines many simple devices itself. A list of these devices may be
+//! found under [the `AudioDevice`
+//! documentation](types/trait.AudioDevice.html#implementors).
 
 extern crate byteorder;
 extern crate num;
