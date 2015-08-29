@@ -108,8 +108,26 @@
 //! ```
 //!
 //! `oxcable` defines many simple devices itself. A list of these devices may be
-//! found under [the `AudioDevice`
+//! found under the [`AudioDevice`
 //! documentation](types/trait.AudioDevice.html#implementors).
+//!
+//! # Message Passing
+//!
+//! To allow modifying audio device parameters while they are inside containers
+//! or processesing in seperate threads, all setter behavior is instead
+//! encapsulated inside a message passing system. Each device has its own
+//! message `enum` type that describes the different actions it can handle.  The
+//! device then handles those messages by implementing the
+//! [`MessageReceiver` trait](types/trait.MessageReceiver.html).
+//!
+//! Using this trait, setters can be used by calling the `handle_message`
+//! function and passing the specific message directly to the device.
+//!
+//! However, when devices are hidden behind trait objects or used to process in
+//! a seperate thread, there is no way to get to the device to hand it the
+//! message directly. In this case the [`Messaged`
+//! wrapper](wrappers/struct.Messaged.html) provides an abstraction using
+//! [Rust channels](https://doc.rust-lang.org/std/sync/mpsc/fn.channel.html).
 //!
 //! # Thread Safety
 //!
