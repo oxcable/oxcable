@@ -5,14 +5,20 @@ use num::traits::Float;
 use types::{SAMPLE_RATE, AudioDevice, MessageReceiver, Sample, Time};
 
 
-/// Defines the messages that the ADSR supports
+/// Defines the messages that the ADSR supports.
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
+    /// Triggers an attack.
     NoteDown,
+    /// Triggers a release.
     NoteUp,
+    /// Sets the attack time, in seconds.
     SetAttack(f32),
+    /// Sets the decay time, in seconds.
     SetDecay(f32),
+    /// Sets the sustain amplitude.
     SetSustain(f32),
+    /// Sets the relase time, in seconds.
     SetRelease(f32),
 }
 pub use self::Message::*;

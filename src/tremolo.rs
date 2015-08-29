@@ -37,9 +37,10 @@ use num::traits::Float;
 use types::{AudioDevice, MessageReceiver, Sample, Time};
 
 
-/// Defines the messages that the ADSR supports
+/// Defines the messages that the Tremolo supports.
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
+    /// Set the tremolo intensity, in decibels.
     SetIntensity(f32)
 }
 pub use self::Message::*;

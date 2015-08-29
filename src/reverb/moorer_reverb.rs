@@ -8,11 +8,14 @@ use utils::helpers::decibel_to_ratio;
 use reverb::rooms::Room;
 
 
-/// Defines the messages that the MoorerReverb supports
+/// Defines the messages that the MoorerReverb supports.
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
+    /// Sets the length of the reverberation, in seconds.
     SetReverbTime(f32),
+    /// Sets the feedback level; should be between 0.0 and 1.0.
     SetGain(f32),
+    /// Sets the wetness level; should be between 0.0 and 1.0.
     SetWetness(f32),
 }
 pub use self::Message::*;

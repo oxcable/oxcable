@@ -10,11 +10,14 @@ use types::{SAMPLE_RATE, AudioDevice, MessageReceiver, Sample, Time};
 use utils::ringbuffer::RingBuffer;
 
 
-/// Defines the messages that the Delay supports
+/// Defines the messages that the Delay supports.
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
+    /// Sets the delay time, in seconds.
     SetDelay(f32),
+    /// Sets the feedback level; should be between 0.0 and 1.0.
     SetFeedback(f32),
+    /// Sets the wetness level; should be between 0.0 and 1.0.
     SetWetness(f32)
 }
 pub use self::Message::*;

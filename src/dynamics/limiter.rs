@@ -3,10 +3,12 @@ use utils::helpers::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
 
 
-/// Defines the messages that the Limiter supports
+/// Defines the messages that the Limiter supports.
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
+    /// Sets the limiting threshold, in decibels.
     SetThreshold(f32),
+    /// Sets the output gian, in decibels.
     SetGain(f32)
 }
 pub use self::Message::*;

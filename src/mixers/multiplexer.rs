@@ -1,9 +1,10 @@
 use types::{AudioDevice, MessageReceiver, Sample, Time};
 
 
-/// Defines the messages that the Multiplexer supports
+/// Defines the messages that the Multiplexer supports.
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
+    /// Selects the channel to pass to the output.
     SelectChannel(usize)
 }
 pub use self::Message::*;

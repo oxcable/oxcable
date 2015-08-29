@@ -2,9 +2,10 @@ use types::{AudioDevice, MessageReceiver, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 
 
-/// Defines the messages that the Gain supports
+/// Defines the messages that the Gain supports.
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
+    /// Sets the output gian, in decibels.
     SetGain(f32)
 }
 pub use self::Message::*;

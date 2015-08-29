@@ -43,18 +43,18 @@ use rand::random;
 use types::{SAMPLE_RATE, AudioDevice, MessageReceiver, Sample, Time};
 
 
-/// The messages that the Oscillator responds to.
+/// Defines the messages that the Oscillator supports.
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
-    /// Set the frequency in Hz.
+    /// Sets the frequency in Hz.
     SetFreq(f32),
-    /// Set the waveform type.
+    /// Sets the waveform type.
     SetWaveform(Waveform),
-    /// Set the LFO vibrato depth, in steps.
+    /// Sets the LFO vibrato depth, in steps.
     SetLFOIntensity(f32),
-    /// Set the pitch transposition, in steps.
+    /// Sets the pitch transposition, in steps.
     SetTranspose(f32),
-    /// Set the pitch bend, in steps.
+    /// Sets the pitch bend, in steps.
     SetBend(f32),
 }
 pub use self::Message::*;

@@ -18,9 +18,10 @@ use types::{SAMPLE_RATE, AudioDevice, MessageReceiver, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 
 
-/// Defines the messages that the Filter supports
+/// Defines the messages that the Filter supports.
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
+    /// Sets the filter's mode of operation.
     SetMode(FilterMode),
 }
 pub use self::Message::*;

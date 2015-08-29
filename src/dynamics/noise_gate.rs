@@ -3,11 +3,14 @@ use utils::helpers::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
 
 
-/// Defines the messages that the NoiseGate supports
+/// Defines the messages that the NoiseGate supports.
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
+    /// Sets the threshold to open the gate, in decibels.
     SetOnThreshold(f32),
+    /// Sets the threshold to close the gate, in decibels.
     SetOffThreshold(f32),
+    /// Sets the output gian, in decibels.
     SetGain(f32)
 }
 pub use self::Message::*;

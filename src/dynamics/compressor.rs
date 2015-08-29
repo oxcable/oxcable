@@ -3,11 +3,14 @@ use utils::helpers::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
 
 
-/// Defines the messages that the Compressor supports
+/// Defines the messages that the Compressor supports.
 #[derive(Clone, Copy, Debug)]
 pub enum Message {
+    /// Sets the compression threshold, in decibels.
     SetThreshold(f32),
+    /// Sets the compression ratio.
     SetRatio(f32),
+    /// Sets the output gian, in decibels.
     SetGain(f32)
 }
 pub use self::Message::*;
