@@ -10,6 +10,16 @@ use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use utils::ringbuffer::RingBuffer;
 
 
+/// Defines the messages that the Delay supports
+#[derive(Clone, Copy, Debug)]
+pub enum Message {
+    SetDelay(f32),
+    SetFeedback(f32),
+    SetWetness(f32)
+}
+pub use self::Message::*;
+
+
 pub struct Delay {
     num_channels: usize,
     delay_buffers: Vec<RingBuffer<Sample>>,
@@ -36,6 +46,24 @@ impl Delay {
             delay_buffers: vec![RingBuffer::from(&init[..]); num_channels],
             feedback: feedback,
             wetness: wetness
+        }
+    }
+
+    /// Applies the message to our Delay
+    pub fn handle_message(&mut self, msg: Message) {
+        match msg {
+            SetDelay(delay) => {
+                let delay_samples = (delay * SAMPLE_RATE as f32) as usize;
+                for rb in self.delay_buffers.iter_mut() {
+                    rb.resize(delay_samples);
+                }
+            },
+            SetFeedback(feedback) => {
+                self.feedback = feedback;
+            },
+            SetWetness(wetness) => {
+                self.wetness = wetness;
+            }
         }
     }
 }
