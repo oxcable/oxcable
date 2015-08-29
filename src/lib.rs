@@ -110,6 +110,16 @@
 //! `oxcable` defines many simple devices itself. A list of these devices may be
 //! found under [the `AudioDevice`
 //! documentation](types/trait.AudioDevice.html#implementors).
+//!
+//! # Thread Safety
+//!
+//! Unfortunately, `oxcable` is not able to provide `AudioDevice` containers
+//! that are `Send`. This is due to a limitation in the `rust-portaudio` crate,
+//! in which audio streams are not `Send`. This prohibits binding `AudioDevice`
+//! trait objects with `Send`.
+//!
+//! Therefore, when using generic containers, the signal chain must be
+//! initialized in the thread it will eventually process audio.
 
 extern crate byteorder;
 extern crate num;
