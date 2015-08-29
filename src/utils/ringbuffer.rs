@@ -1,8 +1,4 @@
-//! A generic circular ring buffer.
-//!
-//! A ring buffer can continue appending data to itself indefinitely.  However,
-//! it has a limited capacity; when that capacity is reached, it will overwrite
-//! the oldest data to make space.
+//! A generic, fixed-size ring buffer.
 
 use std::iter::Zip;
 use std::ops::{Index, IndexMut};
@@ -12,6 +8,43 @@ use types::Time;
 
 
 /// A generic ring buffer.
+///
+/// A ring buffer can continue appending data to itself indefinitely. However,
+/// it has a limited capacity; when that capacity is reached, it will overwrite
+/// the oldest data.
+///
+/// The buffer is indexed with `Time` values. As data is overwritten, the
+/// times stored in the buffer continue to slide forward.
+///
+/// # Example
+///
+/// ```
+/// # use oxcable::utils::ringbuffer::RingBuffer;
+/// // Create a new buffer that holds 4 elements...
+/// let mut rb = RingBuffer::new(4);
+///
+/// // Insert 3 elements...
+/// rb.push(1);
+/// rb.push(2);
+/// rb.push(3);
+/// assert_eq!(rb.len(), 3);
+/// assert_eq!(rb.get(0), Some(&1));
+/// assert_eq!(rb.get(1), Some(&2));
+/// assert_eq!(rb.get(2), Some(&3));
+///
+/// // Insert two more elements. This will push the oldest element out...
+/// rb.push(4);
+/// rb.push(5);
+/// assert_eq!(rb.len(), 4);
+/// assert_eq!(rb.get(0), None);
+/// assert_eq!(rb.get(4), Some(&5));
+///
+/// // Pop the oldest element off the buffer...
+/// assert_eq!(rb.get(1), Some(&2));
+/// assert_eq!(rb.pop(), Some(2));
+/// assert_eq!(rb.get(1), None);
+/// assert_eq!(rb.len(), 3);
+/// ```
 #[derive(Clone, Debug)]
 pub struct RingBuffer<T> {
     buf: Vec<T>,
@@ -22,7 +55,7 @@ pub struct RingBuffer<T> {
 }
 
 impl<T> RingBuffer<T> {
-    /// Return an empty ring buffer that can hold at most `capacity` elements.
+    /// Returns an empty ring buffer that can hold at most `capacity` elements.
     pub fn new(capacity: usize) -> Self {
         RingBuffer {
             buf: Vec::with_capacity(capacity),
@@ -45,11 +78,22 @@ impl<T> RingBuffer<T> {
 
     /// Returns the range of timestamps stored in the ringbuffer, as a tuple
     /// (first, last). First is inclusive, while last is exlusive.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use oxcable::utils::ringbuffer::RingBuffer;
+    /// let mut rb = RingBuffer::new(2);
+    /// rb.push("first");  // t=0
+    /// rb.push("second"); // t=1
+    /// rb.push("third");  // t=2, first is overwritten
+    /// assert_eq!(rb.times(), (1,3));
+    /// ```
     pub fn times(&self) -> (Time, Time) {
         (self.start_t, self.end_t)
     }
 
-    /// Attempt to return a ref to the data stored at time `t`. If the requested
+    /// Attempts to return a ref to the data stored at time `t`. If the requested
     /// time is not in the buffer, instead returns `None`.
     pub fn get(&self, t: Time) -> Option<&T> {
         if self.start_t <= t && t < self.end_t {
@@ -59,7 +103,7 @@ impl<T> RingBuffer<T> {
         }
     }
 
-    /// Attempt to return a mutable ref to the data stored at time `t`. If the
+    /// Attempts to return a mutable ref to the data stored at time `t`. If the
     /// requested time is not in the buffer, instead returns `None`.
     pub fn get_mut(&mut self, t: Time) -> Option<&mut T> {
         if self.start_t <= t && t < self.end_t {
@@ -69,7 +113,7 @@ impl<T> RingBuffer<T> {
         }
     }
 
-    /// Push the supplied data onto the end of the buffer. If the buffer is
+    /// Pushes the supplied data onto the end of the buffer. If the buffer is
     /// full, this will overwrite the oldest data.
     pub fn push(&mut self, data: T) {
         if self.buf.len() < self.capacity {
@@ -84,7 +128,7 @@ impl<T> RingBuffer<T> {
         }
     }
 
-    /// Clear all the elements from the buffer.
+    /// Clears all the elements from the buffer.
     pub fn clear(&mut self) {
         self.start_t = self.end_t;
     }
@@ -147,7 +191,7 @@ impl<T> RingBuffer<T> {
 }
 
 impl<T: Clone> RingBuffer<T> {
-    /// Remove the oldest element from the ringbuffer and return it. If there
+    /// Removes the oldest element from the ringbuffer and return it. If there
     /// are no elements, returns `None` insteads.
     pub fn pop(&mut self) -> Option<T> {
         if self.start_t == self.end_t {
@@ -163,6 +207,16 @@ impl<T: Clone> RingBuffer<T> {
     /// Resizes the ringbuffer to hold up to `capacity` elements. If the new
     /// capacity is smaller than the old one, then the oldest elements will be
     /// removed from the buffer.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use oxcable::utils::ringbuffer::RingBuffer;
+    /// let mut rb = RingBuffer::new(4);
+    /// rb.push(1); rb.push(2); rb.push(3); rb.push(4);
+    /// rb.resize(2);
+    /// assert_eq!(rb.iter().cloned().collect::<Vec<_>>(), [3,4]);
+    /// ```
     pub fn resize(&mut self, capacity: usize) {
         let mut elems = (self.end_t - self.start_t) as usize;
         if capacity < elems {
