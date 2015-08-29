@@ -20,7 +20,7 @@ pub struct Gain {
 impl Gain {
     /// Returns a new gain filter.
     ///
-    /// `gain` is in decibels.
+    /// * `gain` is in decibels.
     pub fn new(gain: f32, num_channels: usize) -> Self {
         Gain {
             num_channels: num_channels,

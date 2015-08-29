@@ -3,7 +3,7 @@
 use num::traits::Float;
 
 
-/// Compare floating point numbers for equality.
+/// Compares floating point numbers for equality.
 ///
 /// The maximum difference is specified by `epsilon`; that is, `f1` and `f2` are
 /// equal if they differ by at most epsilon.
@@ -11,17 +11,17 @@ pub fn flt_eq(f1: f32, f2: f32, epsilon: f32) -> bool {
     (f1 - f2).abs() < epsilon
 }
 
-/// Convert a decibel ratio to an amplitude multiplier.
+/// Converts a decibel ratio to an amplitude multiplier.
 pub fn decibel_to_ratio(db: f32) -> f32 {
     10.0.powf(db/10.0)
 }
 
-/// Convert an amplitude multiplier to decibels.
+/// Converts an amplitude multiplier to decibels.
 pub fn ratio_to_decibel(ratio: f32) -> f32 {
     10.0*ratio.log10()
 }
 
-/// Convert a MIDI note number to frequency in Hz.
+/// Converts a MIDI note number to frequency in Hz.
 pub fn midi_note_to_freq(note: u8) -> f32 {
     440.0*2.0.powf((note as f32 - 69.0) / 12.0)
 }

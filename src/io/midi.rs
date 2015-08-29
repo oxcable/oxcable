@@ -21,21 +21,21 @@ pub struct MidiEngine {
 }
 
 impl MidiEngine {
-    /// Initialize the MIDI driver.
+    /// Initializes the MIDI driver.
     pub fn open() -> Result<Self, MidiError> {
         try!(portmidi::initialize());
         Ok(MidiEngine { marker: Rc::new(MidiEngineMarker) })
     }
 
-    /// Open a MidiIn using the default OS device.
+    /// Opens a MidiIn using the default OS device.
     pub fn default_input(&self) -> Result<MidiIn, MidiError> {
         let device = try!(portmidi::get_default_input_device_id().ok_or(
                 MidiError::NoDevices));
         MidiIn::new(self.marker.clone(), device)
     }
 
-    /// Launch a command-line input selection message, then open a MidiIn using
-    /// the user selected device.
+    /// Launches a command-line input selection message, then open a MidiIn
+    /// using the user selected device.
     pub fn choose_input(&self) -> Result<MidiIn, MidiError> {
         println!("Select a MIDI input:");
         let default_in = portmidi::get_default_input_device_id();
@@ -92,7 +92,7 @@ impl Drop for MidiEngineMarker {
 }
 
 
-/// Read audio from the OS's default midi device.
+/// Reads audio from the OS's default midi device.
 pub struct MidiIn {
     #[allow(dead_code)] // the engine is used as an RAII marker
     engine: Rc<MidiEngineMarker>,

@@ -46,6 +46,7 @@ pub enum Message {
 pub use self::Message::*;
 
 
+/// A tremolo filter.
 pub struct Tremolo {
     intensity: f32,
 }

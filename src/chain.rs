@@ -34,19 +34,21 @@
 use types::{AudioDevice, Sample, Time};
 pub use tick::Tick;
 
+
+/// A container for a series of audio devices.
 pub struct DeviceChain {
     devices: Vec<AudioNode>,
     time: Time
 }
 
 impl DeviceChain {
-    /// Create a new chain that starts from the provided device. This device
+    /// Creates a new chain that starts from the provided device. This device
     /// will receive no inputs.
     pub fn from<D>(device: D) -> Self where D: 'static+AudioDevice {
         DeviceChain { devices: vec![AudioNode::new(device)], time: 0 }
     }
 
-    /// Append the provided device to the end of the chain. This device will be
+    /// Appends the provided device to the end of the chain. This device will be
     /// passed the output of the last device as input. This method returns the
     /// same chain it was passed.
     pub fn into<D>(mut self, device: D) -> Self where D: 'static+AudioDevice {
@@ -57,7 +59,7 @@ impl DeviceChain {
         self
     }
 
-    /// Fetch the last output frame from the end of the chain.
+    /// Fetches the last output frame from the end of the chain.
     pub fn get_output(&self) -> Vec<Sample> {
         self.devices[self.devices.len()-1].outputs.clone()
     }
@@ -83,7 +85,7 @@ struct AudioNode {
 }
 
 impl AudioNode {
-    /// Wrap the provided audio device in a new node and allocate its output
+    /// Wraps the provided audio device in a new node and allocate its output
     /// buffer.
     fn new<D>(device: D) -> AudioNode where D: 'static+AudioDevice {
         let n = device.num_outputs();
@@ -93,7 +95,7 @@ impl AudioNode {
         }
     }
 
-    /// Tick the device one time step.
+    /// Ticks the device one time step.
     ///
     /// `inputs` should be the output of the previous device.
     fn tick(&mut self, t: Time, inputs: &[Sample]) {

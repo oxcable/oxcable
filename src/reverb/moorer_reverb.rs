@@ -42,7 +42,7 @@ pub struct MoorerReverb {
 }
 
 impl MoorerReverb {
-    /// Create and initialize a new reverberator.
+    /// Creates and initializes a new reverberator.
     ///
     /// * `room`: a [`Room`](rooms/struct.Room.html) struct. This specifies
     ///   aspects of the reverberation character.

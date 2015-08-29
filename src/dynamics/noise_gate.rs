@@ -1,3 +1,5 @@
+//! A noise gate.
+
 use types::{AudioDevice, MessageReceiver, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
@@ -18,7 +20,7 @@ pub use self::Message::*;
 
 /// A noise gate.
 ///
-/// Noise gates provides a floor the signal must exceed; anything below the
+/// Noise gates provide a floor the signal must exceed; anything below the
 /// floor is muted instead.
 ///
 /// The noise gate provides two different thresholds. The gate will open once
@@ -36,11 +38,10 @@ pub struct NoiseGate {
 impl NoiseGate {
     /// Creates a new compressor.
     ///
-    /// The `on_threshold` and `off_threshold` specify the signal floors in
-    /// decibels.
-    ///
-    /// The specified `gain` (in decibels) will be applied to the signal after
-    /// compression.
+    /// * The `on_threshold` and `off_threshold` specify the signal floors in
+    ///   decibels.
+    /// * The specified `gain` (in decibels) will be applied to the signal after
+    ///   compression.
     pub fn new(on_threshold: f32, off_threshold: f32, gain: f32,
                num_channels: usize) -> Self {
         NoiseGate {

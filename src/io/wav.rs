@@ -136,6 +136,7 @@ impl AudioDevice for WavWriter {
 }
 
 
+/// An error type for dealing with wav files.
 #[derive(Debug)]
 pub enum WavError {
     InvalidFile,

@@ -23,6 +23,7 @@ pub enum Message {
 pub use self::Message::*;
 
 
+/// A simple delay filter.
 pub struct Delay {
     num_channels: usize,
     delay_buffers: Vec<RingBuffer<Sample>>,

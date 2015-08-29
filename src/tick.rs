@@ -11,17 +11,17 @@ use types::{SAMPLE_RATE, Time};
 /// The implementor must only implement the `tick` method.  By defining `tick`
 /// this trait provides several more convenience methods for controlling time.
 pub trait Tick {
-    /// Handle a single time step.
+    /// Handles a single time step.
     fn tick(&mut self);
 
-    /// Run `tick` `n` times. Returns after processing.
+    /// Runs `tick` `n` times. Returns after processing.
     fn tick_n_times(&mut self, n: Time) {
         for _ in 0..n {
             self.tick();
         }
     }
 
-    /// Tick into infinity. Never returns.
+    /// Ticks into infinity. Never returns.
     fn tick_forever(&mut self) {
         loop {
             self.tick();

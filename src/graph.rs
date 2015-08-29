@@ -57,7 +57,7 @@ pub struct DeviceGraph {
 }
 
 impl DeviceGraph {
-    /// Create an empty graph.
+    /// Creates an empty graph.
     pub fn new() -> Self {
         DeviceGraph {
             nodes: Vec::new(),
@@ -67,7 +67,7 @@ impl DeviceGraph {
         }
     }
 
-    /// Add a new device into the graph, with no connections. Returns
+    /// Adds a new device into the graph, with no connections. Returns
     /// a identifier that refers back to this device.
     pub fn add_node<D>(&mut self, device: D) -> AudioNodeIdx
             where D: 'static+AudioDevice {
@@ -78,11 +78,10 @@ impl DeviceGraph {
         AudioNodeIdx(idx)
     }
 
-    /// Connect two devices in the graph. 
+    /// Connects two devices in the graph. 
     ///
-    /// `src` and `dest` are identifiers for the actual devices to connect.
-    ///
-    /// `src_ch` and `dest_ch` are the channel indices of the two devices.
+    /// * `src` and `dest` are identifiers for the actual devices to connect.
+    /// * `src_ch` and `dest_ch` are the channel indices of the two devices.
     ///
     /// If invalid indices are provided, or if the specified edge would create
     /// a cycle in the graph, an Err is returned and no changes dest the graph are
@@ -214,7 +213,7 @@ struct AudioNode {
 }
 
 impl AudioNode {
-    /// Wrap the device in a new node
+    /// Wraps the device in a new node
     fn new<D>(device: D, bus: &mut Vec<Sample>) -> AudioNode
             where D: 'static+AudioDevice {
         let num_in = device.num_inputs();
@@ -233,7 +232,7 @@ impl AudioNode {
         }
     }
 
-    /// Extract the inputs out of the bus, tick the device and place the outputs
+    /// Extracts the inputs out of the bus, tick the device and place the outputs
     /// back into the bus.
     fn tick(&mut self, t: Time, bus: &mut[Sample]) {
         for (i, ch) in self.inputs.iter().enumerate() {

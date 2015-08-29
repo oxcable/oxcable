@@ -12,11 +12,11 @@ use types::{AudioDevice, MessageReceiver, Sample, Time};
 /// `inputs` buffer, then `tick` may be called to generate outputs. The output
 /// samples can be found in the `outputs` buffer.
 pub struct Buffered<D> where D: AudioDevice {
-    /// The AudioDevice being wrapped
+    /// The AudioDevice being wrapped.
     pub device: D,
-    /// The input buffer
+    /// The input buffer.
     pub inputs: Vec<Sample>,
-    /// The output buffer
+    /// The output buffer.
     pub outputs: Vec<Sample>,
 }
 
@@ -55,7 +55,7 @@ impl<D> DerefMut for Buffered<D> where D: AudioDevice {
 
 /// Bundles a MessageReceiver with threaded message passing.
 pub struct Messaged<D> where D: MessageReceiver {
-    /// The device being wrapped
+    /// The device being wrapped.
     pub device: D,
     tx: Sender<D::Msg>,
     rx: Receiver<D::Msg>,

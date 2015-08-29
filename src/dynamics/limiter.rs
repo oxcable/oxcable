@@ -1,3 +1,5 @@
+//! A limiter.
+
 use types::{AudioDevice, MessageReceiver, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
@@ -29,10 +31,9 @@ pub struct Limiter {
 impl Limiter {
     /// Creates a new limiter.
     ///
-    /// The `threshold` specifies the decibel level to limit the signal to.
-    ///
-    /// The specified `gain` (in decibels) will be applied to the signal after
-    /// compression.
+    /// * The `threshold` specifies the decibel level to limit the signal to.
+    /// * The specified `gain` (in decibels) will be applied to the signal after
+    ///   compression.
     pub fn new(threshold: f32, gain: f32, num_channels: usize) -> Self {
         Limiter {
             level_detectors: vec![LevelDetector::default(); num_channels],

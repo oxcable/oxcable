@@ -26,7 +26,7 @@ pub struct AudioEngine {
 }
 
 impl AudioEngine {
-    /// Initialize the audio driver and sets the buffer size to be used for IO.
+    /// Initializes the audio driver and sets the buffer size to be used for IO.
     pub fn with_buffer_size(samples: usize) -> Result<Self, pa::Error> {
         try!(pa::initialize());
         Ok(AudioEngine {
@@ -35,13 +35,13 @@ impl AudioEngine {
         })
     }
 
-    /// Open an AudioIn using the default OS device.
+    /// Opens an AudioIn using the default OS device.
     pub fn default_input(&self, num_channels: usize)
             -> Result<AudioIn, pa::Error> {
         AudioIn::new(self, num_channels)
     }
 
-    /// Open an AudioOut using the default OS device.
+    /// Opens an AudioOut using the default OS device.
     pub fn default_output(&self, num_channels: usize)
             -> Result<AudioOut, pa::Error> {
         AudioOut::new(self, num_channels)
@@ -61,7 +61,7 @@ impl Drop for AudioEngineMarker {
 }
 
 
-/// Read audio from the OS's default input device.
+/// Reads audio from the OS's default input device.
 pub struct AudioIn {
     #[allow(dead_code)] // the engine is used as an RAII marker
     engine: Rc<AudioEngineMarker>,
@@ -73,7 +73,7 @@ pub struct AudioIn {
 }
 
 impl AudioIn {
-    /// Open an audio input stream reading `num_channels` inputs.
+    /// Opens an audio input stream reading `num_channels` inputs.
     fn new(engine: &AudioEngine, num_channels: usize)
             -> Result<Self, pa::Error> {
         // Open a stream in blocking mode
@@ -142,7 +142,7 @@ impl AudioDevice for AudioIn {
 }
 
 
-/// Write audio to the OS's default output device.
+/// Writes audio to the OS's default output device.
 pub struct AudioOut {
     #[allow(dead_code)] // the engine is used as an RAII marker
     engine: Rc<AudioEngineMarker>,
@@ -154,7 +154,7 @@ pub struct AudioOut {
 }
 
 impl AudioOut {
-    /// Open an output stream writing `num_channels` outputs.
+    /// Opens an output stream writing `num_channels` outputs.
     fn new(engine: &AudioEngine, num_channels: usize)
             -> Result<Self, pa::Error> {
         // Open a stream in blocking mode

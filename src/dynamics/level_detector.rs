@@ -1,3 +1,5 @@
+//! An envelope estimator.
+
 use num::traits::Float;
 
 use types::{SAMPLE_RATE, Sample};

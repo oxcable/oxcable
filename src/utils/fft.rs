@@ -49,7 +49,7 @@ pub struct Transformer {
 }
 
 impl Transformer {
-    /// Initialize a transformer to perform FFTs of the provided size, rounded
+    /// Initializes a transformer to perform FFTs of the provided size, rounded
     /// up to the nearest power of two.
     pub fn new(size: usize) -> Self {
         // Only operate in powers of two
@@ -77,12 +77,12 @@ impl Transformer {
             twiddles: twiddles }
     }
 
-    /// Return the size FFT this Transformer performs.
+    /// Returns the size FFT this Transformer performs.
     pub fn get_size(&self) -> usize {
         self.size
     }
 
-    /// Perform an FFT on `input`, and place the result in `output`.
+    /// Performs an FFT on `input`, and place the result in `output`.
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
@@ -90,7 +90,7 @@ impl Transformer {
         self.transform(input, output, false);
     }
 
-    /// Perform an inverse FFT on `input`, and place the result in `output`.
+    /// Performs an inverse FFT on `input`, and place the result in `output`.
     ///
     /// The input is zero padded if less than `size` samples are provided, and
     /// truncated if more than `size` samples are provided.
@@ -98,7 +98,7 @@ impl Transformer {
         self.transform(input, output, true);
     }
 
-    /// Perform the actual transform on `input`, placing the result in `output`.
+    /// Performs the actual transform on `input`, placing the result in `output`.
     ///
     /// This function performs both forward and backwards transforms, since
     /// there are only minor algorithmic differences in the beginning and end
@@ -156,7 +156,7 @@ impl Transformer {
 }
 
 
-/// Return the bit reverse of `n`, for the lower `bits` bits.
+/// Returns the bit reverse of `n`, for the lower `bits` bits.
 ///
 /// For small examples, the bit reverse of 0b00011010 is 0b01011000, but the bit
 /// reverse of just the lower 5 bits is 0b00001011.
@@ -171,7 +171,7 @@ fn bit_reverse(n: u32, bits: u32) -> u32 {
 }
 
 
-/// Return the log base 2 of n, rounded up.
+/// Returns the log base 2 of n, rounded up.
 fn int_log(n: u32) -> u32 {
     let mut i = n-1; // correct for exact powers of 2
     let mut res = 0;

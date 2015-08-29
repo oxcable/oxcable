@@ -29,7 +29,7 @@ impl Multiplexer {
         }
     }
 
-    /// Select the `i`th channel as the output. Returns Err if the channel is
+    /// Selects the `i`th channel as the output. Returns Err if the channel is
     /// out of range.
     ///
     /// While this has identical behavior to the `SetChannel` message, the

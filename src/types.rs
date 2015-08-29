@@ -60,13 +60,13 @@ pub enum MidiMessage {
 
 /// A device that processes and/or generates audio.
 pub trait AudioDevice {
-    /// Return the number of input channels the device accepts.
+    /// Returns the number of input channels the device accepts.
     fn num_inputs(&self) -> usize;
 
-    /// Return the number of output channels the device returns.
+    /// Return sthe number of output channels the device returns.
     fn num_outputs(&self) -> usize;
 
-    /// Process a single frame worth of audio data. This function should be
+    /// Processes a single frame worth of audio data. This function should be
     /// called once per time step, starting at `t=0`.
     ///
     /// If a device accepts no inputs, or generates no outputs, then zero length
@@ -87,6 +87,6 @@ pub trait MessageReceiver {
 
 /// A device that generates MIDI events.
 pub trait MidiDevice {
-    /// Return any events scheduled for time `t`.
+    /// Returns any events scheduled for time `t`.
     fn get_events(&mut self, t: Time) -> Vec<MidiEvent>;
 }

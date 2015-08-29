@@ -64,17 +64,17 @@ impl<T> VoiceArray<T> {
         }
     }
 
-    /// Get an iterator over the voice objects.
+    /// Returns an iterator over the voice objects.
     pub fn iter(&self) -> Iter<T> {
         self.voices.iter()
     }
 
-    /// Get a mutable iterator over the voice objects.
+    /// Returns a mutable iterator over the voice objects.
     pub fn iter_mut(&mut self) -> IterMut<T> {
         self.voices.iter_mut()
     }
 
-    /// Select a new voice, mark it as playing, and loan it out for
+    /// Selects a new voice, marks it as playing, and loans it out for
     /// modification.
     pub fn note_on(&mut self, note: u8) -> &mut T {
         let i = match self.note_to_voice.get(&note) {
@@ -104,9 +104,9 @@ impl<T> VoiceArray<T> {
         &mut self.voices[i]
     }
 
-    /// Find the voice playing the provided note, marking it as free, then
-    /// loaning it out for modification. If no voice is playing the provided
-    /// note, then `None` is returned instead.
+    /// Finds the voice playing the provided note, marks it as free, then loans
+    /// it out for modification. If no voice is playing the provided note, then
+    /// `None` is returned instead.
     pub fn note_off(&mut self, note: u8) -> Option<&mut T> {
         match self.note_to_voice.remove(&note) {
             Some(i) => {
@@ -118,7 +118,7 @@ impl<T> VoiceArray<T> {
         }
     }
 
-    // Find a voice in the held queue and remove it.
+    // Finds a voice in the held queue and removes it.
     fn remove_from_held_queue(&mut self, voice: usize) {
         for i in (0 .. self.held_voices.len()) {
             let (j, _) = self.held_voices[i];

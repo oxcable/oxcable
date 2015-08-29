@@ -24,7 +24,7 @@ pub enum Message {
 pub use self::Message::*;
 
 
-/// A multichannel ADSR filter
+/// A multichannel ADSR filter.
 pub struct Adsr {
     // Remember parameter values
     num_channels: usize,

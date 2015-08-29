@@ -1,3 +1,5 @@
+//! A compression filter.
+
 use types::{AudioDevice, MessageReceiver, Sample, Time};
 use utils::helpers::decibel_to_ratio;
 use dynamics::level_detector::LevelDetector;
@@ -36,13 +38,11 @@ pub struct Compressor {
 impl Compressor {
     /// Creates a new compressor.
     ///
-    /// The `threshold` specifies the decibel level at which compression begins.
-    ///
-    /// The `compression_ratio` specifies the ratio of attenuation above the
-    /// threshold.
-    ///
-    /// The `gain` (in decibels) will be applied to the signal after
-    /// compression.
+    /// * The `threshold` specifies the decibel level at which compression begins.
+    /// * The `compression_ratio` specifies the ratio of attenuation above the
+    ///   threshold.
+    /// * The `gain` (in decibels) will be applied to the signal after
+    ///   compression.
     pub fn new(threshold: f32, compression_ratio: f32, gain: f32,
                num_channels: usize) -> Self {
         Compressor {
