@@ -30,7 +30,6 @@
 
 use std::collections::{VecDeque, HashMap};
 use std::slice::{Iter, IterMut};
-use std::vec::Vec;
 
 
 /// A manager for a polyphonic set of voices.

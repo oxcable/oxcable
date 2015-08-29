@@ -36,7 +36,6 @@
 //! After this example, `output` will contain the FFT of `input`.
 
 use std::f32::consts::PI;
-use std::vec::Vec;
 
 use num::complex::Complex32;
 use num::traits::Zero;
@@ -187,8 +186,6 @@ fn int_log(n: u32) -> u32 {
 // Unit tests...
 #[cfg(test)]
 mod test {
-    use std::vec::Vec;
-
     use num::complex::Complex32;
     use num::traits::{One, Zero};
 

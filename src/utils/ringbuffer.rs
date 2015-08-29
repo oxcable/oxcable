@@ -2,7 +2,6 @@
 
 use std::iter::Zip;
 use std::ops::{Index, IndexMut};
-use std::vec::Vec;
 
 use types::Time;
 

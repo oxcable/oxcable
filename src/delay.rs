@@ -6,8 +6,6 @@
 //!
 //! The output is mixed with the raw input using the wetness percentage.
 
-use std::vec::Vec;
-
 use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 use utils::ringbuffer::RingBuffer;
 
