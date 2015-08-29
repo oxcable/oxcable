@@ -1,9 +1,21 @@
+//! An algorithmic, IIR reverberation filter.
+
 use num::traits::Float;
 
-use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
+use types::{SAMPLE_RATE, AudioDevice, MessageReceiver, Sample, Time};
 use utils::ringbuffer::RingBuffer;
 use utils::helpers::decibel_to_ratio;
 use reverb::rooms::Room;
+
+
+/// Defines the messages that the MoorerReverb supports
+#[derive(Clone, Copy, Debug)]
+pub enum Message {
+    SetReverbTime(f32),
+    SetGain(f32),
+    SetWetness(f32),
+}
+pub use self::Message::*;
 
 
 /// An algorithmic, IIR reverberation filter.
@@ -44,13 +56,8 @@ impl MoorerReverb {
         let comb_out_delay = max_tapped_delay;
 
         // Calculate comb gains based on reverberation time
-        let mut comb_gains = Vec::with_capacity(room.comb_delays.len());
-        for i in (0 .. room.comb_delays.len()) {
-            let gain = 10.0.powf(-3.0*(room.comb_delays[i] as f32) *
-                                 rev_time / (SAMPLE_RATE as f32));
-            comb_gains.push(gain);
-        }
-        let comb_out_gain = 1.0 - 0.366/rev_time;
+        let (comb_gains, comb_out_gain) =
+            compute_comb_gains(&room.comb_delays, rev_time);
 
         // Allocate tapped delay lines
         let init = vec![0.0; max_tapped_delay as usize + 1];
@@ -84,6 +91,26 @@ impl MoorerReverb {
             comb_gains: comb_gains,
             comb_out_buffer: comb_out_buffer,
             comb_out_gain: comb_out_gain,
+        }
+    }
+}
+
+impl MessageReceiver for MoorerReverb {
+    type Msg = Message;
+    fn handle_message(&mut self, msg: Message) {
+        match msg {
+            SetReverbTime(rev_time) => {
+                let (comb_gains, comb_out_gain) =
+                    compute_comb_gains(&self.comb_delays, rev_time);
+                self.comb_gains = comb_gains;
+                self.comb_out_gain = comb_out_gain;
+            },
+            SetGain(gain) => {
+                self.gain = decibel_to_ratio(gain);
+            },
+            SetWetness(wetness) => {
+                self.wetness = wetness;
+            }
         }
     }
 }
@@ -126,4 +153,24 @@ impl AudioDevice for MoorerReverb {
             outputs[i] = y;
         }
     }
+}
+
+/// Calculates comb gains based on reverberation time
+///
+/// Inputs:
+///  * comb_delays: the delays for each comb filter, in samples
+///  * rev_time: the reverberation time, in seconds
+///
+/// Outputs:
+///  * A vector of gains for each comb filter
+///  * The final output gain of the comb filter summation
+fn compute_comb_gains(comb_delays: &[Time], rev_time: f32)
+        -> (Vec<f32>, f32) {
+    let mut comb_gains = Vec::with_capacity(comb_delays.len());
+    for &delay in comb_delays.iter() {
+        let gain = 10.0.powf(-3.0*(delay as f32)*rev_time / (SAMPLE_RATE as f32));
+        comb_gains.push(gain);
+    }
+    let comb_out_gain = 1.0 - 0.366/rev_time;
+    (comb_gains, comb_out_gain)
 }
