@@ -75,6 +75,16 @@ pub trait AudioDevice {
 }
 
 
+/// A device that receives messages.
+pub trait MessageReceiver {
+    /// The type of messages to be received.
+    type Msg;
+
+    /// Handles the message.
+    fn handle_message(&mut self, msg: Self::Msg);
+}
+
+
 /// A device that generates MIDI events.
 pub trait MidiDevice {
     /// Return any events scheduled for time `t`.
