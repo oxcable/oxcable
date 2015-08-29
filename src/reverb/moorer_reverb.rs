@@ -53,31 +53,23 @@ impl MoorerReverb {
         let comb_out_gain = 1.0 - 0.366/rev_time;
 
         // Allocate tapped delay lines
-        let mut tapped_delay_lines = Vec::with_capacity(num_channels);
-        for _i in (0 .. num_channels) {
-            let mut rb = RingBuffer::new(max_tapped_delay as usize + 1);
-            for _t in (0 .. max_tapped_delay) { rb.push(0.0); }
-            tapped_delay_lines.push(rb);
-        }
+        let init = vec![0.0; max_tapped_delay as usize + 1];
+        let tapped_delay_lines = vec![RingBuffer::from(&init[..]); num_channels];
 
         // Allocate comb delay lines
         let mut comb_delay_lines = Vec::with_capacity(num_channels);
-        for _i in (0 .. num_channels) {
+        for _ in (0 .. num_channels) {
             let mut channel_lines = Vec::with_capacity(room.comb_delays.len());
             for j in (0 .. room.comb_delays.len()) {
                 let delay = room.comb_delays[j];
-                let mut rb = RingBuffer::new((delay+1) as usize);
-                for _t in (0 .. delay) { rb.push(0.0); }
-                channel_lines.push(rb);
+                let init = vec![0.0; delay as usize + 1];
+                channel_lines.push(RingBuffer::from(&init[..]));
             }
             comb_delay_lines.push(channel_lines);
         }
-        let mut comb_out_buffer = Vec::with_capacity(num_channels);
-        for _i in (0 .. num_channels) {
-            let mut rb = RingBuffer::new((comb_out_delay+1) as usize);
-            for _t in (0 .. comb_out_delay) { rb.push(0.0); }
-            comb_out_buffer.push(rb);
-        }
+
+        let init = vec![0.0; comb_out_delay as usize + 1];
+        let comb_out_buffer = vec![RingBuffer::from(&init[..]); num_channels];
 
         // Return struct
         MoorerReverb {
@@ -108,28 +100,28 @@ impl AudioDevice for MoorerReverb {
     fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]) {
         for (i,x) in inputs.iter().enumerate() {
             // Advance tapped delay line
-            self.tapped_delay_lines[i].push(0.0);
             for (delay, gain) in self.tapped_delays.iter()
                     .zip(self.tapped_gains.iter()) {
                 self.tapped_delay_lines[i][t + *delay] += *gain * x;
             }
             let tapped_out = (x + self.tapped_delay_lines[i][t]) /
                 (self.tapped_delays.len() as f32);
+            self.tapped_delay_lines[i].push(0.0);
 
             // Update comb filters
-            let mut comb_out = 0.0;
+            let comb_out = self.comb_out_buffer[i][t];
+            let mut next_comb_out = 0.0;
             for j in (0 .. self.comb_delays.len()) {
                 let gain  = self.comb_gains[j];
                 let feedback = self.comb_delay_lines[i][j][t];
                 self.comb_delay_lines[i][j].push(tapped_out + gain * feedback);
-                comb_out += feedback;
+                next_comb_out += feedback;
             }
-            comb_out *= self.comb_out_gain/(self.comb_delays.len() as f32);
-            self.comb_out_buffer[i].push(comb_out);
+            next_comb_out *= self.comb_out_gain/(self.comb_delays.len() as f32);
+            self.comb_out_buffer[i].push(next_comb_out);
 
-
-            // Finally store result
-            let wet_out = tapped_out + self.comb_out_buffer[i][t];
+            // Compute and store result
+            let wet_out = tapped_out + comb_out;
             let y = self.gain * (self.wetness*wet_out + (1.0-self.wetness)*x);
             outputs[i] = y;
         }

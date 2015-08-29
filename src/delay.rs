@@ -30,18 +30,12 @@ impl Delay {
     pub fn new(delay: f32, feedback: f32, wetness: f32,
                num_channels: usize) -> Self {
         // Create the delay buffers, starting with silence
-        let delay_samples = (delay * SAMPLE_RATE as f32) as u32;
-        let mut bufs = Vec::with_capacity(num_channels);
-        for i in (0 .. num_channels) {
-            bufs.push(RingBuffer::new(delay_samples as usize));
-            for _ in (0 .. delay_samples) {
-                bufs[i].push(0.0);
-            }
-        }
+        let delay_samples = (delay * SAMPLE_RATE as f32) as usize;
+        let init = vec![0.0; delay_samples];
 
         Delay {
             num_channels: num_channels,
-            delay_buffers: bufs,
+            delay_buffers: vec![RingBuffer::from(&init[..]); num_channels],
             feedback: feedback,
             wetness: wetness
         }
