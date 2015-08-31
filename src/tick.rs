@@ -22,7 +22,7 @@ pub trait Tick {
     }
 
     /// Ticks into infinity. Never returns.
-    fn tick_forever(&mut self) {
+    fn tick_forever(&mut self) -> ! {
         loop {
             self.tick();
         }
