@@ -11,6 +11,15 @@ This is a personal project of mine, with two goals:
 
 I am still fleshing out the core libraries, so interfaces are still unstable.
 
+Projects using oxcable
+----------------------
+
+* [oxcable-subtractive-synth](https://github.com/thenyeguy/oxcable-subtractive-synth),
+  a MIDI subtractive synthesizer.
+
+If you have a project using `oxcable`, I'd love to hear about it. Send me
+a message and I can include it in this list.
+
 Examples
 --------
 
@@ -35,9 +44,6 @@ chain.tick_forever();
 
 For more simple examples, the [`src/bin`](src/bin) directory contains many
 sample test scripts.
-
-For an example of a project leveraging the tools this framework contains, see my
-[sample subtractive synthesizer](https://github.com/thenyeguy/oxcable-subtractive-synth).
 
 Installing
 ----------
