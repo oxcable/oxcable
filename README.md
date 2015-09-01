@@ -62,11 +62,3 @@ The scripts directory contains assorted scripts used both to experiment with new
 features, and to test the output of Rust library code. These scripts are written
 in Python, and leverage the `numpy`, `scipy` and `matplotlib` libraries for
 rapid prototyping purposes.
-
-ClickTrack
-----------
-
-This project is a successor to another project of mine ClickTrack. ClickTrack is
-an audio framework written in C++. Much of this project is a port of work
-originally done in ClickTrack. To see more, visit 
-[my ClickTrack repository](https://github.com/thenyeguy/ClickTrack).
