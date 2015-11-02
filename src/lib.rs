@@ -128,6 +128,7 @@ pub mod adsr;
 pub mod chain;
 pub mod delay;
 pub mod dynamics;
+pub mod error;
 pub mod filters;
 pub mod graph;
 pub mod io;

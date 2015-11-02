@@ -8,6 +8,7 @@ use std::rc::Rc;
 
 use portmidi;
 
+use error::{Error, Result};
 use types::{MidiDevice, MidiEvent, MidiMessage, Time};
 
 
@@ -22,21 +23,21 @@ pub struct MidiEngine {
 
 impl MidiEngine {
     /// Initializes the MIDI driver.
-    pub fn open() -> Result<Self, MidiError> {
+    pub fn open() -> Result<Self> {
         try!(portmidi::initialize());
         Ok(MidiEngine { marker: Rc::new(MidiEngineMarker) })
     }
 
     /// Opens a MidiIn using the default OS device.
-    pub fn default_input(&self) -> Result<MidiIn, MidiError> {
+    pub fn default_input(&self) -> Result<MidiIn> {
         let device = try!(portmidi::get_default_input_device_id().ok_or(
-                MidiError::NoDevices));
+                Error::NoMidiDevices));
         MidiIn::new(self.marker.clone(), device)
     }
 
     /// Launches a command-line input selection message, then open a MidiIn
     /// using the user selected device.
-    pub fn choose_input(&self) -> Result<MidiIn, MidiError> {
+    pub fn choose_input(&self) -> Result<MidiIn> {
         println!("Select a MIDI input:");
         let default_in = portmidi::get_default_input_device_id();
         let mut valids = Vec::new();
@@ -55,7 +56,7 @@ impl MidiEngine {
                 _ => ()
             }
         }
-        if valids.len() == 0 { return Err(MidiError::NoDevices); }
+        if valids.len() == 0 { return Err(Error::NoMidiDevices); }
 
         let mut port = None;
         let mut s = String::new();
@@ -102,7 +103,7 @@ pub struct MidiIn {
 impl MidiIn {
     /// Open a midi input stream.
     fn new(engine: Rc<MidiEngineMarker>, port: portmidi::PortMidiDeviceId)
-            -> Result<Self, MidiError> {
+            -> Result<Self> {
         // Open a stream. For now, use first device
         let mut pm_stream = portmidi::InputPort::new(port, BUFFER_SIZE);
         try!(pm_stream.open());
@@ -131,22 +132,6 @@ impl MidiDevice for MidiIn {
             }
         }
         events
-    }
-}
-
-
-/// An error type for MIDI stream management
-#[derive(Debug)]
-pub enum MidiError {
-    /// No MIDI devices can be found
-    NoDevices,
-    /// Wraps a PortMidi error
-    PortMidi(portmidi::PortMidiError)
-}
-
-impl From<portmidi::PortMidiError> for MidiError {
-    fn from(e: portmidi::PortMidiError) -> MidiError {
-        MidiError::PortMidi(e)
     }
 }
 
