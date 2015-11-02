@@ -4,6 +4,7 @@ use std::io;
 use std::result;
 
 use byteorder;
+use portaudio::pa;
 use portmidi;
 
 #[derive(Debug)]
@@ -22,6 +23,8 @@ pub enum Error {
     CreatesCycle,
     /// A std::io operation failed.
     Io(io::Error),
+    /// A portaudio operation failed.
+    PortAudio(pa::Error),
     /// A portmidi operation failed.
     PortMidi(portmidi::PortMidiError),
     /// A feature isn't supported.
@@ -42,6 +45,12 @@ impl From<byteorder::Error> for Error {
 impl From<io::Error> for Error {
     fn from(e: io::Error) -> Self {
         Error::Io(e)
+    }
+}
+
+impl From<pa::Error> for Error {
+    fn from(e: pa::Error) -> Error {
+        Error::PortAudio(e)
     }
 }
 

@@ -12,6 +12,7 @@ use std::rc::Rc;
 
 use portaudio::pa;
 
+use error::Result;
 use types::{SAMPLE_RATE, AudioDevice, Sample, Time};
 
 
@@ -27,7 +28,7 @@ pub struct AudioEngine {
 
 impl AudioEngine {
     /// Initializes the audio driver and sets the buffer size to be used for IO.
-    pub fn with_buffer_size(samples: usize) -> Result<Self, pa::Error> {
+    pub fn with_buffer_size(samples: usize) -> Result<Self> {
         try!(pa::initialize());
         Ok(AudioEngine {
             marker: Rc::new(AudioEngineMarker),
@@ -36,14 +37,12 @@ impl AudioEngine {
     }
 
     /// Opens an AudioIn using the default OS device.
-    pub fn default_input(&self, num_channels: usize)
-            -> Result<AudioIn, pa::Error> {
+    pub fn default_input(&self, num_channels: usize) -> Result<AudioIn> {
         AudioIn::new(self, num_channels)
     }
 
     /// Opens an AudioOut using the default OS device.
-    pub fn default_output(&self, num_channels: usize)
-            -> Result<AudioOut, pa::Error> {
+    pub fn default_output(&self, num_channels: usize) -> Result<AudioOut> {
         AudioOut::new(self, num_channels)
     }
 }
@@ -74,8 +73,7 @@ pub struct AudioIn {
 
 impl AudioIn {
     /// Opens an audio input stream reading `num_channels` inputs.
-    fn new(engine: &AudioEngine, num_channels: usize)
-            -> Result<Self, pa::Error> {
+    fn new(engine: &AudioEngine, num_channels: usize) -> Result<Self> {
         // Open a stream in blocking mode
         let mut pa_stream = pa::Stream::new();
         try!(pa_stream.open_default(SAMPLE_RATE as f64,
@@ -155,8 +153,7 @@ pub struct AudioOut {
 
 impl AudioOut {
     /// Opens an output stream writing `num_channels` outputs.
-    fn new(engine: &AudioEngine, num_channels: usize)
-            -> Result<Self, pa::Error> {
+    fn new(engine: &AudioEngine, num_channels: usize) -> Result<Self> {
         // Open a stream in blocking mode
         let mut pa_stream = pa::Stream::new();
         try!(pa_stream.open_default(SAMPLE_RATE as f64,
