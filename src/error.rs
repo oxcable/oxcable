@@ -1,20 +1,40 @@
 //! Provides a standardized error type for oxcable.
 
-use std::error;
-use std::fmt;
 use std::io;
 use std::result;
 
+use byteorder;
 use portmidi;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Debug)]
 pub enum Error {
-    /// Returned when no audio resources can be opened.
+    /// No audio resources can be opened.
     NoAudioDevices,
-    /// Returned when no MIDI resources can be opened.
+    /// No MIDI resources can be opened.
     NoMidiDevices,
-    /// Wraps errors returned by portmidi
+    /// A file is not formatted properly.
+    InvalidFile,
+    /// A std::io operation failed.
+    Io(io::Error),
+    /// A portmidi operation failed.
     PortMidi(portmidi::PortMidiError),
+    /// A feature isn't supported. The string argument describes why.
+    Unsupported(&'static str),
+}
+
+impl From<byteorder::Error> for Error {
+    fn from(e: byteorder::Error) -> Self {
+        match e {
+            byteorder::Error::UnexpectedEOF => Error::InvalidFile,
+            byteorder::Error::Io(e) => Error::Io(e),
+        }
+    }
+}
+
+impl From<io::Error> for Error {
+    fn from(e: io::Error) -> Self {
+        Error::Io(e)
+    }
 }
 
 impl From<portmidi::PortMidiError> for Error {

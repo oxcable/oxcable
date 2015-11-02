@@ -4,6 +4,7 @@ use byteorder::{self, ReadBytesExt, WriteBytesExt, LittleEndian};
 use std::fs::File;
 use std::io::{self, Seek, SeekFrom};
 
+use error::{Error, Result};
 use types::{SAMPLE_RATE, AudioDevice, Time, Sample};
 
 
@@ -23,7 +24,7 @@ impl WavReader {
     ///
     /// This function panics if the file can't be opened, or is not a valid wav
     /// file.
-    pub fn open(filename: &str) -> Result<Self, WavError> {
+    pub fn open(filename: &str) -> Result<Self> {
         let mut file = try!(File::open(filename));
         let header = try!(WavHeader::read_from_file(&mut file));
         Ok(WavReader {
@@ -90,7 +91,7 @@ impl WavWriter {
     ///
     /// This function panics if the file can't be opened or written to
     pub fn create(filename: &str, num_channels: usize)
-            -> Result<Self, WavError> {
+            -> Result<Self> {
         let mut file = try!(File::create(filename));
         let header = WavHeader::new(num_channels as u16, SAMPLE_RATE as u32,
                                     0u32);
@@ -132,30 +133,6 @@ impl AudioDevice for WavWriter {
             self.file.write_i16::<LittleEndian>((clipped*32768.0) as i16).unwrap();
         }
         self.samples_written += 1;
-    }
-}
-
-
-/// An error type for dealing with wav files.
-#[derive(Debug)]
-pub enum WavError {
-    InvalidFile,
-    Io(io::Error),
-    UnsupportedFeature(&'static str),
-}
-
-impl From<io::Error> for WavError {
-    fn from(e: io::Error) -> Self {
-        WavError::Io(e)
-    }
-}
-
-impl From<byteorder::Error> for WavError {
-    fn from(e: byteorder::Error) -> Self {
-        match e {
-            byteorder::Error::UnexpectedEOF => WavError::InvalidFile,
-            byteorder::Error::Io(e) => WavError::Io(e),
-        }
     }
 }
 
@@ -206,7 +183,7 @@ impl WavHeader {
     }
 
     /// Attempts to read a wav header from the provided file
-    fn read_from_file(f: &mut File) -> Result<Self, WavError> {
+    fn read_from_file(f: &mut File) -> Result<Self> {
         let riff_hdr = try!(f.read_u32::<LittleEndian>());
         let file_size = try!(f.read_u32::<LittleEndian>());
         let wave_lbl = try!(f.read_u32::<LittleEndian>());
@@ -240,38 +217,38 @@ impl WavHeader {
 
     /// Returns the header if the wav header has valid fields and uses the
     /// supported formats, otherwise return a descriptive error
-    fn check(self) -> Result<Self, WavError> {
+    fn check(self) -> Result<Self> {
         // Check the headers are correct
-        if self.riff_hdr != RIFF { return Err(WavError::InvalidFile); }
-        if self.wave_lbl != WAVE { return Err(WavError::InvalidFile); }
-        if self.fmt_hdr  != FMT_ { return Err(WavError::InvalidFile); }
-        if self.data_hdr != DATA { return Err(WavError::InvalidFile); }
+        if self.riff_hdr != RIFF { return Err(Error::InvalidFile); }
+        if self.wave_lbl != WAVE { return Err(Error::InvalidFile); }
+        if self.fmt_hdr  != FMT_ { return Err(Error::InvalidFile); }
+        if self.data_hdr != DATA { return Err(Error::InvalidFile); }
 
         // Check sizes are correct
         if self.file_size != self.data_size + 36 {
-            return Err(WavError::InvalidFile);
+            return Err(Error::InvalidFile);
         }
         if self.section_size != 16 {
-            return Err(WavError::InvalidFile);
+            return Err(Error::InvalidFile);
         }
         if self.byte_rate != self.sample_rate*(self.num_channels as u32)*
             (self.bit_depth as u32)/8 {
-            return Err(WavError::InvalidFile);
+            return Err(Error::InvalidFile);
         }
         if self.block_align != self.num_channels*self.bit_depth/8 {
-            return Err(WavError::InvalidFile);
+            return Err(Error::InvalidFile);
         }
 
         // Check for formats we can read
         if self.format != 1 {
-            return Err(WavError::UnsupportedFeature("Only PCM is supported"));
+            return Err(Error::Unsupported("Only PCM is supported"));
         }
         if self.sample_rate != (SAMPLE_RATE as u32) {
-            return Err(WavError::UnsupportedFeature(
+            return Err(Error::Unsupported(
                     "Sample rate conversion not supported"));
         }
         if self.bit_depth != 16 {
-            return Err(WavError::UnsupportedFeature("Only 16-bit supported"));
+            return Err(Error::Unsupported("Only 16-bit supported"));
         }
 
         // If this header is valid, then return it instead
