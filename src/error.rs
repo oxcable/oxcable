@@ -1,5 +1,6 @@
 //! Provides a standardized error type for oxcable.
 
+use std::error;
 use std::fmt;
 use std::io;
 use std::result;
@@ -80,6 +81,33 @@ impl fmt::Display for Error {
             &Io(ref e) => write!(f, "IO error: {}", e),
             &PortAudio(ref e) => write!(f, "PortAudio error: {}", e),
             &PortMidi(ref e) => write!(f, "PortMidi error: {:?}", e),
+        }
+    }
+}
+
+impl error::Error for Error {
+    fn description(&self) -> &str {
+        match self {
+            &NoAudioDevices => "No audio devices found.",
+            &NoMidiDevices => "No midi devices found.",
+            &InvalidFile => "The provided was not valid.",
+            &OutOfRange(_) => "Index was out of range.",
+            &CreatesCycle => "The requested action creates a graph cycle.",
+            &Unsupported(_) => "Unsupported feature.",
+            &Io(_) => "std::io error",
+            &PortAudio(_) => "PortAudio error",
+            &PortMidi(_) => "PortMidi error",
+        }
+    }
+
+    fn cause(&self) -> Option<&error::Error> {
+        match self {
+            &Io(ref e) => Some(e),
+            &PortAudio(ref e) => Some(e),
+            // I would like this to be here, but PortMidiError does not
+            // implement Error...
+            // &PortMidi(ref e) => Some(e),
+            _ => None,
         }
     }
 }
