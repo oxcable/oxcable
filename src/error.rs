@@ -56,13 +56,13 @@ impl From<io::Error> for Error {
 }
 
 impl From<pa::Error> for Error {
-    fn from(e: pa::Error) -> Error {
+    fn from(e: pa::Error) -> Self {
         Error::PortAudio(e)
     }
 }
 
 impl From<portmidi::PortMidiError> for Error {
-    fn from(e: portmidi::PortMidiError) -> Error {
+    fn from(e: portmidi::PortMidiError) -> Self {
         Error::PortMidi(e)
     }
 }
