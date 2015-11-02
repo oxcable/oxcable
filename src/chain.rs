@@ -37,15 +37,21 @@ pub use tick::Tick;
 
 /// A container for a series of audio devices.
 pub struct DeviceChain {
+    inputs: Vec<Sample>,
     devices: Vec<AudioNode>,
     time: Time
 }
 
 impl DeviceChain {
     /// Creates a new chain that starts from the provided device. This device
-    /// will receive no inputs.
+    /// will receive no inputs unless they are manually supplied using
+    /// DeviceChain::get_input.
     pub fn from<D>(device: D) -> Self where D: 'static+AudioDevice {
-        DeviceChain { devices: vec![AudioNode::new(device)], time: 0 }
+        DeviceChain {
+            inputs: vec![0.0; device.num_inputs()],
+            devices: vec![AudioNode::new(device)],
+            time: 0
+        }
     }
 
     /// Appends the provided device to the end of the chain. This device will be
@@ -59,15 +65,23 @@ impl DeviceChain {
         self
     }
 
-    /// Fetches the last output frame from the end of the chain.
-    pub fn get_output(&self) -> Vec<Sample> {
-        self.devices[self.devices.len()-1].outputs.clone()
+    /// Return a mutable slice to the input of the first device in the chain.
+    ///
+    /// These inputs never get overwritten, so if you are supplying input you
+    /// must manually zero the buffer again.
+    pub fn get_input(&mut self) -> &mut[Sample] {
+        &mut self.inputs
+    }
+
+    /// Returns a slice to the output of the last device in the chain.
+    pub fn get_output(&self) -> &[Sample] {
+        &self.devices[self.devices.len()-1].outputs
     }
 }
 
 impl Tick for DeviceChain {
     fn tick(&mut self) {
-        self.devices[0].tick(self.time, &[0.0;0]);
+        self.devices[0].tick(self.time, &self.inputs);
         for i in 1..self.devices.len() {
             let inputs = self.devices[i-1].outputs.clone();
             self.devices[i].tick(self.time, &inputs);
