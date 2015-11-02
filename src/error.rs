@@ -112,5 +112,5 @@ impl error::Error for Error {
     }
 }
 
-
+/// A specialized Result for oxcable.
 pub type Result<T> = result::Result<T, Error>;
