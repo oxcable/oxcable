@@ -105,14 +105,14 @@ impl<D> AudioDevice for Messaged<D> where D: AudioDevice+MessageReceiver {
     }
 }
 
-impl<D> Deref for Messaged<D> where D: MessageReceiver {
+impl<D> Deref for Messaged<D> where D: AudioDevice+MessageReceiver {
     type Target = D;
     fn deref(&self) -> &D {
         &self.device
     }
 }
 
-impl<D> DerefMut for Messaged<D> where D: MessageReceiver {
+impl<D> DerefMut for Messaged<D> where D: AudioDevice+MessageReceiver {
     fn deref_mut(&mut self) -> &mut D {
         &mut self.device
     }
