@@ -14,11 +14,19 @@ pub enum Error {
     NoMidiDevices,
     /// A file is not formatted properly.
     InvalidFile,
+    /// A requested index is out of range.
+    ///
+    /// The string argument specifies which index was out of range.
+    OutOfRange(&'static str),
+    /// The requested operation would create a graph cycle.
+    CreatesCycle,
     /// A std::io operation failed.
     Io(io::Error),
     /// A portmidi operation failed.
     PortMidi(portmidi::PortMidiError),
-    /// A feature isn't supported. The string argument describes why.
+    /// A feature isn't supported.
+    ///
+    /// The string argument describes what feature.
     Unsupported(&'static str),
 }
 

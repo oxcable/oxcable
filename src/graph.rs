@@ -44,6 +44,7 @@
 
 use std::collections::VecDeque;
 
+use error::{Error, Result};
 use types::{AudioDevice, Sample, Time};
 pub use tick::Tick;
 
@@ -87,22 +88,22 @@ impl DeviceGraph {
     /// a cycle in the graph, an Err is returned and no changes dest the graph are
     /// made.
     pub fn add_edge(&mut self, src: AudioNodeIdx, src_ch: usize,
-                    dest: AudioNodeIdx, dest_ch: usize) -> Result<(), GraphError> {
+                    dest: AudioNodeIdx, dest_ch: usize) -> Result<()> {
         // Check device indices
         let AudioNodeIdx(src_i) = src;
         let AudioNodeIdx(dest_i) = dest;
         if src_i >= self.nodes.len() {
-            return Err(GraphError::SrcOutOfRange);
+            return Err(Error::OutOfRange("src"));
         } else if dest_i >= self.nodes.len() {
-            return Err(GraphError::DestOutOfRange);
+            return Err(Error::OutOfRange("dest"));
         }
 
         // Check channels
         if self.nodes[src_i].device.num_outputs() <= src_ch {
-            return Err(GraphError::SrcChOutOfRange);
+            return Err(Error::OutOfRange("src_ch"));
         }
         if self.nodes[dest_i].device.num_inputs() <= dest_ch {
-            return Err(GraphError::DestChOutOfRange);
+            return Err(Error::OutOfRange("dest_ch"));
         }
         while self.nodes[dest_i].inputs.len() < dest_ch {
             self.nodes[dest_i].inputs.push(None);
@@ -117,8 +118,7 @@ impl DeviceGraph {
     /// Determines the topology of our device graph. If the graph has a cycle,
     /// then we remove the last edge. Otherwise, we set self.topology to
     /// a topologically sorted order.
-    fn topological_sort(&mut self, dest_i: usize, dest_ch: usize) ->
-            Result<(), GraphError> {
+    fn topological_sort(&mut self, dest_i: usize, dest_ch: usize) -> Result<()> {
         // Intialize our set of input edges, and our set of edgeless nodes
         let mut topology = Vec::new();
         let mut inputs: Vec<Vec<_>> = self.nodes.iter().map(
@@ -166,7 +166,7 @@ impl DeviceGraph {
             Ok(())
         } else {
             self.nodes[dest_i].inputs[dest_ch] = None;
-            Err(GraphError::CreatesCycle)
+            Err(Error::CreatesCycle)
         }
     }
 }
@@ -178,22 +178,6 @@ impl Tick for DeviceGraph {
         }
         self.time += 1;
     }
-}
-
-
-/// Errors returned while modifying the graph.
-#[derive(Copy, Clone, Debug)]
-pub enum GraphError {
-    /// The provided source device does not exist.
-    SrcOutOfRange,
-    /// The source device does not have that channel.
-    SrcChOutOfRange,
-    /// The provided destination device does not exist.
-    DestOutOfRange,
-    /// The destination device does not have that channel.
-    DestChOutOfRange,
-    /// Adding this edge would create a cycle.
-    CreatesCycle
 }
 
 
