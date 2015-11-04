@@ -3,6 +3,8 @@ oxcable
 
 [Documentation](http://thenyeguy.github.io/oxcable/doc/oxcable/index.html)
 
+[Crates.io](https://crates.io/crates/oxcable)
+
 A signal processing framework for making music with Rust.
 
 This is a personal project of mine, with two goals:
