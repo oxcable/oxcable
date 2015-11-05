@@ -1,4 +1,4 @@
-oxcable
+oxcable [![Build Status](https://travis-ci.org/thenyeguy/oxcable.svg?branch=master)](https://travis-ci.org/thenyeguy/oxcable)
 =======
 
 [Documentation](http://thenyeguy.github.io/oxcable/doc/oxcable/index.html)
