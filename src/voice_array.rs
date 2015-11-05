@@ -88,8 +88,9 @@ impl<T> VoiceArray<T> {
                 let i = match self.free_voices.pop_front() {
                     // If there is a free voice, use the oldest one
                     Some(i) => i,
-                    // Otherwise, use the oldest playing voice
+                    // Otherwise, use the oldest playing voice.
                     None => {
+                        // No free voices imply a held voice, so unwrap is safe.
                         let (i, n) = self.held_voices.pop_front().unwrap();
                         self.note_to_voice.remove(&n);
                         i

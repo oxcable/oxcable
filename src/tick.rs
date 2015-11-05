@@ -36,7 +36,7 @@ pub trait Tick {
             use std::io::{Read, stdin};
             let mut buf = [0];
             let _ = stdin().read(&mut buf);
-            tx.send(()).unwrap();
+            tx.send(()).expect("Failed to send end message.");
         });
 
         let ticks = SAMPLE_RATE / 10;

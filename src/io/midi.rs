@@ -62,7 +62,7 @@ impl MidiEngine {
         let mut s = String::new();
         while port.is_none() {
             print!(" > ");
-            io::stdout().flush().unwrap();
+            let _ = io::stdout().flush();
             if io::stdin().read_line(&mut s).is_ok() {
                 port = s.trim().parse::<usize>().ok().map_or(None, |i|
                     if i < valids.len() {
@@ -75,6 +75,7 @@ impl MidiEngine {
             s.clear();
         }
 
+        // Unwrap is safe here, since we don't exit the loop if it is still None
         let port = port.unwrap() as portmidi::PortMidiDeviceId;
         MidiIn::new(self.marker.clone(), port)
     }
@@ -88,7 +89,7 @@ impl MidiEngine {
 struct MidiEngineMarker;
 impl Drop for MidiEngineMarker {
     fn drop(&mut self) {
-        portmidi::terminate().unwrap();
+        portmidi::terminate().expect("Failed to terminate portmidi");
     }
 }
 
@@ -117,8 +118,7 @@ impl MidiIn {
 
 impl Drop for MidiIn {
     fn drop(&mut self) {
-        // Close the portmidi stream
-        self.pm_stream.close().unwrap();
+        self.pm_stream.close().expect("Failed to close the portmidi stream");
     }
 }
 
@@ -126,9 +126,11 @@ impl MidiDevice for MidiIn {
     fn get_events(&mut self, t: Time) -> Vec<MidiEvent> {
         let mut events = Vec::new();
         loop {
-            match self.pm_stream.read().unwrap() {
-                Some(pm_event) => events.push(midievent_from_portmidi(pm_event, t)),
-                None => break
+            match self.pm_stream.read() {
+                Ok(Some(pm_event))
+                    => events.push(midievent_from_portmidi(pm_event, t)),
+                Ok(None) => break,
+                Err(e) => panic!("Failed to read from portmidi stream: {:?}", e)
             }
         }
         events

@@ -55,7 +55,7 @@ struct AudioEngineMarker;
 impl Drop for AudioEngineMarker {
     fn drop(&mut self)
     {
-        pa::terminate().unwrap();
+        pa::terminate().expect("Failed to terminate portaudio.");
     }
 }
 
@@ -98,8 +98,8 @@ impl AudioIn {
 
 impl Drop for AudioIn {
     fn drop(&mut self) {
-        self.pa_stream.stop().unwrap();
-        self.pa_stream.close().unwrap();
+        self.pa_stream.stop().expect("Failed to stop portaudio stream.");
+        self.pa_stream.close().expect("Failed to close portaudio stream.");
     }
 }
 
@@ -127,7 +127,7 @@ impl AudioDevice for AudioIn {
                         self.buffer[i] = 0.0;
                     }
                 },
-                Err(e) => panic!("{}", e)
+                Err(e) => panic!("Failed to read from portaudio stream: {}", e)
             }
             self.samples_read = 0;
         }
@@ -176,8 +176,8 @@ impl AudioOut {
 
 impl Drop for AudioOut {
     fn drop(&mut self) {
-        self.pa_stream.stop().unwrap();
-        self.pa_stream.close().unwrap();
+        self.pa_stream.stop().expect("Failed to stop portaudio stream.");
+        self.pa_stream.close().expect("Failed to close portaudio stream.");
     }
 }
 
@@ -204,7 +204,7 @@ impl AudioDevice for AudioOut {
                                  self.buffer_size as u32) {
                 Ok(()) => (),
                 Err(pa::Error::OutputUnderflowed) => println!("Output underflowed"),
-                Err(e) => panic!("{}", e)
+                Err(e) => panic!("Failed to write to portaudio stream: {}", e)
             }
             self.samples_written = 0;
             self.buffer.clear()

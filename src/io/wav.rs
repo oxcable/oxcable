@@ -65,7 +65,9 @@ impl AudioDevice for WavReader {
     fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {
         for i in (0 .. self.num_channels) {
             let s = if self.samples_read < self.num_samples {
-                (self.file.read_i16::<LittleEndian>().unwrap() as Sample) / 32768.0
+                let n = self.file.read_i16::<LittleEndian>()
+                    .expect("Failed to read next sample from wav file.");
+                (n as Sample) / 32768.0
             } else {
                 0.0
             };
@@ -109,10 +111,14 @@ impl Drop for WavWriter {
         // Updates the wav header to have the correct amount of data written
         let data_size = self.samples_written * self.num_channels * 16/8;
         let file_size = 36+data_size;
-        self.file.seek(SeekFrom::Start(4)).unwrap();
-        self.file.write_u32::<LittleEndian>(file_size as u32).unwrap();
-        self.file.seek(SeekFrom::Start(40)).unwrap();
-        self.file.write_u32::<LittleEndian>(data_size as u32).unwrap();
+        self.file.seek(SeekFrom::Start(4))
+            .expect("Failed to seek wav file size.");
+        self.file.write_u32::<LittleEndian>(file_size as u32)
+            .expect("Failed to write wav file size.");
+        self.file.seek(SeekFrom::Start(40))
+            .expect("Failed to seek wav data size.");
+        self.file.write_u32::<LittleEndian>(data_size as u32)
+            .expect("Failed to write wav data size.");
     }
 }
 
@@ -130,7 +136,8 @@ impl AudioDevice for WavWriter {
             let mut clipped = *s;
             if clipped > 0.999f32 { clipped = 0.999f32; }
             if clipped < -0.999f32 { clipped = -0.999f32; }
-            self.file.write_i16::<LittleEndian>((clipped*32768.0) as i16).unwrap();
+            self.file.write_i16::<LittleEndian>((clipped*32768.0) as i16)
+                .expect("Failed to write next sample to wav file.");
         }
         self.samples_written += 1;
     }
