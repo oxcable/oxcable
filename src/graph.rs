@@ -15,8 +15,7 @@
 //! a microphone with delay into the right channel.
 //!
 //! ```
-//! # // this example uses tick_forever(), so we wrap it in a function that gets
-//! # // compiled by not run by doctest
+//! # // Wrap in a dummy function to prevent running in doctest.
 //! # fn dummy() {
 //! use oxcable::delay::Delay;
 //! use oxcable::graph::{DeviceGraph, Tick};

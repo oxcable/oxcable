@@ -20,16 +20,15 @@
 //! use oxcable::oscillator::{Oscillator, Sine};
 //!
 //! fn main() {
+//! # }
+//! # // Wrap in a dummy function to prevent running in doctest.
+//! # fn dummy() {
 //!     let engine = AudioEngine::with_buffer_size(256).unwrap();
 //!     let mut chain = DeviceChain::from(
 //!         Oscillator::new(Sine).freq(440.0)
 //!     ).into(
 //!         engine.default_output(1).unwrap()
 //!     );
-//! # }
-//! # // wrap tick_forever() in a function that gets compiled by not run by
-//! # //doctest
-//! # fn dummy(chain: &mut DeviceChain) {
 //!     chain.tick_forever();
 //! }
 //! ```
