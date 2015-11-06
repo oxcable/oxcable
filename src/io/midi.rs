@@ -166,6 +166,11 @@ fn midievent_from_portmidi(event: portmidi::MidiEvent, t: Time) -> MidiEvent {
         },
         0b1011 => match msg.data1 {
             0x40 => MidiMessage::SustainPedal(msg.data2 >= 64),
+            0x41 => MidiMessage::Portamento(msg.data2 >= 64),
+            0x42 => MidiMessage::Sostenuto(msg.data2 >= 64),
+            0x43 => MidiMessage::SoftPedal(msg.data2 >= 64),
+            0x44 => MidiMessage::LegatoPedal(msg.data2 >= 64),
+            0x45 => MidiMessage::LegatoPedal(msg.data2 >= 64),
             _ => MidiMessage::ControlChange(msg.data1, msg.data2)
         },
         0b1100 => MidiMessage::ProgramChange(msg.data1),

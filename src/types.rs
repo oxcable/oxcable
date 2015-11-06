@@ -49,6 +49,16 @@ pub enum MidiMessage {
     ChannelAftertouch(f32),
     /// SustainPedal(on/off)
     SustainPedal(bool),
+    /// Portamento(on/off)
+    Portamento(bool),
+    /// Sostenuto(on/off)
+    Sostenuto(bool),
+    /// SoftPedal(on/off)
+    SoftPedal(bool),
+    /// LegatoPedal(on/off)
+    LegatoPedal(bool),
+    /// Hold2(on/off)
+    Hold2(bool),
     /// ControlChange(controller, value)
     ControlChange(u8, u8),
     /// ProgramChange(num)
