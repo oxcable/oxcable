@@ -14,7 +14,8 @@ name = "oxcable"
 
 [dependencies]
 byteorder = "*"
-portmidi = "*"
+# TODO: return this to `"*"` after pull request lands
+portmidi = { git = "https://github.com/thenyeguy/portmidi-rs" }
 num = { version = "*", default-features = false }
 portaudio = "*"
 rand = "*"

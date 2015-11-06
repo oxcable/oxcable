@@ -69,19 +69,7 @@ impl From<portmidi::PortMidiError> for Error {
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            &NoAudioDevices => write!(f, "No audio devices found."),
-            &NoMidiDevices => write!(f, "No midi devices found."),
-            &InvalidFile => write!(f, "The provided was not valid."),
-            &OutOfRange(ref idx) => write!(f, "Index `{}` was out of range.", idx),
-            &CreatesCycle =>
-                write!(f, "The requested action creates a graph cycle."),
-            &Unsupported(ref feat) =>
-                write!(f, "Unsupported feature: {}", feat),
-            &Io(ref e) => write!(f, "IO error: {}", e),
-            &PortAudio(ref e) => write!(f, "PortAudio error: {}", e),
-            &PortMidi(ref e) => write!(f, "PortMidi error: {:?}", e),
-        }
+        write!(f, "{:?}", self)
     }
 }
 
@@ -104,9 +92,7 @@ impl error::Error for Error {
         match self {
             &Io(ref e) => Some(e),
             &PortAudio(ref e) => Some(e),
-            // I would like this to be here, but PortMidiError does not
-            // implement Error...
-            // &PortMidi(ref e) => Some(e),
+            &PortMidi(ref e) => Some(e),
             _ => None,
         }
     }
