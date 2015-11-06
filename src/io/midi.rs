@@ -162,14 +162,14 @@ fn midievent_from_portmidi(event: portmidi::MidiEvent, t: Time) -> MidiEvent {
         0b1010 => {
             let note = msg.data1;
             let pressure = (msg.data2 as f32) / 127.0;
-            MidiMessage::KeyPressure(note, pressure)
+            MidiMessage::PolyphonicAftertouch(note, pressure)
         },
         0b1011 => match msg.data1 {
             0x40 => MidiMessage::SustainPedal(msg.data2 >= 64),
             _ => MidiMessage::ControlChange(msg.data1, msg.data2)
         },
         0b1100 => MidiMessage::ProgramChange(msg.data1),
-        0b1101 => MidiMessage::ChannelPressure(msg.data1 as f32 / 127.0),
+        0b1101 => MidiMessage::ChannelAftertouch(msg.data1 as f32 / 127.0),
         _ => MidiMessage::Other(msg.status, msg.data1, msg.data2)
     };
 

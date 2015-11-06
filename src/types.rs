@@ -43,16 +43,16 @@ pub enum MidiMessage {
     NoteOff(u8, f32),
     /// PitchBend(bend)
     PitchBend(f32),
-    /// KeyPressure(note number, pressure)
-    KeyPressure(u8, f32),
+    /// PolyphonicAftertouch(note number, pressure)
+    PolyphonicAftertouch(u8, f32),
+    /// ChannelAftertouch(pressure)
+    ChannelAftertouch(f32),
     /// SustainPedal(on/off)
     SustainPedal(bool),
     /// ControlChange(controller, value)
     ControlChange(u8, u8),
     /// ProgramChange(num)
     ProgramChange(u8),
-    /// ChannelPressure(pressure)
-    ChannelPressure(f32),
     /// Other(status, byte1, byte2)
     Other(u8, u8, u8)
 }
