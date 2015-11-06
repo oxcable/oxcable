@@ -76,12 +76,12 @@ impl fmt::Display for Error {
 impl error::Error for Error {
     fn description(&self) -> &str {
         match self {
-            &NoAudioDevices => "No audio devices found.",
-            &NoMidiDevices => "No midi devices found.",
-            &InvalidFile => "The provided was not valid.",
-            &OutOfRange(_) => "Index was out of range.",
-            &CreatesCycle => "The requested action creates a graph cycle.",
-            &Unsupported(_) => "Unsupported feature.",
+            &NoAudioDevices => "No audio devices found",
+            &NoMidiDevices => "No midi devices found",
+            &InvalidFile => "The provided was not valid",
+            &OutOfRange(_) => "Index was out of range",
+            &CreatesCycle => "The requested action creates a graph cycle",
+            &Unsupported(_) => "Unsupported feature",
             &Io(_) => "std::io error",
             &PortAudio(_) => "PortAudio error",
             &PortMidi(_) => "PortMidi error",
