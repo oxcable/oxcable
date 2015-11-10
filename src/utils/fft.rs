@@ -12,8 +12,6 @@
 //! # extern crate num;
 //! # extern crate oxcable;
 //! # fn main() {
-//! use num::complex::Complex32;
-//! use num::traits::Zero;
 //! use oxcable::utils::fft;
 //!
 //! // Initialize the FFT
@@ -22,11 +20,11 @@
 //! // Generate an input signal
 //! let mut input = Vec::with_capacity(8);
 //! for i in 0..8 {
-//!     input.push(Complex32::new(i as f32, 0.0));
+//!     input.push(fft::Complex32::new(i as f32, 0.0));
 //! }
 //!
 //! // Generate an empty output buffer
-//! let mut output = vec![Complex32::zero(); 8];
+//! let mut output = vec![fft::Complex32::new(0.0, 0.0); 8];
 //!
 //! // Perform the FFT
 //! transformer.fft(&input, &mut output);
@@ -35,10 +33,10 @@
 //!
 //! After this example, `output` will contain the FFT of `input`.
 
+use num::traits::Zero;
 use std::f32::consts::PI;
 
-use num::complex::Complex32;
-use num::traits::Zero;
+#[doc(no_inline)] pub use num::complex::Complex32;
 
 
 /// A container for precomputed values to perform FFTs of a fixed size.

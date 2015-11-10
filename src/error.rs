@@ -2,12 +2,14 @@
 
 use std::error;
 use std::fmt;
-use std::io;
 use std::result;
 
 use byteorder;
-use portaudio::pa;
-use portmidi;
+
+#[doc(no_inline)] pub use portaudio::pa::Error as PortAudioError;
+#[doc(no_inline)] pub use portmidi::PortMidiError;
+#[doc(no_inline)] pub use std::io::Error as IoError;
+
 
 /// A global error type for all oxcable operations.
 ///
@@ -32,13 +34,13 @@ pub enum Error {
     /// The string argument describes what feature.
     Unsupported(&'static str),
     /// A std::io operation failed.
-    Io(io::Error),
+    Io(IoError),
     /// A portaudio operation failed.
-    PortAudio(pa::Error),
+    PortAudio(PortAudioError),
     /// A portmidi operation failed.
-    PortMidi(portmidi::PortMidiError),
+    PortMidi(PortMidiError),
 }
-use self::Error::*;
+pub use self::Error::*;
 
 impl From<byteorder::Error> for Error {
     fn from(e: byteorder::Error) -> Self {
@@ -49,20 +51,20 @@ impl From<byteorder::Error> for Error {
     }
 }
 
-impl From<io::Error> for Error {
-    fn from(e: io::Error) -> Self {
+impl From<IoError> for Error {
+    fn from(e: IoError) -> Self {
         Error::Io(e)
     }
 }
 
-impl From<pa::Error> for Error {
-    fn from(e: pa::Error) -> Self {
+impl From<PortAudioError> for Error {
+    fn from(e: PortAudioError) -> Self {
         Error::PortAudio(e)
     }
 }
 
-impl From<portmidi::PortMidiError> for Error {
-    fn from(e: portmidi::PortMidiError) -> Self {
+impl From<PortMidiError> for Error {
+    fn from(e: PortMidiError) -> Self {
         Error::PortMidi(e)
     }
 }
