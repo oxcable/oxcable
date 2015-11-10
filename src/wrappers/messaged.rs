@@ -26,7 +26,7 @@ use types::{AudioDevice, MessageReceiver, Sample, Time};
 ///
 /// # Example
 ///
-/// ```
+/// ```no_run
 /// use std::thread;
 /// use oxcable::chain::{DeviceChain, Tick};
 /// use oxcable::oscillator::{Oscillator, Sine, SetFreq};
@@ -34,9 +34,6 @@ use types::{AudioDevice, MessageReceiver, Sample, Time};
 /// use oxcable::wrappers::Messaged;
 ///
 /// fn main() {
-/// # }
-/// # // Wrap in a dummy function to prevent running in doctest.
-/// # fn dummy() {
 ///     // Initialize signal chain...
 ///     let tx;
 ///     let engine = AudioEngine::with_buffer_size(256).unwrap();

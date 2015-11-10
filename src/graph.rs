@@ -14,9 +14,7 @@
 //! a stereo output. It feeds an oscillator to the left channel, and
 //! a microphone with delay into the right channel.
 //!
-//! ```
-//! # // Wrap in a dummy function to prevent running in doctest.
-//! # fn dummy() {
+//! ```no_run
 //! use oxcable::delay::Delay;
 //! use oxcable::graph::{DeviceGraph, Tick};
 //! use oxcable::io::audio::AudioEngine;
@@ -38,7 +36,6 @@
 //!
 //! // Play audio ad nauseam.
 //! graph.tick_forever();
-//! # }
 //! ```
 
 use std::collections::VecDeque;

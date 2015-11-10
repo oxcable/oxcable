@@ -10,9 +10,7 @@
 //! The following will pass microphone input through a delay unit, then out to
 //! the speaker:
 //!
-//! ```
-//! # // Wrap in a dummy function to prevent running in doctest.
-//! # fn dummy() {
+//! ```no_run
 //! use oxcable::delay::Delay;
 //! use oxcable::chain::{DeviceChain, Tick};
 //! use oxcable::io::audio::AudioEngine;
@@ -26,7 +24,6 @@
 //!     engine.default_output(1).unwrap()
 //! );
 //! chain.tick_forever();
-//! # }
 //! ```
 
 

@@ -13,16 +13,13 @@
 //! 440Hz, and play it on your computer's speakers or headphones in an infinite
 //! loop:
 //!
-//! ```
+//! ```no_run
 //! extern crate oxcable;
 //! use oxcable::chain::{DeviceChain, Tick};
 //! use oxcable::io::audio::AudioEngine;
 //! use oxcable::oscillator::{Oscillator, Sine};
 //!
 //! fn main() {
-//! # }
-//! # // Wrap in a dummy function to prevent running in doctest.
-//! # fn dummy() {
 //!     let engine = AudioEngine::with_buffer_size(256).unwrap();
 //!     let mut chain = DeviceChain::from(
 //!         Oscillator::new(Sine).freq(440.0)

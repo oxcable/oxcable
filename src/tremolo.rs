@@ -13,14 +13,12 @@
 //! To set up a tremolo, the channels must be properly configured. The following
 //! will apply a tremolo to our microphone input, using a 10Hz LFO:
 //!
-//! ```
+//! ```no_run
 //! use oxcable::graph::DeviceGraph;
 //! use oxcable::io::audio::AudioEngine;
 //! use oxcable::oscillator::*;
 //! use oxcable::tremolo::Tremolo;
 //!
-//! # // Wrap in a dummy function to prevent running in doctest.
-//! # fn dummy() {
 //! let engine = AudioEngine::with_buffer_size(256).unwrap();
 //! let mut graph = DeviceGraph::new();
 //!
@@ -32,7 +30,6 @@
 //! graph.add_edge(microphone, 0, tremolo, 0); // first channnel is input signal
 //! graph.add_edge(lfo, 0, tremolo, 1); // second channel is LFO output
 //! graph.add_edge(tremolo, 0, speaker, 0);
-//! # }
 //! ```
 
 use num::traits::Float;
