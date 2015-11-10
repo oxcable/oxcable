@@ -6,7 +6,8 @@
 //!
 //! # Example
 //!
-//! The following demonstrates how to use the `Transformer` to perform an 8-point FFT.
+//! The following demonstrates how to use the `Transformer` to perform an
+//! 8-point FFT.
 //!
 //! ```
 //! # extern crate num;
