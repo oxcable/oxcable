@@ -7,6 +7,11 @@
 //! The engine also sets the buffer size to be used for IO. The best buffer size
 //! is going to vary from system to system, but should ideally be as small as
 //! possible without causing skipping in the audio.
+//!
+//! # Panics
+//!
+//! The `tick` functions for both input and output streams will panic if they
+//! can't read from the system audio stream.
 
 use std::rc::Rc;
 

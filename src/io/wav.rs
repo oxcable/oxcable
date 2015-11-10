@@ -21,9 +21,6 @@ pub struct WavReader {
 
 impl WavReader {
     /// Returns a `WavReader` reading the provided file.
-    ///
-    /// This function panics if the file can't be opened, or is not a valid wav
-    /// file.
     pub fn open(filename: &str) -> Result<Self> {
         let mut file = try!(File::open(filename));
         let header = try!(WavHeader::read_from_file(&mut file));
@@ -90,8 +87,6 @@ pub struct WavWriter {
 
 impl WavWriter {
     /// Returns a `WavWriting` writing to the provided file
-    ///
-    /// This function panics if the file can't be opened or written to
     pub fn create(filename: &str, num_channels: usize)
             -> Result<Self> {
         let mut file = try!(File::create(filename));

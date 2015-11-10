@@ -2,6 +2,11 @@
 //!
 //! A `MidiEngine` is used to manage the MIDI driver and open new MIDI streams.
 //! All input streams must be opened through an engine instance.
+//!
+//! # Panics
+//!
+//! The `tick` functions for both input streams will panic if they can't read
+//! from the system MIDI stream.
 
 use std::io::{self, Read, Write};
 use std::rc::Rc;

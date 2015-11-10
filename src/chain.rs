@@ -53,6 +53,11 @@ impl DeviceChain {
     /// Appends the provided device to the end of the chain. This device will be
     /// passed the output of the last device as input. This method returns the
     /// same chain it was passed.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the provided device does not have as many inputs as the
+    /// previous device has outputs.
     pub fn into<D>(mut self, device: D) -> Self where D: 'static+AudioDevice {
         if self.devices[self.devices.len()-1].outputs.len() != device.num_inputs() {
             panic!("DeviceChain: number of outputs must match number of inputs");
