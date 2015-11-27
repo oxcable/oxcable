@@ -58,7 +58,7 @@ use types::{AudioDevice, MessageReceiver, Sample, Time};
 /// ```
 pub struct Messaged<D> where D: MessageReceiver {
     /// The device being wrapped.
-    pub device: D,
+    device: D,
     tx: Sender<D::Msg>,
     rx: Receiver<D::Msg>,
 }
