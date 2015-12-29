@@ -52,7 +52,7 @@ impl<T> VoiceArray<T> {
     pub fn new(voices: Vec<T>) -> Self {
         let num_voices = voices.len();
         let mut free_voices = VecDeque::new();
-        for i in (0 .. num_voices) {
+        for i in 0..num_voices {
             free_voices.push_back(i);
         }
 
@@ -121,7 +121,7 @@ impl<T> VoiceArray<T> {
 
     // Finds a voice in the held queue and removes it.
     fn remove_from_held_queue(&mut self, voice: usize) {
-        for i in (0 .. self.held_voices.len()) {
+        for i in 0..self.held_voices.len() {
             let (j, _) = self.held_voices[i];
             if j == voice {
                 self.held_voices.remove(i);

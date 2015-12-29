@@ -68,9 +68,9 @@ impl MoorerReverb {
 
         // Allocate comb delay lines
         let mut comb_delay_lines = Vec::with_capacity(num_channels);
-        for _ in (0 .. num_channels) {
+        for _ in 0..num_channels {
             let mut channel_lines = Vec::with_capacity(room.comb_delays.len());
-            for j in (0 .. room.comb_delays.len()) {
+            for j in 0..room.comb_delays.len() {
                 let delay = room.comb_delays[j];
                 let init = vec![0.0; delay as usize + 1];
                 channel_lines.push(RingBuffer::from(&init[..]));
@@ -141,7 +141,7 @@ impl AudioDevice for MoorerReverb {
             // Update comb filters
             let comb_out = self.comb_out_buffer[i][t];
             let mut next_comb_out = 0.0;
-            for j in (0 .. self.comb_delays.len()) {
+            for j in 0..self.comb_delays.len() {
                 let gain  = self.comb_gains[j];
                 let feedback = self.comb_delay_lines[i][j][t];
                 self.comb_delay_lines[i][j].push(tapped_out + gain * feedback);

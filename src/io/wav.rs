@@ -60,7 +60,7 @@ impl AudioDevice for WavReader {
     }
 
     fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {
-        for i in (0 .. self.num_channels) {
+        for i in 0..self.num_channels {
             let s = if self.samples_read < self.num_samples {
                 let n = self.file.read_i16::<LittleEndian>()
                     .expect("Failed to read next sample from wav file.");

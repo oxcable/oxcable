@@ -137,7 +137,7 @@ impl AudioDevice for AudioIn {
             self.samples_read = 0;
         }
 
-        for i in (0 .. self.num_channels) {
+        for i in 0..self.num_channels {
             outputs[i] = self.buffer[self.samples_read*self.num_channels + i];
         }
         self.samples_read += 1;

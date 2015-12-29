@@ -57,7 +57,7 @@ impl Transformer {
         // Populate the bit reverses
         // We only use the lower log2(size) bits to express the index
         let mut bit_reverses = Vec::with_capacity(bufsize);
-        for i in (0 .. size) {
+        for i in 0..size {
             let br = bit_reverse(i as u32, int_log(bufsize as u32));
             bit_reverses.push(br as usize);
         }
@@ -66,7 +66,7 @@ impl Transformer {
         // w_n = exp(-j*2*pi*n/N)
         let mut twiddles = Vec::with_capacity(bufsize);
         let exponent = Complex32::new(0.0, -2.0*PI/(bufsize as f32));
-        for i in (0 .. bufsize) {
+        for i in 0..bufsize {
             let c1 = exponent.scale(i as f32);
             let c = Complex32::new(c1.im.cos(), c1.im.sin()).scale(c1.re.exp());
             twiddles.push(c);
@@ -109,7 +109,7 @@ impl Transformer {
                  inverse: bool) {
         // Copy the input into bit reverse order, zero padding if necessary,
         // conjugating if we are inverse transforming
-        for i in (0 .. input.len()) {
+        for i in 0..input.len() {
             output[self.bit_reverses[i]] =
                 if inverse {
                     input[i].conj()
@@ -125,9 +125,9 @@ impl Transformer {
         let mut n = 2;
         while n <= self.size {
             // For each of the small FFTs
-            for set in (0 .. self.size/n) {
+            for set in 0..self.size/n {
                 // For each pair of n
-                for i in (0 .. n/2) {
+                for i in 0..n/2 {
                     let ilo = n*set + i;
                     let ihi = ilo + n/2;
 
@@ -147,7 +147,7 @@ impl Transformer {
 
         // If we are inverse transforming, conjugate and normalize the output
         if inverse {
-            for i in (0 .. self.size) {
+            for i in 0..self.size {
                 output[i] = output[i].conj().scale(1.0/(self.size as f32));
             }
         }
@@ -225,7 +225,7 @@ mod test {
     fn test_fft_impulse() {
         let mut impulse = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
-        for i in (0 .. 8) {
+        for i in 0..8 {
             impulse.push(if i == 0 { Complex32::one() } else { Complex32::zero() });
             out.push(Complex32::zero());
         }
@@ -246,7 +246,7 @@ mod test {
     fn test_ifft_impulse() {
         let mut impulse = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
-        for _i in (0 .. 8) {
+        for _i in 0..8 {
             impulse.push(Complex32::one());
             out.push(Complex32::zero());
         }
@@ -266,7 +266,7 @@ mod test {
         let mut input = Vec::with_capacity(8);
         let mut fft = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
-        for i in (0 .. 8) {
+        for i in 0..8 {
             input.push(Complex32::new((i+1) as f32, 0.0));
             fft.push(Complex32::zero());
             out.push(Complex32::zero());
@@ -276,7 +276,7 @@ mod test {
         t.fft(&input, &mut fft);
         t.ifft(&fft, &mut out);
 
-        for i in (0 .. 7) {
+        for i in 0..7 {
             println!("{}",out[i].re - ((i+1) as f32));
             assert!(out[i].re - ((i+1) as f32) < EPSILON);
             assert!(out[i].im < EPSILON);
@@ -290,7 +290,7 @@ mod test {
         let mut input = Vec::with_capacity(7);
         let mut fft = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);
-        for i in (0 .. 8) {
+        for i in 0..8 {
             if i < 7 {
                 input.push(Complex32::new((i+1) as f32, 0.0));
             }
@@ -302,7 +302,7 @@ mod test {
         t.fft(&input, &mut fft);
         t.ifft(&fft, &mut out);
 
-        for i in (0 .. 7) {
+        for i in 0..7 {
             println!("{}",out[i].re - ((i+1) as f32));
             assert!(out[i].re - ((i+1) as f32) < EPSILON);
             assert!(out[i].im < EPSILON);
