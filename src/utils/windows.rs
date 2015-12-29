@@ -1,6 +1,9 @@
 //! A collection of window functions.
 //!
 //! All functions take a size `n` and return vectors with `n` elements.
+//!
+//! Window calculation can be costly depending on the size and type of window,
+//! so it is recommended to precompute windows whenever possible.
 
 use std::f32::consts::PI;
 
@@ -55,15 +58,43 @@ pub fn blackman(n: usize) -> Vec<Sample> {
 }
 
 
+/// Numerically estimates a zeroth order modified bessel function.
+///
+/// The mathematical function is an infinite summation, but the terms quickly go
+/// to zero, so we instead use just the first k terms.
+fn i0(x: Sample, k: usize) -> Sample {
+    let mut ifact = 1.0;
+    let mut y = 0.0;
+    for i in 0..k {
+        // Compute i factorial iteratively
+        if i > 1 { ifact *= i as f32; }
+        y += (x/2.0).powf(2.0*i as f32) / (ifact*ifact);
+    }
+    y
+}
+
+/// Returns a kaiser window of size `n`, with the provided beta.
+pub fn kaiser(beta: Sample, n: usize) -> Vec<Sample> {
+    let mut window = Vec::with_capacity(n);
+    let i0_beta = i0(beta, 20);
+    for i in 0..n {
+        let tmp = 2.0*i as f32/(n-1) as f32 - 1.0;
+        let x = beta * (1.0 - tmp*tmp).sqrt();
+        window.push(i0(x, 20)/i0_beta);
+    }
+    window
+}
+
+
 #[cfg(test)]
 mod tests {
+    use std::f32::consts::PI;
     use utils::helpers::flt_eq;
     use types::Sample;
     static EPSILON: f32 = 1e-6;
 
     fn check_window(actual: &[Sample], expected: &[Sample]) {
         for (a, e) in actual.iter().zip(expected) {
-            println!("{}, {}", a, e);
             assert!(flt_eq(*a, *e, EPSILON));
         }
     }
@@ -99,5 +130,13 @@ mod tests {
                      &[-1.38777878e-17, 9.04534244e-02, 4.59182958e-01,
                        9.20363618e-01, 9.20363618e-01, 4.59182958e-01,
                        9.04534244e-02, -1.38777878e-17]);
+    }
+
+    #[test]
+    fn test_kaiser() {
+        use super::kaiser;
+        check_window(&kaiser(2.0*PI, 8),
+                     &[0.01147993, 0.18336612, 0.57527808, 0.94267182,
+                       0.94267182, 0.57527808, 0.18336612, 0.01147993]);
     }
 }
