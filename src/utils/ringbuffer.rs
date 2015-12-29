@@ -282,7 +282,6 @@ impl<T> IndexMut<Time> for RingBuffer<T> {
 }
 
 impl<'a, T> From<&'a [T]> for RingBuffer<T> where T: Clone {
-    /// Test
     fn from(s: &'a [T]) -> RingBuffer<T> {
         RingBuffer {
             buf: Vec::from(s),
@@ -290,6 +289,15 @@ impl<'a, T> From<&'a [T]> for RingBuffer<T> where T: Clone {
             capacity: s.len(),
             start_t: 0,
             end_t: s.len() as Time
+        }
+    }
+}
+
+impl<T> Extend<T> for RingBuffer<T> {
+    #[inline]
+    fn extend<I: IntoIterator<Item = T>>(&mut self, iterable: I) {
+        for item in iterable {
+            self.push(item);
         }
     }
 }
