@@ -323,6 +323,8 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
+impl<'a, T> ExactSizeIterator for Iter<'a, T> {}
+
 
 /// An iterator over RingBuffer timestamps.
 pub struct IterTimes {
@@ -351,6 +353,8 @@ impl Iterator for IterTimes {
         self.size_hint().0
     }
 }
+
+impl ExactSizeIterator for IterTimes {}
 
 
 #[cfg(test)]
