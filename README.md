@@ -3,7 +3,7 @@ oxcable
 
 [![Build Status](https://travis-ci.org/thenyeguy/oxcable.svg?branch=master)](https://travis-ci.org/thenyeguy/oxcable)
 [![Crates.io](https://img.shields.io/crates/v/oxcable.svg)](https://crates.io/crates/oxcable)
-[![License](https://img.shields.io/crates/l/oxcable.svg)](https://github.com/thenyeguy/oxcable/blob/master/license.txt)
+![License](https://img.shields.io/crates/l/oxcable.svg)
 
 [Documentation](http://thenyeguy.github.io/oxcable/doc/oxcable/index.html)
 
