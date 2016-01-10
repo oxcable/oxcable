@@ -13,8 +13,8 @@ exclude= [ "wav/*" ]
 name = "oxcable"
 
 [dependencies]
-byteorder = "*"
-portmidi = "*"
-num = { version = "*", default-features = false }
-portaudio = "*"
-rand = "*"
+byteorder = "0.4.2"
+num = { version = "0.1.27", default-features = false }
+portaudio = "0.5.1"
+portmidi = "0.1.4"
+rand = "0.3.12"
