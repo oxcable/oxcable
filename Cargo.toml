@@ -2,7 +2,7 @@
 name = "oxcable"
 version = "0.4.1"
 authors = ["Michael Nye <thenyeguy@gmail.com>"]
-license = "MIT"
+license = "MIT/Apache-2.0"
 homepage = "https://github.com/thenyeguy/oxcable"
 repository = "https://github.com/thenyeguy/oxcable"
 documentation = "http://thenyeguy.github.io/oxcable/doc/oxcable/index.html"
