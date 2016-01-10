@@ -1,6 +1,6 @@
 [package]
 name = "oxcable"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Michael Nye <thenyeguy@gmail.com>"]
 license = "MIT/Apache-2.0"
 homepage = "https://github.com/thenyeguy/oxcable"
