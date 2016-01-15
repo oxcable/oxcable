@@ -1,6 +1,10 @@
 //! A collection of utilities for testing.
 
 
+mod mock_audio_device;
+pub use self::mock_audio_device::MockAudioDevice;
+
+
 /// Compares floating point numbers for equality.
 ///
 /// The maximum difference is specified by `epsilon`; that is, `f1` and `f2` are
