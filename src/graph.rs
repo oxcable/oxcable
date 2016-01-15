@@ -222,3 +222,108 @@ impl AudioNode {
         self.device.tick(t, &self.input_buf, &mut bus[start..end]);
     }
 }
+
+
+#[cfg(test)]
+mod test {
+    use testing::MockAudioDevice;
+    use super::{DeviceGraph, Tick};
+
+    #[test]
+    fn test_empty_graph() {
+        DeviceGraph::new().tick();
+    }
+
+    #[test]
+    fn test_one_node() {
+        let mut mock = MockAudioDevice::new("mock", 1, 1);
+        mock.will_tick(&[0.0], &[1.0]);
+
+        let mut graph = DeviceGraph::new();
+        graph.add_node(mock);
+        graph.tick();
+    }
+
+    #[test]
+    fn test_disconnected() {
+        let mut mock1 = MockAudioDevice::new("mock1", 1, 1);
+        let mut mock2 = MockAudioDevice::new("mock2", 1, 1);
+        mock1.will_tick(&[0.0], &[1.0]);
+        mock2.will_tick(&[0.0], &[2.0]);
+
+        let mut graph = DeviceGraph::new();
+        graph.add_node(mock1);
+        graph.add_node(mock2);
+        graph.tick();
+    }
+
+    #[test]
+    fn test_linear() {
+        let mut mock1 = MockAudioDevice::new("mock1", 0, 1);
+        let mut mock2 = MockAudioDevice::new("mock2", 1, 0);
+        mock1.will_tick(&[], &[1.0]);
+        mock2.will_tick(&[1.0], &[]);
+
+        let mut graph = DeviceGraph::new();
+        let mock1 = graph.add_node(mock1);
+        let mock2 = graph.add_node(mock2);
+        graph.add_edge(mock1, 0, mock2, 0).unwrap();
+        graph.tick();
+    }
+
+    #[test]
+    fn test_complex() {
+        let mut mock1 = MockAudioDevice::new("mock1", 1, 1);
+        let mut mock2 = MockAudioDevice::new("mock2", 1, 1);
+        let mut mock3 = MockAudioDevice::new("mock3", 2, 1);
+        let mut mock4 = MockAudioDevice::new("mock4", 1, 1);
+        let mut mock5 = MockAudioDevice::new("mock5", 1, 1);
+
+        mock1.will_tick(&[0.0], &[1.0]);
+        mock2.will_tick(&[4.0], &[2.0]);
+        mock3.will_tick(&[2.0, 4.0], &[3.0]);
+        mock4.will_tick(&[1.0], &[4.0]);
+        mock5.will_tick(&[0.0], &[5.0]);
+
+        let mut graph = DeviceGraph::new();
+        let mock1 = graph.add_node(mock1);
+        let mock2 = graph.add_node(mock2);
+        let mock3 = graph.add_node(mock3);
+        let mock4 = graph.add_node(mock4);
+        let _mock5 = graph.add_node(mock5);
+        graph.add_edge(mock1, 0, mock4, 0).unwrap();
+        graph.add_edge(mock4, 0, mock2, 0).unwrap();
+        graph.add_edge(mock2, 0, mock3, 0).unwrap();
+        graph.add_edge(mock4, 0, mock3, 1).unwrap();
+        graph.tick();
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_direct_cycle() {
+        let mock1 = MockAudioDevice::new("mock1", 1, 1);
+        let mock2 = MockAudioDevice::new("mock2", 1, 1);
+
+        let mut graph = DeviceGraph::new();
+        let mock1 = graph.add_node(mock1);
+        let mock2 = graph.add_node(mock2);
+        graph.add_edge(mock1, 0, mock2, 0).unwrap();
+        graph.add_edge(mock2, 0, mock1, 0).unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_indirect_cycle() {
+        let mock1 = MockAudioDevice::new("mock1", 1, 1);
+        let mock2 = MockAudioDevice::new("mock2", 1, 1);
+        let mock3 = MockAudioDevice::new("mock3", 1, 1);
+
+        let mut graph = DeviceGraph::new();
+        let mock1 = graph.add_node(mock1);
+        let mock2 = graph.add_node(mock2);
+        let mock3 = graph.add_node(mock3);
+        graph.add_edge(mock1, 0, mock2, 0).unwrap();
+        graph.add_edge(mock2, 0, mock3, 0).unwrap();
+        graph.add_edge(mock3, 0, mock1, 0).unwrap();
+    }
+}
