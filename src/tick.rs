@@ -6,12 +6,13 @@ use std::thread;
 use types::{SAMPLE_RATE, Time};
 
 
-/// Methods for processing something in discrete time steps.
+/// Methods for processing something in discrete time steps. By defining how to
+/// perform a single tick, this trait gives several convenience methods.
 ///
-/// The implementor must only implement the `tick` method.  By defining `tick`
-/// this trait provides several more convenience methods for controlling time.
+/// A single tick could correspond to one frame, but it doesn't have to. For
+/// example, if an object does buffering it may process many samples per tick.
 pub trait Tick {
-    /// Handles a single time step.
+    /// Handles one time step.
     fn tick(&mut self);
 
     /// Runs `tick` `n` times. Returns after processing.

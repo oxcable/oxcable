@@ -8,7 +8,7 @@ pub static SAMPLE_RATE: u32 = 44100;
 pub type Sample = f32;
 
 /// The datatype of a single time tick.
-pub type Time   = u64;
+pub type Time = u64;
 
 
 /// The datatype of a MIDI event.
