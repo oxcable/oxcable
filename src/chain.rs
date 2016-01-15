@@ -48,6 +48,9 @@ impl DeviceChain {
             devices: Vec::new(),
             time: 0
         };
+        for _ in 0..device.num_inputs() {
+            chain.bus.push(0.0);
+        }
         chain.devices.push(AudioNode::new(device, &mut chain.bus));
         chain
     }
@@ -126,5 +129,52 @@ impl AudioNode {
         let bus_slice = &mut bus[self.bus_start .. self.bus_end];
         let (inputs, outputs) = bus_slice.split_at_mut(self.split_point);
         self.device.tick(t, inputs, outputs);
+    }
+}
+
+
+#[cfg(test)]
+mod test {
+    use testing::MockAudioDevice;
+    use super::{DeviceChain, Tick};
+
+    #[test]
+    fn test_success() {
+        let mut mock1 = MockAudioDevice::new("mock1", 0, 1);
+        let mut mock2 = MockAudioDevice::new("mock2", 1, 2);
+        let mut mock3 = MockAudioDevice::new("mock3", 2, 0);
+        mock1.will_tick(&[], &[1.0]);
+        mock2.will_tick(&[1.0], &[2.0, 3.0]);
+        mock3.will_tick(&[2.0, 3.0], &[]);
+
+        DeviceChain::from(mock1).into(mock2).into(mock3).tick();
+    }
+
+    #[test]
+    fn test_input() {
+        let mut mock = MockAudioDevice::new("mock1", 1, 0);
+        mock.will_tick(&[1.0], &[]);
+
+        let mut chain = DeviceChain::from(mock);
+        chain.get_input()[0] = 1.0;
+        chain.tick();
+    }
+
+    #[test]
+    fn test_output() {
+        let mut mock = MockAudioDevice::new("mock1", 0, 1);
+        mock.will_tick(&[], &[1.0]);
+
+        let mut chain = DeviceChain::from(mock);
+        chain.tick();
+        assert_eq!(chain.get_output(), [1.0]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_wrong_number_inputs() {
+        let mock1 = MockAudioDevice::new("mock1", 0, 1);
+        let mock2 = MockAudioDevice::new("mock2", 2, 1);
+        DeviceChain::from(mock1).into(mock2);
     }
 }
