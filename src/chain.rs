@@ -33,7 +33,7 @@ pub use tick::Tick;
 
 /// A container for a series of audio devices.
 pub struct DeviceChain {
-    inputs: Vec<Sample>,
+    bus: Vec<Sample>,
     devices: Vec<AudioNode>,
     time: Time
 }
@@ -43,11 +43,13 @@ impl DeviceChain {
     /// will receive no inputs unless they are manually supplied using
     /// DeviceChain::get_input.
     pub fn from<D>(device: D) -> Self where D: 'static+AudioDevice {
-        DeviceChain {
-            inputs: vec![0.0; device.num_inputs()],
-            devices: vec![AudioNode::new(device)],
+        let mut chain = DeviceChain {
+            bus: Vec::new(),
+            devices: Vec::new(),
             time: 0
-        }
+        };
+        chain.devices.push(AudioNode::new(device, &mut chain.bus));
+        chain
     }
 
     /// Appends the provided device to the end of the chain. This device will be
@@ -59,10 +61,11 @@ impl DeviceChain {
     /// Panics if the provided device does not have as many inputs as the
     /// previous device has outputs.
     pub fn into<D>(mut self, device: D) -> Self where D: 'static+AudioDevice {
-        if self.devices[self.devices.len()-1].outputs.len() != device.num_inputs() {
+        if self.devices[self.devices.len()-1].device.num_outputs() !=
+                device.num_inputs() {
             panic!("DeviceChain: number of outputs must match number of inputs");
         }
-        self.devices.push(AudioNode::new(device));
+        self.devices.push(AudioNode::new(device, &mut self.bus));
         self
     }
 
@@ -71,49 +74,57 @@ impl DeviceChain {
     /// These inputs never get overwritten, so if you are supplying input you
     /// must manually zero the buffer again.
     pub fn get_input(&mut self) -> &mut[Sample] {
-        &mut self.inputs
+        &mut self.bus[..self.devices[0].device.num_inputs()]
     }
 
     /// Returns a slice to the output of the last device in the chain.
     pub fn get_output(&self) -> &[Sample] {
-        &self.devices[self.devices.len()-1].outputs
+        let outputs = self.devices[self.devices.len()-1].device.num_outputs();
+        &self.bus[self.bus.len()-outputs..]
     }
 }
 
 impl Tick for DeviceChain {
     fn tick(&mut self) {
-        self.devices[0].tick(self.time, &self.inputs);
-        for i in 1..self.devices.len() {
-            let inputs = self.devices[i-1].outputs.clone();
-            self.devices[i].tick(self.time, &inputs);
+        for device in self.devices.iter_mut() {
+            device.tick(self.time, &mut self.bus);
         }
         self.time += 1;
     }
 }
 
 
-/// Wrap an audio device behind a pointer, and provide an allocated buffer to
-/// contain its output.
+/// Wrap an audio device behind a pointer, and stores an index into the bus.
 struct AudioNode {
     device: Box<AudioDevice>,
-    outputs: Vec<Sample>
+    bus_start: usize,
+    bus_end: usize,
+    split_point: usize
 }
 
 impl AudioNode {
-    /// Wraps the provided audio device in a new node and allocate its output
-    /// buffer.
-    fn new<D>(device: D) -> AudioNode where D: 'static+AudioDevice {
-        let n = device.num_outputs();
+    /// Wraps the provided audio device in a new node and allocate space for it
+    /// in the bus.
+    fn new<D>(device: D, bus: &mut Vec<Sample>) -> AudioNode
+            where D: 'static+AudioDevice {
+        let inputs = device.num_inputs();
+        let outputs = device.num_outputs();
+        let bus_start = bus.len() - inputs;
+        for _ in 0..outputs {
+            bus.push(0.0);
+        }
         AudioNode {
             device: Box::new(device),
-            outputs: vec![0.0; n]
+            bus_start: bus_start,
+            bus_end: bus_start + inputs + outputs,
+            split_point: inputs,
         }
     }
 
     /// Ticks the device one time step.
-    ///
-    /// `inputs` should be the output of the previous device.
-    fn tick(&mut self, t: Time, inputs: &[Sample]) {
-        self.device.tick(t, inputs, &mut self.outputs);
+    fn tick(&mut self, t: Time, bus: &mut [Sample]) {
+        let bus_slice = &mut bus[self.bus_start .. self.bus_end];
+        let (inputs, outputs) = bus_slice.split_at_mut(self.split_point);
+        self.device.tick(t, inputs, outputs);
     }
 }
