@@ -278,8 +278,7 @@ fn poly_belp_offset(t: f32, dt: f32) -> f32 {
 // A couple of basic unit tests...
 #[cfg(test)]
 mod test {
-    use utils::helpers::flt_eq;
-    static EPSILON: f32 = 1e-6;
+    use testing::flt_eq;
 
     /// Tests fmod with many values
     #[test]
@@ -287,27 +286,27 @@ mod test {
         use super::fmod;
 
         // negatives...
-        assert!(flt_eq(fmod(-1.5, 1.0), 0.5, EPSILON));
-        assert!(flt_eq(fmod(-1.0, 1.0), 0.0, EPSILON));
-        assert!(flt_eq(fmod(-0.5, 1.0), 0.5, EPSILON));
+        assert!(flt_eq(fmod(-1.5, 1.0), 0.5));
+        assert!(flt_eq(fmod(-1.0, 1.0), 0.0));
+        assert!(flt_eq(fmod(-0.5, 1.0), 0.5));
 
         // in range...
-        assert!(flt_eq(fmod(0.0, 1.0), 0.0, EPSILON));
-        assert!(flt_eq(fmod(0.5, 1.0), 0.5, EPSILON));
-        assert!(flt_eq(fmod(0.9, 1.0), 0.9, EPSILON));
+        assert!(flt_eq(fmod(0.0, 1.0), 0.0));
+        assert!(flt_eq(fmod(0.5, 1.0), 0.5));
+        assert!(flt_eq(fmod(0.9, 1.0), 0.9));
 
         // above...
-        assert!(flt_eq(fmod(1.0, 1.0), 0.0, EPSILON));
-        assert!(flt_eq(fmod(1.5, 1.0), 0.5, EPSILON));
-        assert!(flt_eq(fmod(2.0, 1.0), 0.0, EPSILON));
-        assert!(flt_eq(fmod(2.5, 1.0), 0.5, EPSILON));
+        assert!(flt_eq(fmod(1.0, 1.0), 0.0));
+        assert!(flt_eq(fmod(1.5, 1.0), 0.5));
+        assert!(flt_eq(fmod(2.0, 1.0), 0.0));
+        assert!(flt_eq(fmod(2.5, 1.0), 0.5));
 
         // different base...
-        assert!(flt_eq(fmod(-0.5, 0.9), 0.4, EPSILON));
-        assert!(flt_eq(fmod(0.0, 0.9), 0.0, EPSILON));
-        assert!(flt_eq(fmod(0.5, 0.9), 0.5, EPSILON));
-        assert!(flt_eq(fmod(0.9, 0.9), 0.0, EPSILON));
-        assert!(flt_eq(fmod(1.0, 0.9), 0.1, EPSILON));
+        assert!(flt_eq(fmod(-0.5, 0.9), 0.4));
+        assert!(flt_eq(fmod(0.0, 0.9), 0.0));
+        assert!(flt_eq(fmod(0.5, 0.9), 0.5));
+        assert!(flt_eq(fmod(0.9, 0.9), 0.0));
+        assert!(flt_eq(fmod(1.0, 0.9), 0.1));
     }
 
     /// Tests square wave
@@ -341,14 +340,14 @@ mod test {
         let input = vec![];
         let mut output = vec![0.0];
 
-        osc.tick(0, &input, &mut output); assert!(flt_eq(output[0], -0.8, EPSILON));
-        osc.tick(1, &input, &mut output); assert!(flt_eq(output[0], -0.6, EPSILON));
-        osc.tick(2, &input, &mut output); assert!(flt_eq(output[0], -0.4, EPSILON));
-        osc.tick(3, &input, &mut output); assert!(flt_eq(output[0], -0.2, EPSILON));
-        osc.tick(4, &input, &mut output); assert!(flt_eq(output[0], 0.0, EPSILON));
-        osc.tick(5, &input, &mut output); assert!(flt_eq(output[0], 0.2, EPSILON));
-        osc.tick(6, &input, &mut output); assert!(flt_eq(output[0], 0.4, EPSILON));
-        osc.tick(7, &input, &mut output); assert!(flt_eq(output[0], 0.6, EPSILON));
-        osc.tick(8, &input, &mut output); assert!(flt_eq(output[0], 0.8, EPSILON));
+        osc.tick(0, &input, &mut output); assert!(flt_eq(output[0], -0.8));
+        osc.tick(1, &input, &mut output); assert!(flt_eq(output[0], -0.6));
+        osc.tick(2, &input, &mut output); assert!(flt_eq(output[0], -0.4));
+        osc.tick(3, &input, &mut output); assert!(flt_eq(output[0], -0.2));
+        osc.tick(4, &input, &mut output); assert!(flt_eq(output[0], 0.0));
+        osc.tick(5, &input, &mut output); assert!(flt_eq(output[0], 0.2));
+        osc.tick(6, &input, &mut output); assert!(flt_eq(output[0], 0.4));
+        osc.tick(7, &input, &mut output); assert!(flt_eq(output[0], 0.6));
+        osc.tick(8, &input, &mut output); assert!(flt_eq(output[0], 0.8));
     }
 }

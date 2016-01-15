@@ -188,10 +188,8 @@ mod test {
     use num::complex::Complex32;
     use num::traits::{One, Zero};
 
+    use testing::flt_eq;
     use super::{Transformer, int_log, bit_reverse};
-
-    // For floating point comparison
-    static EPSILON: f32 = 1e-6;
 
     /// Tests int_log with many values
     #[test]
@@ -278,8 +276,8 @@ mod test {
 
         for i in 0..7 {
             println!("{}",out[i].re - ((i+1) as f32));
-            assert!(out[i].re - ((i+1) as f32) < EPSILON);
-            assert!(out[i].im < EPSILON);
+            assert!(flt_eq(out[i].re - ((i+1) as f32), 0.0));
+            assert!(flt_eq(out[i].im, 0.0));
         }
     }
 
@@ -304,8 +302,8 @@ mod test {
 
         for i in 0..7 {
             println!("{}",out[i].re - ((i+1) as f32));
-            assert!(out[i].re - ((i+1) as f32) < EPSILON);
-            assert!(out[i].im < EPSILON);
+            assert!(flt_eq(out[i].re - ((i+1) as f32), 0.0));
+            assert!(flt_eq(out[i].im, 0.0));
         }
     }
 }

@@ -89,13 +89,12 @@ pub fn kaiser(beta: Sample, n: usize) -> Vec<Sample> {
 #[cfg(test)]
 mod tests {
     use std::f32::consts::PI;
-    use utils::helpers::flt_eq;
+    use testing::flt_eq;
     use types::Sample;
-    static EPSILON: f32 = 1e-6;
 
     fn check_window(actual: &[Sample], expected: &[Sample]) {
         for (a, e) in actual.iter().zip(expected) {
-            assert!(flt_eq(*a, *e, EPSILON));
+            assert!(flt_eq(*a, *e));
         }
     }
 
