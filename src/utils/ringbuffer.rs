@@ -1,6 +1,5 @@
 //! A generic, fixed-size ring buffer.
 
-use std::iter::Zip;
 use std::ops::{Index, IndexMut};
 
 use types::Time;
@@ -154,7 +153,7 @@ impl<T> RingBuffer<T> {
         self.start_t = self.end_t;
     }
 
-    /// Returns an iterator over the buffer.
+    /// Returns an iterator than returns the buffer's values.
     /// 
     /// # Example
     ///
@@ -165,35 +164,15 @@ impl<T> RingBuffer<T> {
     /// rb.push("second");
     /// rb.push("third");
     ///
-    /// let values: Vec<_> = rb.iter().collect();
+    /// let values: Vec<_> = rb.values().collect();
     /// assert_eq!(values, [&"second", &"third"]);
     /// ```
-    pub fn iter(&self) -> Iter<T> {
-        Iter { buffer: self, t: self.start_t }
-    }
-
-    /// Returns an iterator over the buffer's timestamps.
-    /// 
-    /// # Example
-    ///
-    /// ```
-    /// # use oxcable::utils::ringbuffer::RingBuffer;
-    /// let mut rb = RingBuffer::new(2);
-    /// rb.push("first");
-    /// rb.push("second");
-    /// rb.push("third");
-    ///
-    /// let times: Vec<_> = rb.timestamp_iter().collect();
-    /// assert_eq!(times, [1, 2]);
-    /// ```
-    pub fn timestamp_iter(&self) -> IterTimes {
-        IterTimes { t: self.start_t, end: self.end_t }
+    pub fn values(&self) -> Values<T> {
+        Values { buffer: self, t: self.start_t }
     }
 
     /// Returns an iterator that pairs values with their timestamp.
     ///
-    /// Equivalent to `self.timestamp_iter().zip(self.iter())`.
-    /// 
     /// # Example
     ///
     /// ```
@@ -203,11 +182,11 @@ impl<T> RingBuffer<T> {
     /// rb.push("second");
     /// rb.push("third");
     ///
-    /// let zipped: Vec<_> = rb.zipped_iter().collect();
+    /// let zipped: Vec<_> = rb.iter().collect();
     /// assert_eq!(zipped, [(1, &"second"), (2, &"third")]);
     /// ```
-    pub fn zipped_iter(&self) -> Zip<IterTimes, Iter<T>> {
-        self.timestamp_iter().zip(self.iter())
+    pub fn iter(&self) -> Iter<T> {
+        Iter { buffer: self, t: self.start_t }
     }
 }
 
@@ -236,7 +215,7 @@ impl<T: Clone> RingBuffer<T> {
     /// let mut rb = RingBuffer::new(4);
     /// rb.push(1); rb.push(2); rb.push(3); rb.push(4);
     /// rb.resize(2);
-    /// assert_eq!(rb.iter().cloned().collect::<Vec<_>>(), [3,4]);
+    /// assert_eq!(rb.values().cloned().collect::<Vec<_>>(), [3,4]);
     /// ```
     pub fn resize(&mut self, capacity: usize) {
         let mut elems = (self.end_t - self.start_t) as usize;
@@ -303,13 +282,44 @@ impl<T> Extend<T> for RingBuffer<T> {
 }
 
 
-/// An iterator over RingBuffer values.
+/// A RingBuffer iterator.
 pub struct Iter<'a, T: 'a> {
     buffer: &'a RingBuffer<T>,
     t: Time
 }
 
 impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = (Time, &'a T);
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.t == self.buffer.end_t {
+            None
+        } else {
+            let result = (self.t, &self.buffer[self.t]);
+            self.t += 1;
+            Some(result)
+        }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let exact = (self.buffer.end_t - self.t) as usize;
+        (exact, Some(exact))
+    }
+
+    fn count(self) -> usize {
+        self.size_hint().0
+    }
+}
+
+impl<'a, T> ExactSizeIterator for Iter<'a, T> {}
+
+
+/// An Ringbuffer values iterator.
+pub struct Values<'a, T: 'a> {
+    buffer: &'a RingBuffer<T>,
+    t: Time
+}
+
+impl<'a, T> Iterator for Values<'a, T> {
     type Item = &'a T;
     fn next(&mut self) -> Option<Self::Item> {
         if self.t == self.buffer.end_t {
@@ -331,38 +341,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
-impl<'a, T> ExactSizeIterator for Iter<'a, T> {}
-
-
-/// An iterator over RingBuffer timestamps.
-pub struct IterTimes {
-    t: Time,
-    end: Time
-}
-
-impl Iterator for IterTimes {
-    type Item = Time;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.t == self.end {
-            None
-        } else {
-            let result = self.t;
-            self.t += 1;
-            Some(result)
-        }
-    }
-
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        let exact = (self.end - self.t) as usize;
-        (exact, Some(exact))
-    }
-
-    fn count(self) -> usize {
-        self.size_hint().0
-    }
-}
-
-impl ExactSizeIterator for IterTimes {}
+impl<'a, T> ExactSizeIterator for Values<'a, T> {}
 
 
 #[cfg(test)]
@@ -405,7 +384,7 @@ mod tests {
     fn test_pop() {
         let mut rb = get_test_rb();
         assert_eq!(rb.pop(), Some(13));
-        assert_eq!(rb.iter().cloned().collect::<Vec<_>>(), [7]);
+        assert_eq!(rb.values().cloned().collect::<Vec<_>>(), [7]);
         assert_eq!(rb.pop(), Some(7));
         assert_eq!(rb.pop(), None);
     }
@@ -492,11 +471,11 @@ mod tests {
         rb.push(19);
         rb.push(21);
         rb.push(23);
-        assert_eq!(rb.iter().cloned().collect::<Vec<_>>(), [7,19,21,23]);
+        assert_eq!(rb.values().cloned().collect::<Vec<_>>(), [7,19,21,23]);
 
         // Test contracting
         rb.resize(2);
-        assert_eq!(rb.iter().cloned().collect::<Vec<_>>(), [21,23]);
+        assert_eq!(rb.values().cloned().collect::<Vec<_>>(), [21,23]);
 
         // Test expanding a partially full buffer
         let mut rb = RingBuffer::new(2);
@@ -504,7 +483,7 @@ mod tests {
         rb.resize(4);
         rb.push(2);
         rb.push(3);
-        assert_eq!(rb.iter().cloned().collect::<Vec<_>>(), [1,2,3]);
+        assert_eq!(rb.values().cloned().collect::<Vec<_>>(), [1,2,3]);
 
         // Test contracting a partially full buffer
         let mut rb = RingBuffer::new(4);
@@ -512,6 +491,6 @@ mod tests {
         rb.resize(2);
         rb.push(2);
         rb.push(3);
-        assert_eq!(rb.iter().cloned().collect::<Vec<_>>(), [2,3]);
+        assert_eq!(rb.values().cloned().collect::<Vec<_>>(), [2,3]);
     }
 }
