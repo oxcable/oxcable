@@ -61,7 +61,7 @@ mod instrument {
 
                     // If we found one, stop it from playing
                     voice.map_or((), |d| {
-                        d.playing = true;
+                        d.playing = false;
                     });
                 },
                 _ => ()
