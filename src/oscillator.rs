@@ -202,7 +202,7 @@ impl AudioDevice for Oscillator {
                         // two discontinuities, at rising and falling edges
                         out += poly_belp_offset(self.phase/(2.0*PI),
                                                 phase_delta/(2.0*PI));
-                        out -= poly_belp_offset(fmod(self.phase/(2.0*PI)+0.5, 1.0),
+                        out -= poly_belp_offset(self.phase/(2.0*PI)+0.5 % 1.0,
                                                 phase_delta/(2.0*PI));
                     },
                     _ => ()
@@ -217,7 +217,7 @@ impl AudioDevice for Oscillator {
                         // two discontinuities, at rising and falling edges
                         out += poly_belp_offset(self.phase/(2.0*PI),
                                                 phase_delta/(2.0*PI));
-                        out -= poly_belp_offset(fmod(self.phase/(2.0*PI)+0.5, 1.0),
+                        out -= poly_belp_offset(self.phase/(2.0*PI)+0.5 % 1.0,
                                                 phase_delta/(2.0*PI));
                     },
                     _ => ()
@@ -244,20 +244,6 @@ impl AudioDevice for Oscillator {
 }
 
 
-/// Floating point modulus
-fn fmod(n: f32, base: f32) -> f32 {
-    assert!(base > 0.0);
-    let mut out = n;
-    while out < 0.0 {
-        out += base;
-    }
-    while out >= base {
-        out -= base;
-    }
-    out
-}
-
-
 /// Computes an offset for PolyBLEP antialiasing
 ///
 /// `t` should be the current waveform phase, normalized
@@ -279,35 +265,6 @@ fn poly_belp_offset(t: f32, dt: f32) -> f32 {
 #[cfg(test)]
 mod test {
     use testing::flt_eq;
-
-    /// Tests fmod with many values
-    #[test]
-    fn test_fmod() {
-        use super::fmod;
-
-        // negatives...
-        assert!(flt_eq(fmod(-1.5, 1.0), 0.5));
-        assert!(flt_eq(fmod(-1.0, 1.0), 0.0));
-        assert!(flt_eq(fmod(-0.5, 1.0), 0.5));
-
-        // in range...
-        assert!(flt_eq(fmod(0.0, 1.0), 0.0));
-        assert!(flt_eq(fmod(0.5, 1.0), 0.5));
-        assert!(flt_eq(fmod(0.9, 1.0), 0.9));
-
-        // above...
-        assert!(flt_eq(fmod(1.0, 1.0), 0.0));
-        assert!(flt_eq(fmod(1.5, 1.0), 0.5));
-        assert!(flt_eq(fmod(2.0, 1.0), 0.0));
-        assert!(flt_eq(fmod(2.5, 1.0), 0.5));
-
-        // different base...
-        assert!(flt_eq(fmod(-0.5, 0.9), 0.4));
-        assert!(flt_eq(fmod(0.0, 0.9), 0.0));
-        assert!(flt_eq(fmod(0.5, 0.9), 0.5));
-        assert!(flt_eq(fmod(0.9, 0.9), 0.0));
-        assert!(flt_eq(fmod(1.0, 0.9), 0.1));
-    }
 
     /// Tests square wave
     #[test]
