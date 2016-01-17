@@ -72,8 +72,11 @@ impl Transformer {
             twiddles.push(c);
         }
 
-        Transformer { size: bufsize, bit_reverses: bit_reverses,
-            twiddles: twiddles }
+        Transformer {
+            size: bufsize,
+            bit_reverses: bit_reverses,
+            twiddles: twiddles
+        }
     }
 
     /// Returns the size FFT this Transformer performs.
