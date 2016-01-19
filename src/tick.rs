@@ -1,6 +1,7 @@
 //! A trait for objects that process in discrete time steps.
 
-use std::sync::mpsc::channel;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 
 use types::{SAMPLE_RATE, Time};
@@ -32,12 +33,13 @@ pub trait Tick {
     /// Ticks while waiting for the user to press `Enter`. When enter is
     /// pressed, ticking stops and the method returns.
     fn tick_until_enter(&mut self) {
-        let (tx, rx) = channel();
-        let _ = thread::spawn(move || {
+        let stopped = Arc::new(AtomicBool::new(false));
+        let signal_stop = stopped.clone();
+        thread::spawn(move || {
             use std::io::{Read, stdin};
             let mut buf = [0];
             let _ = stdin().read(&mut buf);
-            tx.send(()).expect("Failed to send end message.");
+            signal_stop.store(true, Ordering::Relaxed);
         });
 
         let ticks = SAMPLE_RATE / 10;
@@ -46,7 +48,7 @@ pub trait Tick {
             for _ in 0..ticks {
                 self.tick();
             }
-            if rx.try_recv().is_ok() {
+            if stopped.load(Ordering::Relaxed) {
                 break;
             }
         }
