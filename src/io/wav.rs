@@ -337,6 +337,12 @@ mod test {
         reader.tick(1, &[], &mut output);
         assert_eq!(reader.is_done(), true);
         assert_eq!(output, [0.0, 0.0]);
+
+        reader.restart().unwrap();
+        assert_eq!(reader.is_done(), false);
+        reader.tick(0, &[], &mut output);
+        assert_eq!(reader.is_done(), true);
+        assert_eq!(output, [-1.0, 0.9999695]);
     }
 
     #[test]
