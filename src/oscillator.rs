@@ -264,44 +264,45 @@ fn poly_belp_offset(t: f32, dt: f32) -> f32 {
 #[cfg(test)]
 mod test {
     use testing::flt_eq;
+    use super::{Aliased, Oscillator, Waveform};
+    use types::{AudioDevice, Sample, Time};
+
+    const FREQ: f32 = 4410.0;
+    fn get_one_cycle(osc: &mut Oscillator) -> [Sample; 10] {
+        let mut output = [0.0; 10];
+        for t in 0..10 {
+            osc.tick(t as Time, &[], &mut output[t..t+1]);
+        }
+        output
+    }
+
+    fn check(actual: &[Sample], expected: &[Sample]) {
+        println!("actual:\n    {:?}", actual);
+        println!("expected:\n    {:?}", expected);
+        assert_eq!(actual.len(), expected.len());
+        for (a, e) in actual.iter().zip(expected) {
+            assert!(flt_eq(*a, *e));
+        }
+    }
 
     #[test]
     fn test_naive_square() {
-        use super::{AntialiasType, Waveform, Oscillator};
-        use types::AudioDevice;
-        let mut osc = Oscillator::new(Waveform::Square(AntialiasType::Aliased))
-            .freq(4410.0);
-        let input = vec![];
-        let mut output = vec![0.0];
-
-        osc.tick(0, &input, &mut output); assert!(output[0] == 1.0);
-        osc.tick(1, &input, &mut output); assert!(output[0] == 1.0);
-        osc.tick(2, &input, &mut output); assert!(output[0] == 1.0);
-        osc.tick(3, &input, &mut output); assert!(output[0] == 1.0);
-        osc.tick(4, &input, &mut output); assert!(output[0] == -1.0);
-        osc.tick(5, &input, &mut output); assert!(output[0] == -1.0);
-        osc.tick(6, &input, &mut output); assert!(output[0] == -1.0);
-        osc.tick(7, &input, &mut output); assert!(output[0] == -1.0);
-        osc.tick(8, &input, &mut output); assert!(output[0] == -1.0);
+        let mut osc = Oscillator::new(Waveform::Square(Aliased)).freq(FREQ);
+        check(&get_one_cycle(&mut osc),
+              &[1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0]);
     }
 
     #[test]
     fn test_naive_saw() {
-        use super::{AntialiasType, Waveform, Oscillator};
-        use types::AudioDevice;
-        let mut osc = Oscillator::new(Waveform::Saw(AntialiasType::Aliased))
-            .freq(4410.0);
-        let input = vec![];
-        let mut output = vec![0.0];
+        let mut osc = Oscillator::new(Waveform::Saw(Aliased)).freq(FREQ);
+        check(&get_one_cycle(&mut osc),
+              &[-0.8, -0.6, -0.4, -0.2, 0.0, 0.2, 0.4, 0.6, 0.8, -1.0]);
+    }
 
-        osc.tick(0, &input, &mut output); assert!(flt_eq(output[0], -0.8));
-        osc.tick(1, &input, &mut output); assert!(flt_eq(output[0], -0.6));
-        osc.tick(2, &input, &mut output); assert!(flt_eq(output[0], -0.4));
-        osc.tick(3, &input, &mut output); assert!(flt_eq(output[0], -0.2));
-        osc.tick(4, &input, &mut output); assert!(flt_eq(output[0], 0.0));
-        osc.tick(5, &input, &mut output); assert!(flt_eq(output[0], 0.2));
-        osc.tick(6, &input, &mut output); assert!(flt_eq(output[0], 0.4));
-        osc.tick(7, &input, &mut output); assert!(flt_eq(output[0], 0.6));
-        osc.tick(8, &input, &mut output); assert!(flt_eq(output[0], 0.8));
+    #[test]
+    fn test_pulse() {
+        let mut osc = Oscillator::new(Waveform::PulseTrain).freq(FREQ);
+        check(&get_one_cycle(&mut osc),
+              &[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]);
     }
 }
