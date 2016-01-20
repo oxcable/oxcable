@@ -2,7 +2,7 @@
 
 use byteorder::{self, ReadBytesExt, WriteBytesExt, LittleEndian};
 use std::fs::File;
-use std::io::{self, Seek, SeekFrom};
+use std::io::{self, Read, Seek, SeekFrom, Write};
 
 use error::{Error, Result};
 use types::{SAMPLE_RATE, AudioDevice, Time, Sample};
@@ -12,24 +12,31 @@ use types::{SAMPLE_RATE, AudioDevice, Time, Sample};
 ///
 /// The reader will continue until it runs out of samples. When it does, the
 /// reader will return silence until it is reset to the beginning of the file.
-pub struct WavReader {
+pub struct WavReader<R: Read> {
     num_channels: usize,
     num_samples: Time,
     samples_read: Time,
-    file: File
+    reader: R
 }
 
-impl WavReader {
+impl WavReader<File> {
     /// Returns a `WavReader` reading the provided file.
     pub fn open(filename: &str) -> Result<Self> {
-        let mut file = try!(File::open(filename));
-        let header = try!(WavHeader::read_from_file(&mut file));
+        let file = try!(File::open(filename));
+        WavReader::new(file)
+    }
+}
+
+impl<R: Read> WavReader<R> {
+    /// Retuns a `WavReader` reading anything implementing `Read`.
+    pub fn new(mut reader: R) -> Result<Self> {
+        let header = try!(WavHeader::read_from_file(&mut reader));
         Ok(WavReader {
             num_channels: header.num_channels as usize,
             num_samples: (header.data_size / ((header.bit_depth/8) as u32) /
                 (header.num_channels as u32)) as Time,
             samples_read: 0,
-            file: file
+            reader: reader
         })
     }
 
@@ -42,15 +49,17 @@ impl WavReader {
     pub fn is_done(&self) -> bool {
         self.samples_read >= self.num_samples
     }
+}
 
+impl<R: Read+Seek> WavReader<R> {
     /// Resets the reader to begin reading from the start of the file.
     pub fn restart(&mut self) -> io::Result<u64> {
         self.samples_read = 0;
-        self.file.seek(SeekFrom::Start(44))
+        self.reader.seek(SeekFrom::Start(44))
     }
 }
 
-impl AudioDevice for WavReader {
+impl<R: Read> AudioDevice for WavReader<R> {
     fn num_inputs(&self) -> usize {
         0
     }
@@ -62,8 +71,8 @@ impl AudioDevice for WavReader {
     fn tick(&mut self, _: Time, _: &[Sample], outputs: &mut[Sample]) {
         for i in 0..self.num_channels {
             let s = if self.samples_read < self.num_samples {
-                let n = self.file.read_i16::<LittleEndian>()
-                    .expect("Failed to read next sample from wav file.");
+                let n = self.reader.read_i16::<LittleEndian>()
+                    .expect("Failed to read next sample from wav.");
                 (n as Sample) / 32768.0
             } else {
                 0.0
@@ -79,45 +88,56 @@ impl AudioDevice for WavReader {
 ///
 /// The writer initializes the data_size to be 0. This will not be overwritten
 /// with the proper size until `update_data_size` is called.
-pub struct WavWriter {
+///
+/// While `WavReader` only requires its type be `Seek` to use the `restart`
+/// method, the `WavWriter` reqiures `Seek` for all types, because the final
+/// data size must be written to the header when the writer leaves scope.
+pub struct WavWriter<W: Write+Seek> {
     num_channels: usize,
-    file: File,
     samples_written: usize,
+    writer: W,
 }
 
-impl WavWriter {
-    /// Returns a `WavWriting` writing to the provided file
+impl WavWriter<File> {
+    /// Returns a `WavWriter` writing to the provided file.
     pub fn create(filename: &str, num_channels: usize)
             -> Result<Self> {
-        let mut file = try!(File::create(filename));
+        let file = try!(File::create(filename));
+        WavWriter::new(file, num_channels)
+    }
+}
+
+impl<W: Write+Seek> WavWriter<W> {
+    /// Returns a `WavWriter` writing to anything implementing `Write`.
+    pub fn new(mut writer: W, num_channels: usize) -> Result<Self> {
         let header = WavHeader::new(num_channels as u16, SAMPLE_RATE as u32,
                                     0u32);
-        try!(header.write_to_file(&mut file));
+        try!(header.write_to_file(&mut writer));
         Ok(WavWriter {
             num_channels: num_channels,
-            file: file,
-            samples_written: 0
+            samples_written: 0,
+            writer: writer,
         })
     }
 }
 
-impl Drop for WavWriter {
+impl<W: Write+Seek> Drop for WavWriter<W> {
     fn drop(&mut self) {
         // Updates the wav header to have the correct amount of data written
         let data_size = self.samples_written * self.num_channels * 16/8;
         let file_size = 36+data_size;
-        self.file.seek(SeekFrom::Start(4))
+        self.writer.seek(SeekFrom::Start(4))
             .expect("Failed to seek wav file size.");
-        self.file.write_u32::<LittleEndian>(file_size as u32)
+        self.writer.write_u32::<LittleEndian>(file_size as u32)
             .expect("Failed to write wav file size.");
-        self.file.seek(SeekFrom::Start(40))
+        self.writer.seek(SeekFrom::Start(40))
             .expect("Failed to seek wav data size.");
-        self.file.write_u32::<LittleEndian>(data_size as u32)
+        self.writer.write_u32::<LittleEndian>(data_size as u32)
             .expect("Failed to write wav data size.");
     }
 }
 
-impl AudioDevice for WavWriter {
+impl<W: Write+Seek> AudioDevice for WavWriter<W> {
     fn num_inputs(&self) -> usize {
         self.num_channels
     }
@@ -131,7 +151,7 @@ impl AudioDevice for WavWriter {
             let mut clipped = *s;
             if clipped > 0.999f32 { clipped = 0.999f32; }
             if clipped < -0.999f32 { clipped = -0.999f32; }
-            self.file.write_i16::<LittleEndian>((clipped*32768.0) as i16)
+            self.writer.write_i16::<LittleEndian>((clipped*32768.0) as i16)
                 .expect("Failed to write next sample to wav file.");
         }
         self.samples_written += 1;
@@ -185,7 +205,7 @@ impl WavHeader {
     }
 
     /// Attempts to read a wav header from the provided file
-    fn read_from_file(f: &mut File) -> Result<Self> {
+    fn read_from_file<R: Read>(f: &mut R) -> Result<Self> {
         let riff_hdr = try!(f.read_u32::<LittleEndian>());
         let file_size = try!(f.read_u32::<LittleEndian>());
         let wave_lbl = try!(f.read_u32::<LittleEndian>());
@@ -258,19 +278,19 @@ impl WavHeader {
     }
 
     /// Attempts to write this wav header to the provided file
-    fn write_to_file(&self, f: &mut File) -> byteorder::Result<()> {
-        f.write_u32::<LittleEndian>(self.riff_hdr)
-            .and_then(|()| f.write_u32::<LittleEndian>(self.file_size))
-            .and_then(|()| f.write_u32::<LittleEndian>(self.wave_lbl))
-            .and_then(|()| f.write_u32::<LittleEndian>(self.fmt_hdr))
-            .and_then(|()| f.write_u32::<LittleEndian>(self.section_size))
-            .and_then(|()| f.write_u16::<LittleEndian>(self.format))
-            .and_then(|()| f.write_u16::<LittleEndian>(self.num_channels))
-            .and_then(|()| f.write_u32::<LittleEndian>(self.sample_rate))
-            .and_then(|()| f.write_u32::<LittleEndian>(self.byte_rate))
-            .and_then(|()| f.write_u16::<LittleEndian>(self.block_align))
-            .and_then(|()| f.write_u16::<LittleEndian>(self.bit_depth))
-            .and_then(|()| f.write_u32::<LittleEndian>(self.data_hdr))
-            .and_then(|()| f.write_u32::<LittleEndian>(self.data_size))
+    fn write_to_file<W: Write>(&self, w: &mut W) -> byteorder::Result<()> {
+        w.write_u32::<LittleEndian>(self.riff_hdr)
+            .and_then(|()| w.write_u32::<LittleEndian>(self.file_size))
+            .and_then(|()| w.write_u32::<LittleEndian>(self.wave_lbl))
+            .and_then(|()| w.write_u32::<LittleEndian>(self.fmt_hdr))
+            .and_then(|()| w.write_u32::<LittleEndian>(self.section_size))
+            .and_then(|()| w.write_u16::<LittleEndian>(self.format))
+            .and_then(|()| w.write_u16::<LittleEndian>(self.num_channels))
+            .and_then(|()| w.write_u32::<LittleEndian>(self.sample_rate))
+            .and_then(|()| w.write_u32::<LittleEndian>(self.byte_rate))
+            .and_then(|()| w.write_u16::<LittleEndian>(self.block_align))
+            .and_then(|()| w.write_u16::<LittleEndian>(self.bit_depth))
+            .and_then(|()| w.write_u32::<LittleEndian>(self.data_hdr))
+            .and_then(|()| w.write_u32::<LittleEndian>(self.data_size))
     }
 }
