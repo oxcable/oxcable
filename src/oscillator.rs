@@ -182,46 +182,20 @@ impl AudioDevice for Oscillator {
         }
 
         // Compute the next sample
-        let s: Sample = match self.waveform.clone() {
+        self.last_sample = match self.waveform {
             Sine => self.phase.sin(),
-            Saw(aa) => {
-                let mut out = self.phase/PI -1.0;
-                match aa {
-                    PolyBlep => {
-                        out -= poly_belp_offset(self.phase/(2.0*PI),
-                                                phase_delta/(2.0*PI));
-                    },
-                    _ => ()
-                }
-                out
+            Saw(_) => {
+                self.phase/PI -1.0 +
+                    poly_blep(self.waveform, self.phase, phase_delta)
             },
-            Square(aa) => {
-                let mut out = if self.phase < PI { 1.0 } else { -1.0 };
-                match aa {
-                    PolyBlep => {
-                        // two discontinuities, at rising and falling edges
-                        out += poly_belp_offset(self.phase/(2.0*PI),
-                                                phase_delta/(2.0*PI));
-                        out -= poly_belp_offset(self.phase/(2.0*PI)+0.5 % 1.0,
-                                                phase_delta/(2.0*PI));
-                    },
-                    _ => ()
-                }
-                out
+            Square(_) => {
+                (if self.phase < PI { 1.0 } else { -1.0 }) +
+                    poly_blep(self.waveform, self.phase, phase_delta)
             },
-            Tri(aa) => {
+            Tri(_) => {
                 // Compute a square wave signal
-                let mut out = if self.phase < PI { 1.0 } else { -1.0 };
-                match aa {
-                    PolyBlep => {
-                        // two discontinuities, at rising and falling edges
-                        out += poly_belp_offset(self.phase/(2.0*PI),
-                                                phase_delta/(2.0*PI));
-                        out -= poly_belp_offset(self.phase/(2.0*PI)+0.5 % 1.0,
-                                                phase_delta/(2.0*PI));
-                    },
-                    _ => ()
-                }
+                let out = (if self.phase < PI { 1.0 } else { -1.0 }) +
+                    poly_blep(self.waveform, self.phase, phase_delta);
 
                 // Perform leaky integration
                 phase_delta*out + (1.0-phase_delta)*self.last_sample
@@ -229,26 +203,39 @@ impl AudioDevice for Oscillator {
             WhiteNoise => 2.0*random::<f32>() - 1.0,
             PulseTrain => {
                 // If we wrapped around...
-                if self.phase < self.phase_delta {
-                    1.0
-                } else {
-                    0.0
-                }
+                if self.phase < self.phase_delta { 1.0 } else { 0.0 }
             }
         };
-
-        // Push the sample out
-        self.last_sample = s;
-        outputs[0] = s;
+        outputs[0] = self.last_sample;
     }
 }
 
 
-/// Computes an offset for PolyBLEP antialiasing
+/// Computes the PolyBLEP step for a given waveform type. This should be added
+/// to the naive waveform.
 ///
-/// `t` should be the current waveform phase, normalized
-/// `dt` should be the change in phase for one sample time, normalized
-fn poly_belp_offset(t: f32, dt: f32) -> f32 {
+/// `waveform` should be the waveform we are antialiasing.
+/// `phase` should be the current phase, from 0 to 2pi.
+/// `phase_delta` should be the change in phase for one tick.
+fn poly_blep(waveform: Waveform, phase: f32, phase_delta: f32) -> Sample {
+    match waveform {
+        Saw(PolyBlep) => {
+            -1.0*poly_blep_offset(phase/(2.0*PI), phase_delta/(2.0*PI))
+        },
+        Square(PolyBlep) | Tri(PolyBlep) => {
+            let t = phase/(2.0*PI);
+            let dt = phase_delta/(2.0*PI);
+            poly_blep_offset(t, dt) - poly_blep_offset((t+0.5) % 1.0, dt)
+        },
+        _ => 0.0
+    }
+}
+
+/// Computes a single offset for PolyBLEP antialiasing.
+///
+/// `t` should be the current waveform phase, normalized.
+/// `dt` should be the change in phase for one sample time, normalized.
+fn poly_blep_offset(t: f32, dt: f32) -> f32 {
     if t < dt { // t ~= 0
         let t = t / dt;
         -t*t + 2.0*t - 1.0
