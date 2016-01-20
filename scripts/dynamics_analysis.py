@@ -15,6 +15,7 @@ def load_audio_data():
     filenames = []
     for dynamic in dynamics:
         filenames.append("wav/test_{}.wav".format(dynamic))
+    filenames.append("wav/volume_up.wav");
 
     xs = []
     for filename in filenames:
