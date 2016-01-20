@@ -150,8 +150,8 @@ impl<W: Write+Seek> AudioDevice for WavWriter<W> {
     fn tick(&mut self, _: Time, inputs: &[Sample], _: &mut[Sample]) {
         for s in inputs.iter() {
             let mut clipped = *s;
-            if clipped > 0.999f32 { clipped = 0.999f32; }
-            if clipped < -0.999f32 { clipped = -0.999f32; }
+            if clipped > 0.9999695 { clipped = 0.9999695; }
+            if clipped < -1.0 { clipped = 1.0; }
             self.writer.write_i16::<LittleEndian>((clipped*32768.0) as i16)
                 .expect("Failed to write next sample to wav file.");
         }
@@ -293,5 +293,64 @@ impl WavHeader {
             .and_then(|()| w.write_u16::<LittleEndian>(self.bit_depth))
             .and_then(|()| w.write_u32::<LittleEndian>(self.data_hdr))
             .and_then(|()| w.write_u32::<LittleEndian>(self.data_size))
+    }
+}
+
+
+#[cfg(test)]
+mod test {
+    use std::io::Cursor;
+
+    use types::AudioDevice;
+    use super::{WavHeader, WavReader, WavWriter};
+
+    static WAV_HEADER: [u8; 48] =
+        [0x52, 0x49, 0x46, 0x46, 0x28, 0x00, 0x00, 0x00, 0x57, 0x41,
+         0x56, 0x45, 0x66, 0x6D, 0x74, 0x20, 0x10, 0x00, 0x00, 0x00,
+         0x01, 0x00, 0x02, 0x00, 0x44, 0xAC, 0x00, 0x00, 0x10, 0xB1,
+         0x02, 0x00, 0x04, 0x00, 0x10, 0x00, 0x64, 0x61, 0x74, 0x61,
+         0x04, 0x00, 0x00, 0x00, 0x00, 0x80, 0xFF, 0x7F];
+
+    #[test]
+    fn test_read_wav_header() {
+        let mut cursor = Cursor::new(&WAV_HEADER[..]);
+        let header = WavHeader::read_from_file(&mut cursor).unwrap();
+        assert_eq!(header.bit_depth, 16);
+        assert_eq!(header.data_size, 4);
+        assert_eq!(header.num_channels, 2);
+    }
+
+    #[test]
+    fn test_wav_reader() {
+        let cursor = Cursor::new(&WAV_HEADER[..]);
+        let mut reader = WavReader::new(cursor).unwrap();
+        assert_eq!(reader.num_inputs(), 0);
+        assert_eq!(reader.num_outputs(), 2);
+        assert_eq!(reader.get_num_samples(), 1);
+        assert_eq!(reader.is_done(), false);
+
+        let mut output = [0.0, 0.0];
+        reader.tick(0, &[], &mut output);
+        assert_eq!(reader.is_done(), true);
+        assert_eq!(output, [-1.0, 0.9999695]);
+
+        reader.tick(1, &[], &mut output);
+        assert_eq!(reader.is_done(), true);
+        assert_eq!(output, [0.0, 0.0]);
+    }
+
+    #[test]
+    fn test_wav_writer() {
+        let mut buffer = [0u8; 48];
+        {
+            // Scope the cursor so its borrow on the buffer ends.
+            // Scope the writer so it gets dropped and the file size written.
+            let cursor = Cursor::new(&mut buffer[..]);
+            let mut writer = WavWriter::new(cursor, 2).unwrap();
+            assert_eq!(writer.num_inputs(), 2);
+            assert_eq!(writer.num_outputs(), 0);
+            writer.tick(0, &[-1.0, 0.9999695], &mut[]);
+        }
+        assert_eq!(&buffer[..], &WAV_HEADER[..]);
     }
 }
