@@ -22,7 +22,6 @@ pub fn midi_note_to_freq(note: u8) -> f32 {
 mod tests {
     use testing::{flt_eq, flt_eq_eps};
 
-    /// Tests some basic decibel values.
     #[test]
     fn test_decibel_to_ratio() {
         use super::decibel_to_ratio;
@@ -33,7 +32,6 @@ mod tests {
         assert!(flt_eq(decibel_to_ratio(10.0), 10.0));
     }
 
-    /// Tests some basic ratio values.
     #[test]
     fn test_ratio_to_decibel() {
         use super::ratio_to_decibel;
@@ -44,7 +42,6 @@ mod tests {
         assert!(flt_eq(ratio_to_decibel(10.0), 10.0));
     }
 
-    /// Tests some MIDI notes
     #[test]
     fn test_midi_note_to_freq() {
         use super::midi_note_to_freq;

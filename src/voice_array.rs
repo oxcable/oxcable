@@ -133,7 +133,7 @@ impl<T> VoiceArray<T> {
 
 #[cfg(test)]
 mod test {
-    /// Verify that asking for a new note selects free voices first
+    /// Verify that asking for a new note selects free voices first.
     #[test]
     fn test_free_voice() {
         use super::VoiceArray;
@@ -152,7 +152,7 @@ mod test {
         assert_eq!(v2, v3);
     }
 
-    /// Verify that asking for a held note always returns that held note
+    /// Verify that asking for a held note always returns that held note.
     #[test]
     fn test_key_repeat() {
         use super::VoiceArray;
@@ -170,7 +170,7 @@ mod test {
         assert_eq!(v2, v6);
     }
 
-    /// Verify that the oldest free voice is always selected
+    /// Verify that the oldest free voice is always selected.
     #[test]
     fn test_oldest_free() {
         use super::VoiceArray;
@@ -188,7 +188,7 @@ mod test {
         assert_eq!(v4, v2);
     }
 
-    /// Verify that note pruning always selects the oldest held voice
+    /// Verify that note pruning always selects the oldest held voice.
     #[test]
     fn test_oldest_held() {
         use super::VoiceArray;

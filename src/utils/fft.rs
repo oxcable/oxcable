@@ -185,7 +185,6 @@ fn int_log(n: u32) -> u32 {
 }
 
 
-// Unit tests...
 #[cfg(test)]
 mod test {
     use num::complex::Complex32;
@@ -194,7 +193,6 @@ mod test {
     use testing::flt_eq;
     use super::{Transformer, int_log, bit_reverse};
 
-    /// Tests int_log with many values
     #[test]
     fn test_int_log() {
         assert_eq!(int_log(1), 0);
@@ -207,7 +205,6 @@ mod test {
         assert_eq!(int_log(32), 5);
     }
 
-    /// Tests bit_reverse.
     #[test]
     fn test_bit_reverse() {
         assert_eq!(bit_reverse(0x00000000, 32), 0x00000000);
@@ -261,9 +258,9 @@ mod test {
         }
     }
 
-    /// Tests that the identify property, i.e. IFFT(FTT(f)) == f
+    /// Tests that FFT and IFFT are inverses, i.e. IFFT(FTT(f)) == f.
     #[test]
-    fn test_fft_identity() {
+    fn test_fft_inverse() {
         let mut input = Vec::with_capacity(8);
         let mut fft = Vec::with_capacity(8);
         let mut out = Vec::with_capacity(8);

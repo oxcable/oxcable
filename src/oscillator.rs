@@ -261,12 +261,10 @@ fn poly_belp_offset(t: f32, dt: f32) -> f32 {
 }
 
 
-// A couple of basic unit tests...
 #[cfg(test)]
 mod test {
     use testing::flt_eq;
 
-    /// Tests square wave
     #[test]
     fn test_naive_square() {
         use super::{AntialiasType, Waveform, Oscillator};
@@ -287,7 +285,6 @@ mod test {
         osc.tick(8, &input, &mut output); assert!(output[0] == -1.0);
     }
 
-    /// Tests saw wave
     #[test]
     fn test_naive_saw() {
         use super::{AntialiasType, Waveform, Oscillator};
