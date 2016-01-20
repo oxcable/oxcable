@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import matplotlib.pyplot as plot
 import numpy as np
 import scipy.io.wavfile as wav
@@ -12,7 +14,7 @@ dynamics = ["compressor", "limiter", "noise_gate"]
 def load_audio_data():
     filenames = []
     for dynamic in dynamics:
-        filenames.append("../wav/test_{}.wav".format(dynamic))
+        filenames.append("wav/test_{}.wav".format(dynamic))
 
     xs = []
     for filename in filenames:

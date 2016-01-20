@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import matplotlib.pyplot as plot
 import numpy as np
 import scipy.io.wavfile as wav
@@ -11,7 +13,7 @@ filters = ["first_order_low_pass",  "first_order_high_pass",
 
 
 def load_audio_data(filter_type):
-    filename = "../wav/test_{}.wav".format(filter_type)
+    filename = "wav/test_{}.wav".format(filter_type)
     _, x = wav.read(filename)
     return (filename, x.astype(float) / 32767.0)
 

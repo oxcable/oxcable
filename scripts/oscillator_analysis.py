@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import matplotlib.pyplot as plot
 import numpy as np
 import scipy.io.wavfile as wav
@@ -10,10 +12,10 @@ waveforms = basic_waveforms + blep_waveforms
 
 def load_audio_data(waveform):
     if waveform in blep_waveforms:
-        filenames = ["../wav/test_{}_naive.wav".format(waveform),
-                     "../wav/test_{}_blep.wav".format(waveform)]
+        filenames = ["wav/test_{}_naive.wav".format(waveform),
+                     "wav/test_{}_blep.wav".format(waveform)]
     else:
-        filenames = ["../wav/test_{}.wav".format(waveform)]
+        filenames = ["wav/test_{}.wav".format(waveform)]
 
     xs = []
     for filename in filenames:
