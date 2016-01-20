@@ -3,6 +3,7 @@
 use byteorder::{self, ReadBytesExt, WriteBytesExt, LittleEndian};
 use std::fs::File;
 use std::io::{self, Read, Seek, SeekFrom, Write};
+use std::path::Path;
 
 use error::{Error, Result};
 use types::{SAMPLE_RATE, AudioDevice, Time, Sample};
@@ -21,7 +22,7 @@ pub struct WavReader<R: Read> {
 
 impl WavReader<File> {
     /// Returns a `WavReader` reading the provided file.
-    pub fn open(filename: &str) -> Result<Self> {
+    pub fn open<P: AsRef<Path>>(filename: P) -> Result<Self> {
         let file = try!(File::open(filename));
         WavReader::new(file)
     }
@@ -100,7 +101,7 @@ pub struct WavWriter<W: Write+Seek> {
 
 impl WavWriter<File> {
     /// Returns a `WavWriter` writing to the provided file.
-    pub fn create(filename: &str, num_channels: usize)
+    pub fn create<P: AsRef<Path>>(filename: P, num_channels: usize)
             -> Result<Self> {
         let file = try!(File::create(filename));
         WavWriter::new(file, num_channels)
