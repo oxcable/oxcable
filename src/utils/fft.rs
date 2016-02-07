@@ -114,31 +114,22 @@ impl Transformer {
         // conjugating if we are inverse transforming
         for i in 0..input.len() {
             output[self.bit_reverses[i]] =
-                if inverse {
-                    input[i].conj()
-                } else {
-                    input[i]
-                }
+                if inverse { input[i].conj() } else { input[i] }
         }
-        for i in self.bit_reverses[input.len() .. self.size].iter() {
-            output[*i] = Complex32::zero();
+        for &i in self.bit_reverses[input.len() .. self.size].iter() {
+            output[i] = Complex32::zero();
         }
 
-        // Iteratively perform FFT, starting at 2 points
+        // Iteratively perform FFTs of increasing size, starting at n=2.
+        // Each step combines two n/2-sized FFTs into one n-sized FFT.
         let mut n = 2;
         while n <= self.size {
-            // For each of the small FFTs
             for set in 0..self.size/n {
-                // For each pair of n
                 for i in 0..n/2 {
                     let ilo = n*set + i;
                     let ihi = ilo + n/2;
-
-                    // Grab out the lower and upper n
                     let lower = output[ilo];
                     let upper = output[ihi] * self.twiddles[self.size/n * i];
-
-                    // Assign them back using a butterfly
                     output[ilo] = lower + upper;
                     output[ihi] = lower - upper;
                 }
@@ -150,8 +141,9 @@ impl Transformer {
 
         // If we are inverse transforming, conjugate and normalize the output
         if inverse {
+            let scale = 1.0 / (self.size as f32);
             for i in 0..self.size {
-                output[i] = output[i].conj().scale(1.0/(self.size as f32));
+                output[i] = output[i].conj().scale(scale);
             }
         }
     }
