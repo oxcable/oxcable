@@ -5,7 +5,7 @@ import numpy as np
 import scipy.io.wavfile as wav
 import sys
 
-from fit_envelope import fitEnvelope
+from fit_envelope import fit_envelope
 
 
 dynamics = ["compressor", "limiter", "noise_gate"]
@@ -27,7 +27,7 @@ def load_audio_data():
 def plot_signals(title, names, xs):
     fs = range
     for (name,x) in zip(names, xs):
-        plot.plot(fitEnvelope(x), label=name)
+        plot.plot(fit_envelope(x), label=name)
     plot.legend(loc="upper left")
     plot.title(title)
     plot.show()
