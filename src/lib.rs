@@ -125,6 +125,7 @@ pub mod error;
 pub mod filters;
 pub mod graph;
 pub mod io;
+pub mod level_detector;
 pub mod mixers;
 pub mod oscillator;
 pub mod tick;
