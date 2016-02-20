@@ -3,46 +3,41 @@
 //! The test operates on two levels:
 //!
 //! 1. All MIDI events are printed to the console.
-//! 2. NoteOn/NoteOff events are used to trigger an ADSR.
-//!
-//! The ADSR gates an oscillator, so that triggering notes can also be heard
-//! through the default audio out, and usage of note events can be tested.
+//! 2. NoteOn/NoteOff events are used to gate the signal.
 
 extern crate oxcable;
 
 
 #[cfg(not(test))]
-mod wrapper {
-    use oxcable::adsr;
+mod gate {
     use oxcable::io::midi::MidiIn;
-    use oxcable::types::{AudioDevice, MessageReceiver, MidiDevice, MidiMessage,
-            Time, Sample};
+    use oxcable::types::{AudioDevice, MidiDevice, MidiMessage, Time, Sample};
 
-    pub struct WrappedAdsr {
+    pub struct Gate {
         pub midi: MidiIn,
-        pub adsr: adsr::Adsr
+        pub enabled: bool,
     }
-    impl AudioDevice for WrappedAdsr {
-        fn num_inputs(&self) -> usize {
-            self.adsr.num_inputs()
+    impl Gate {
+        pub fn new(midi: MidiIn) -> Self {
+            Gate {
+                midi: midi,
+                enabled: false
+            }
         }
-
-        fn num_outputs(&self) -> usize {
-            self.adsr.num_outputs()
-        }
-
+    }
+    impl AudioDevice for Gate {
+        fn num_inputs(&self) -> usize { 1 }
+        fn num_outputs(&self) -> usize { 1 }
         fn tick(&mut self, t: Time, inputs: &[Sample], outputs: &mut[Sample]) {
             for event in self.midi.get_events(t) {
                 println!("{:?}", event);
                 match event.payload {
-                    MidiMessage::NoteOn(_,_) =>
-                        self.adsr.handle_message(adsr::NoteDown),
-                    MidiMessage::NoteOff(_,_) =>
-                        self.adsr.handle_message(adsr::NoteUp),
+                    MidiMessage::NoteOn(_,_) => self.enabled = true,
+                    MidiMessage::NoteOff(_,_) => self.enabled = false,
                     _ => ()
                 }
             }
-            self.adsr.tick(t, inputs, outputs);
+            outputs[0] = if self.enabled { inputs[0] } else { 0.0 };
         }
     }
 }
@@ -50,7 +45,6 @@ mod wrapper {
 
 #[cfg(not(test))]
 fn main() {
-    use oxcable::adsr::Adsr;
     use oxcable::chain::{DeviceChain, Tick};
     use oxcable::io::audio::AudioEngine;
     use oxcable::io::midi::MidiEngine;
@@ -63,10 +57,7 @@ fn main() {
     let mut chain = DeviceChain::from(
         Oscillator::new(oscillator::Saw(oscillator::PolyBlep)).freq(220.0)
     ).into(
-        wrapper::WrappedAdsr {
-            midi: midi_engine.choose_input().unwrap(),
-            adsr: Adsr::default(1)
-        }
+        gate::Gate::new(midi_engine.choose_input().unwrap())
     ).into(
         audio_engine.default_output(1).unwrap()
     );
