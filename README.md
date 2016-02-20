@@ -9,31 +9,29 @@ oxcable
 
 A signal processing framework for making music with Rust.
 
-Projects using oxcable
-----------------------
+This framework aims to provide the basic tools for music processing. It defines
+many useful types, utilities, signal processing elements for building music
+processing pipelines.
 
-* [oxcable-subtractive-synth](https://github.com/oxcable/oxcable-subtractive-synth),
-  a MIDI subtractive synthesizer.
-
-If you have a project using `oxcable`, I'd love to hear about it. Send me
-a message and I can include it in this list.
+For a basic set of predefined filters, see
+[oxcable-basic-devices](https://github.com/oxcable/basic-devices).
 
 Examples
 --------
 
 The following example will play back your computer's microphone input to the
-speakers, with an echo effect:
+speakers, with an low-pass effect:
 
 ```rust
-use oxcable::delay::Delay;
 use oxcable::chain::{DeviceChain, Tick};
+use oxcable::filters::first_order::{Filter, LowPass};
 use oxcable::io::audio::AudioEngine;
 
 let engine = AudioEngine::with_buffer_size(256).unwrap();
 let mut chain = DeviceChain::from(
     engine.default_input(1).unwrap()
 ).into(
-    Delay::new(1.0, 0.5, 0.5, 1)
+    Filter::new(LowPass(8000f32), 1)
 ).into(
     engine.default_output(1).unwrap()
 );
@@ -42,6 +40,15 @@ chain.tick_forever();
 
 For more simple examples, the [`src/bin`](src/bin) directory contains many
 sample test scripts.
+
+Projects using oxcable
+----------------------
+
+* [oxcable-subtractive-synth](https://github.com/oxcable/oxcable-subtractive-synth),
+  a MIDI subtractive synthesizer.
+
+If you have a project using `oxcable`, I'd love to hear about it. Send me
+a message and I can include it in this list.
 
 Installing
 ----------
