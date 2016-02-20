@@ -5,7 +5,7 @@ oxcable
 [![Crates.io](https://img.shields.io/crates/v/oxcable.svg)](https://crates.io/crates/oxcable)
 ![License](https://img.shields.io/crates/l/oxcable.svg)
 
-[Documentation](http://thenyeguy.github.io/oxcable/doc/oxcable/index.html)
+[Documentation](http://oxcable.github.io/oxcable/doc/oxcable/index.html)
 
 A signal processing framework for making music with Rust.
 
