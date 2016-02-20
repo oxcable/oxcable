@@ -7,19 +7,19 @@
 //!
 //!
 //! # Example
-//! The following will pass microphone input through a delay unit, then out to
-//! the speaker:
+//! The following will pass microphone input through a low pass filter, then out
+//! to the speaker:
 //!
 //! ```no_run
-//! use oxcable::delay::Delay;
 //! use oxcable::chain::{DeviceChain, Tick};
+//! use oxcable::filters::first_order::{Filter, LowPass};
 //! use oxcable::io::audio::AudioEngine;
 //!
 //! let engine = AudioEngine::with_buffer_size(256).unwrap();
 //! let mut chain = DeviceChain::from(
 //!     engine.default_input(1).unwrap()
 //! ).into(
-//!     Delay::new(1.0, 0.5, 0.5, 1)
+//!     Filter::new(LowPass(8000f32), 1)
 //! ).into(
 //!     engine.default_output(1).unwrap()
 //! );

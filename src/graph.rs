@@ -11,11 +11,11 @@
 //! # Example
 //! 
 //! The following example creates a graph with two different branches into
-//! a stereo output. It feeds an oscillator to the left channel, and
-//! a microphone with delay into the right channel.
+//! a stereo output. It feeds the micropgone to the left channel, and
+//! a low-passed oscillator into the right channel.
 //!
 //! ```no_run
-//! use oxcable::delay::Delay;
+//! use oxcable::filters::first_order::{Filter, LowPass};
 //! use oxcable::graph::{DeviceGraph, Tick};
 //! use oxcable::io::audio::AudioEngine;
 //! use oxcable::oscillator::*;
@@ -24,15 +24,15 @@
 //! let mut graph = DeviceGraph::new();
 //!
 //! // Add nodes to graph
-//! let oscillator = graph.add_node(Oscillator::new(Sine).freq(440.0));
 //! let microphone = graph.add_node(engine.default_input(1).unwrap());
-//! let delay = graph.add_node(Delay::new(0.5, 0.5, 0.5, 1));
+//! let oscillator = graph.add_node(Oscillator::new(Sine).freq(440.0));
+//! let filter = graph.add_node(Filter::new(LowPass(8000f32), 1));
 //! let speaker = graph.add_node(engine.default_output(2).unwrap());
 //!
 //! // Connect devices together
-//! graph.add_edge(oscillator, 0, speaker, 0);
-//! graph.add_edge(microphone, 0, delay, 0);
-//! graph.add_edge(delay, 0, speaker, 1);
+//! graph.add_edge(microphone, 0, speaker, 0);
+//! graph.add_edge(oscillator, 0, filter, 0);
+//! graph.add_edge(filter, 0, speaker, 1);
 //!
 //! // Play audio ad nauseam.
 //! graph.tick_forever();
