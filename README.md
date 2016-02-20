@@ -1,7 +1,7 @@
 oxcable
 =======
 
-[![Build Status](https://travis-ci.org/thenyeguy/oxcable.svg?branch=master)](https://travis-ci.org/thenyeguy/oxcable)
+[![Build Status](https://travis-ci.org/oxcable/oxcable.svg?branch=master)](https://travis-ci.org/oxcable/oxcable)
 [![Crates.io](https://img.shields.io/crates/v/oxcable.svg)](https://crates.io/crates/oxcable)
 ![License](https://img.shields.io/crates/l/oxcable.svg)
 
@@ -12,7 +12,7 @@ A signal processing framework for making music with Rust.
 Projects using oxcable
 ----------------------
 
-* [oxcable-subtractive-synth](https://github.com/thenyeguy/oxcable-subtractive-synth),
+* [oxcable-subtractive-synth](https://github.com/oxcable/oxcable-subtractive-synth),
   a MIDI subtractive synthesizer.
 
 If you have a project using `oxcable`, I'd love to hear about it. Send me
