@@ -7,6 +7,7 @@ use std::path::Path;
 
 use error::{Error, Result};
 use types::{SAMPLE_RATE, AudioDevice, Time, Sample};
+use utils::helpers::{i16_to_sample, sample_to_16};
 
 
 /// Reads audio from a wav file.
@@ -74,7 +75,7 @@ impl<R: Read> AudioDevice for WavReader<R> {
             let s = if self.samples_read < self.num_samples {
                 let n = self.reader.read_i16::<LittleEndian>()
                     .expect("Failed to read next sample from wav.");
-                (n as Sample) / 32768.0
+                i16_to_sample(n)
             } else {
                 0.0
             };
@@ -149,10 +150,7 @@ impl<W: Write+Seek> AudioDevice for WavWriter<W> {
 
     fn tick(&mut self, _: Time, inputs: &[Sample], _: &mut[Sample]) {
         for s in inputs.iter() {
-            let mut clipped = *s;
-            if clipped > 0.9999695 { clipped = 0.9999695; }
-            if clipped < -1.0 { clipped = 1.0; }
-            self.writer.write_i16::<LittleEndian>((clipped*32768.0) as i16)
+            self.writer.write_i16::<LittleEndian>(sample_to_16(*s))
                 .expect("Failed to write next sample to wav file.");
         }
         self.samples_written += 1;
